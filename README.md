@@ -3,9 +3,13 @@ RIT CSCI 421 - Database System Implementation
 
 Group 11
 Iacob, Alex, ai9388
+
 Maggiolo Cabrera, Carly, cm1748
+
 Nguyen, Hai-Yen, hnn2306
+
 Silva, Alexander-Joseph, aas3992
+
 
 Availibility
 https://www.when2meet.com/?18439865-GmVBc
