@@ -4,10 +4,10 @@ public class Database {
     
     private String name;
     private Map<String, Table> tables;
-    private Map<String, Attribute> catalog;
+    private Catalog catalog;
     private String path;
 
-    public Database(String name, Map<String, Table> tables, Map<String, Attribute> catalog, String path)
+    public Database(String name, Map<String, Table> tables, Catalog catalog, String path)
     {
         this.name = name;
         this.tables = tables;
@@ -46,14 +46,14 @@ public class Database {
     /**
      * @return Map<String, Attribute> return the catalog
      */
-    public Map<String, Attribute> getCatalog() {
+    public Catalog getCatalog() {
         return catalog;
     }
 
     /**
      * @param catalog the catalog to set
      */
-    public void setCatalog(Map<String, Attribute> catalog) {
+    public void setCatalog(Catalog catalog) {
         this.catalog = catalog;
     }
 

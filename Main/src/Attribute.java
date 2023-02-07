@@ -2,16 +2,15 @@
 /// Used in the catalog to store the name of the 
 ///
 
-public class Attribute 
+public class Attribute <Type>
 {
     
     private String name;
-    private String type;
+    private Type type;
 
-    public Attribute(String name, String type)
+    public Attribute(String name)
     {
         name = this.name;
-        type = this.type;
     }
 
     /**
@@ -31,14 +30,14 @@ public class Attribute
     /**
      * @return String return the type
      */
-    public String getType() {
+    public Type getType() {
         return type;
     }
 
     /**
      * @param type the type to set
      */
-    public void setType(String type) {
+    public void setType(Type type) {
         this.type = type;
     }
 
