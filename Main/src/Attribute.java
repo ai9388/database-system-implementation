@@ -14,18 +14,12 @@ public class Attribute
      */
     private int N;
 
-    public Attribute(String name, Type type)
+    public Attribute(String name, Type type, boolean primarykey, int N)
     {
         this.name = name;
         this.type = type;
-    }
-
-    public Attribute(String name, Type type, int N)
-    {
-        this.name = name;
-        this.type = type;
+        this.primarykey = primarykey;
         this.N = N;
-
     }
 
 
