@@ -67,24 +67,23 @@ public class Parser {
             }
             case SELECT -> {
                 String input = user_input.replaceFirst("select", "").strip();
-                int start_index = input.indexOf("*");
-                int end_index = input.indexOf("m");
-                String table_name = input.substring(end_index).replaceAll(";", "").strip();
+                int start_index = input.indexOf("from");
+                int end_index = input.indexOf("m", start_index);
+                String table_name = input.substring(end_index+1).replaceAll(";", "").strip();
                 select("*", table_name);
             }
             case INSERT -> {
                 String input = user_input.replaceFirst("insert into", "").strip();
                 String table_name = input.split(" ")[0];
-                ArrayList<String> table_values = new ArrayList<>();
+                ArrayList<Record> table_values = new ArrayList<>();
                 int start_index = input.indexOf("(");
                 input = input.substring(start_index-1);
-                String[] values = input.split(",");
-                for (String value: values) {
-                    String[] vals = value.replaceAll("[()]", "").strip().split(" ");
-                    Collections.addAll(table_values, vals);
-                    // call insert on the table
-                    insert(table_name, table_values);
+                String[] vals = input.split(",");
+                for (String value: vals) {
+                    String[] values = value.replaceAll("[();]", "").strip().split(" ");
+                    table_values.add(new Record(values));
                 }
+                insert(table_name, table_values);
             }
             case HELP -> System.out.println();
             case QUIT -> {
@@ -116,9 +115,9 @@ public class Parser {
         System.out.println("SUCCESS");
     }
 
-    private void insert(String tableName, ArrayList<String> vals) {
+    private void insert(String tableName, ArrayList<Record> vals) {
 
-        // Call storage manager insert pass in table name and list seperated vals
+        // Call storage manager insert pass in table name and record to insert
     }
 
     private void select(String attr, String tableName) {
