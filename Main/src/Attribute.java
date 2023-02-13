@@ -2,18 +2,24 @@
 /// Used in the catalog to store the name of the 
 ///
 
-public class Attribute <Type>
+public class Attribute
 {
     
     private String name;
     private Type type;
     private boolean primarykey;
+    /*
+     * lenght of the value
+     * only applicable for char/varchar
+     */
+    private int N;
 
-    public Attribute(String name, Type type, boolean primarykey)
+    public Attribute(String name, Type type, boolean primarykey, int N)
     {
         this.name = name;
         this.type = type;
         this.primarykey = primarykey;
+        this.N = N;
     }
 
     /**
@@ -30,10 +36,19 @@ public class Attribute <Type>
         this.name = name;
     }
 
+    public void setN(int N){
+        this.N = N;
+    }
+
+    public int getN() {
+        return N;
+    }
+
     /**
      * @return String return the type
      */
     public Type getType() {
+
         return type;
     }
 

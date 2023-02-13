@@ -1,46 +1,73 @@
 import java.util.*;
 
 public class Record {
-    
-    private Attribute attribute;
-    private Map<Attribute, String> data;
+    /*
+     * Arraylist of entries within record
+     */
+    private ArrayList<String> data;
 
-    public Record(Attribute attr, Map<Attribute, String> data)
+    public Record(String[] values)
     {
-        this.attribute = attr;
-        this.data = data;
-    }
-    
-    /**
-     * @return Attribute return the attribute
-     */
-    public Attribute getAttribute() {
-        return attribute;
-    }
-
-    /**
-     * @param attribute the attribute to set
-     */
-    public void setAttribute(Attribute attribute) {
-        this.attribute = attribute;
-    }
-
-    /**
-     * @return Map<Attribute, String> return the data
-     */
-    public Map<Attribute, String> getData() {
-        return data;
+        data = new ArrayList<String>(Arrays.asList(values));
     }
 
     /**
      * @param data the data to set
      */
-    public void setData(Map<Attribute, String> data) {
-        this.data = data;
+    public void setData(ArrayList<String> newData) {
+        this.data = newData;
     }
 
-    public void validateDataType() {
-        System.out.println("validating!");
+    /*
+     * compare the value types with the ones from the schema
+     */
+    public void validateDataTypeS(ArrayList<Attribute> attributes) throws Exception{
+        for (int i = 0; i < data.size(); i++) {
+            Attribute attribute = attributes.get(i);
+            String value = data.get(i);
+
+            switch(attribute.getType()){
+                case INTEGER:
+                    try {
+                        Integer.parseInt(value);
+                    } catch (Exception e) {
+                        // TODO: handle exception
+                        // throw custom exception with message
+                    }
+                case DOUBLE:
+                    try {
+                        Double.parseDouble(value);
+                    } catch (Exception e) {
+                        // TODO: handle exception
+                        // throw custom exception with message
+                    }
+                case BOOLEAN:
+                    try {
+                        Boolean.parseBoolean(value);
+                    } catch (Exception e) {
+                        // TODO: handle exception
+                        // throw custom exception with message
+                    }
+                case CHAR:
+                    try {
+                        if(value.length() > attribute.getN()){
+                            // throw custom exception
+                        }
+                    } catch (Exception e) {
+                        // TODO: handle exception
+                        // throw custom exception with message
+                    }
+                case VARCHAR:
+                    try {
+                        if(value.length() > attribute.getN()){
+                            // throw custom exception
+                        }
+                    } catch (Exception e) {
+                        // TODO: handle exception
+                        // throw custom exception with message
+                    }
+            }
+        }
     }
 
 }
