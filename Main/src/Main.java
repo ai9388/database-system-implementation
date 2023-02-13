@@ -12,31 +12,31 @@ public class Main
 
         // starting the user input
         Scanner userInput = new Scanner(System.in);
-        String str_input = userInput.nextLine();
+        String strInput = userInput.nextLine();
 
         // looping until <quit> is taken in
-        while (!str_input.equals("quit"))
+        while (!strInput.equals("quit"))
         {
             // oh no the user needs help, have to display it   
-            if (str_input.equals("help"))
+            if (strInput.equals("help"))
             {
                 displayHelp();
             }
             else
             {
             // first get the user input and separate it into a string array
-            String[] arguments = str_input.split(" ", 0);
-            System.out.println("the args in main:");
-            System.out.println(Arrays.toString(arguments));
+            String[] arguments = strInput.split(" ", 0);
             Parser parser = new Parser(arguments);
 
+            System.out.println(args.length);
+            parser.saveArgs(args);
             parser.parse();  
             }
             
             System.out.print(">");
-            str_input = userInput.nextLine();
+            strInput = userInput.nextLine();
         }
-
+        System.out.println("Shutting down 11QL...");
         userInput.close();
 
     }

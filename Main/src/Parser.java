@@ -3,26 +3,48 @@ import java.util.*;
 public class Parser 
 {
     private String[] args;
+    private String path;
+    private String pageSize;
+    private String bufferSize;
+
     public Parser(String[] args) 
     {
         this.args = args;
+    }
+
+    public void saveArgs(String[] args)
+    {
+        this.path = args[0];
+        this.pageSize = args[1];
+        this.bufferSize = args[2];
     }
     /**
      * Assume user passes in database
      */
     public void parse() 
-    {
-        System.out.println("the args in parse()");
-        System.out.println(Arrays.toString(args));
-
+    {   
         // check if we have to create a table
         if (this.args[0].equals("create"))
         {
-            // String[] createString = this.args.split("create");
-            // if (createString[0].startsWith("table")) 
-            // {
-            //     createTable(createString[0].split("\\("));
-            // }
+
+            ArrayList<String> tableInfo = new ArrayList<>();
+
+            // getting rid of 'create table'
+            for (int i = 2; i < this.args.length; i ++)
+            {
+                tableInfo.add(this.args[i]);
+            }
+
+            // getting the name of the table by splitting on '('
+            String tableName = tableInfo.get(0).split("[(]")[0];
+
+            // since we got the table name, everything else is the key params
+
+            //tableInfo.remove(0);
+            // System.out.println(tableInfo);
+            createTable(tableName, tableInfo);
+            
+            
         } 
         else if (this.args[0].equals("select")) 
         {
@@ -87,21 +109,27 @@ public class Parser
         // Call storage manager select and pass in attributes selected + table name
     }
 
-    private void createTable(String[] params) 
+    private void createTable(String tableName, ArrayList<String> params) 
     {
-        String tableName = params[0];
-        String[] args = params[1].split(",");
-        String attrName, attrType;
-        boolean primarykey = false;
 
-        for (String arg : args) 
-        {
-            attrName = arg;
-            attrType = arg;
-            if (arg.endsWith("primarykey")) {
-                primarykey = true;
-            }
-        }
+        int ps = Integer.parseInt(this.pageSize);
+        int bs = Integer.parseInt(this.bufferSize);
+        Catalog catalog = new Catalog(this.path, null, ps, bs);
+        catalog.writeToFile();
+
+        // String tableName = params[0];
+        // String[] args = params[1].split(",");
+        // String attrName, attrType;
+        // boolean primarykey = false;
+
+        // for (String arg : args) 
+        // {
+        //     attrName = arg;
+        //     attrType = arg;
+        //     if (arg.endsWith("primarykey")) {
+        //         primarykey = true;
+        //     }
+        // }
         // Call storage manager create Table with name, attrname, attrtype, and primary key if true
     }
 }
