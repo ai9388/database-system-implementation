@@ -49,12 +49,12 @@ public class Parser {
                     boolean primarykey = components.length > 2 ;
                     switch (components[0]) {
                         //check component after char to know length
-                        case "char": attributes.add(new Attribute<>(attr_name, "char", primarykey));
+                        case "char": attributes.add(new Attribute(components[2], Type.CHAR, components.length > 3, Integer.parseInt(components[1])));
                         //check component after char to know length
-                        case "varchar": attributes.add(new Attribute<>(attr_name, "varchar", primarykey));
-                        case "bool": attributes.add(new Attribute<>(attr_name, "bool", primarykey));
-                        case "integer": attributes.add(new Attribute<>(attr_name, "integer", primarykey));
-                        case "double": attributes.add(new Attribute<>(attr_name, "double", primarykey));
+                        case "varchar": attributes.add(new Attribute(components[2], Type.VARCHAR, components.length > 3, Integer.parseInt(components[1])));
+                        case "bool": attributes.add(new Attribute(attr_name, Type.BOOLEAN, primarykey, 0));
+                        case "integer": attributes.add(new Attribute(attr_name, Type.INTEGER, primarykey, 0));
+                        case "double": attributes.add(new Attribute(attr_name, Type.DOUBLE, primarykey, 0));
                     }
                 }
                 Table table = new Table(table_name, 1, attributes, new ArrayList<Record>());
@@ -86,9 +86,7 @@ public class Parser {
                     insert(table_name, table_values);
                 }
             }
-            case HELP -> {
-                System.out.println();
-            }
+            case HELP -> System.out.println();
             case QUIT -> {
                 System.out.println("Shutting down the database...");
                 System.out.println("Purging the page buffer...");
