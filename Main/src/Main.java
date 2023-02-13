@@ -1,38 +1,32 @@
 import java.util.*;
 
-public class Main 
-{
-    public static void main(String[] args) throws Exception 
-    {
-        // Basic nice-ities for starting up the DB
+public class Main {
+    public static void main(String[] args) throws Exception {
         System.out.println("Starting up 11QL...");
+        // Check for DB
+        // Create DB if it doesn't exist make it
+
+        // Basic nice-ities for starting up the DB
         System.out.println("Enter <quit> to quit");
         System.out.println("Enter <help> for help");
         System.out.print(">");
 
         // starting the user input
         Scanner userInput = new Scanner(System.in);
-        String str_input = userInput.nextLine();
+        String str_input = userInput.nextLine().toLowerCase();
+        System.out.println(str_input);
 
         // looping until <quit> is taken in
-        while (!str_input.equals("quit"))
-        {
+        while (!str_input.equals("<quit>")) {
             // oh no the user needs help, have to display it   
-            if (str_input.equals("help"))
-            {
+            if (str_input.equals("<help>")) {
                 displayHelp();
+            } else {
+                // keep asking user for input
+                Parser parser = new Parser(str_input);
+                parser.parse();
             }
-            else
-            {
-            // first get the user input and separate it into a string array
-            String[] arguments = str_input.split(" ", 0);
-            System.out.println("the args in main:");
-            System.out.println(Arrays.toString(arguments));
-            Parser parser = new Parser(arguments);
 
-            parser.parse();  
-            }
-            
             System.out.print(">");
             str_input = userInput.nextLine();
         }
@@ -41,9 +35,8 @@ public class Main
 
     }
 
-    public static void displayHelp()
-    {
-        System.out.println("To run 11QL, use");
+    public static void displayHelp() {
+        System.out.println("\n To run 11QL, use");
         System.out.println("java Main <db loc> <page size> <buffer size>");
         System.out.println("Available functions are:");
         System.out.println("\tdisplay schema");

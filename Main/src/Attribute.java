@@ -7,10 +7,13 @@ public class Attribute <Type>
     
     private String name;
     private Type type;
+    private boolean primarykey;
 
-    public Attribute(String name)
+    public Attribute(String name, Type type, boolean primarykey)
     {
-        name = this.name;
+        this.name = name;
+        this.type = type;
+        this.primarykey = primarykey;
     }
 
     /**
