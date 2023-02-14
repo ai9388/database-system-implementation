@@ -7,24 +7,26 @@ public class Attribute
     
     private String name;
     private Type type;
+    private boolean pk;
     /*
      * lenght of the value
      * only applicable for char/varchar
      */
     private int N;
 
-    public Attribute(String name, Type type)
+    public Attribute(String name, Type type, boolean pk)
     {
         this.name = name;
         this.type = type;
+        this.pk = pk;
     }
 
-    public Attribute(String name, Type type, int N)
+    public Attribute(String name, Type type, int N, boolean pk)
     {
         this.name = name;
         this.type = type;
         this.N = N;
-
+        this.pk = pk;
     }
 
     /**
