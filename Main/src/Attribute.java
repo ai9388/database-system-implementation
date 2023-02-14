@@ -7,27 +7,21 @@ public class Attribute
     
     private String name;
     private Type type;
-    private boolean pk;
+    private boolean isPrimaryKey;
     /*
      * lenght of the value
      * only applicable for char/varchar
      */
     private int N;
 
-    public Attribute(String name, Type type, boolean pk)
+    public Attribute(String name, Type type, boolean isPrimaryKey, int N)
     {
         this.name = name;
         this.type = type;
-        this.pk = pk;
+        this.isPrimaryKey = isPrimaryKey;
+        this.N = N;
     }
 
-    public Attribute(String name, Type type, int N, boolean pk)
-    {
-        this.name = name;
-        this.type = type;
-        this.N = N;
-        this.pk = pk;
-    }
 
     /**
      * @return String return the name
@@ -52,7 +46,7 @@ public class Attribute
     }
 
     /**
-     * @return String return the type
+     * @return Type return the type
      */
     public Type getType() {
 
@@ -64,6 +58,20 @@ public class Attribute
      */
     public void setType(Type type) {
         this.type = type;
+    }
+
+    /**
+     * @return boolean return the isPrimaryKey
+     */
+    public boolean isIsPrimaryKey() {
+        return isPrimaryKey;
+    }
+
+    /**
+     * @param isPrimaryKey the isPrimaryKey to set
+     */
+    public void setIsPrimaryKey(boolean isPrimaryKey) {
+        this.isPrimaryKey = isPrimaryKey;
     }
 
 }
