@@ -13,17 +13,18 @@ public class Main {
 
         // starting the user input
         Scanner userInput = new Scanner(System.in);
-        String str_input = userInput.nextLine().toLowerCase();
-        System.out.println(str_input);
+        String strInput = userInput.nextLine().toLowerCase();
+        System.out.println(strInput);
 
         // looping until <quit> is taken in
-        while (!str_input.equals("<quit>")) {
+        while (!strInput.equals("<quit>")) {
             // oh no the user needs help, have to display it   
-            if (str_input.equals("<help>")) {
+            if (strInput.equals("<help>")) {
                 displayHelp();
             } else {
                 // keep asking user for input
-                Parser parser = new Parser(str_input);
+                Parser parser = new Parser(strInput);
+                parser.saveArgs(args);
                 parser.parse();
             }
 
