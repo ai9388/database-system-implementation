@@ -7,7 +7,7 @@ public class Table{
     private ArrayList<Attribute> attributes;
     private ArrayList<Record> records;
     private Attribute primaryAttribute;
-    private HashMap<Attribute, Record> recordsByPK;
+    private HashMap<String, Record> recordsByPK;
 
     public Table(String name, int tid, ArrayList<Attribute> attr, ArrayList<Record> recs)
     {
@@ -78,27 +78,76 @@ public class Table{
         this.records = records;
     }
 
+    /*
+     * inserts a record into collection
+     * 
+     */
     public boolean insertRecord(String[] values)
     {
-        Record record = new Record(values);
-        this.records.add(record);
-
         try {
-            record.validateDataTypeS(attributes);
+            Record record = new Record(values, attributes);
+            records.add(record);
             return true;
-        } catch (Exception e) {
-            // if exception is raised, record was not created
+        } catch (InvalidDataTypeException e) {
+            // creation of record failed
+            System.out.println(e.getMessage());
             return false;
         }
+
     }
 
-    public boolean removeRecord(String pk, String pkValue)
+    public boolean removeRecordByPrimaryKey(String pkValue)
     {
-        return false;
+        try {
+            // if primary key is valid, remove from collection
+            if(Type.validateType(pkValue, primaryAttribute)){
+                recordsByPK.remove(pkValue);
+            }
+        } catch (InvalidDataTypeException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+        
+        return true;
     }
 
-    public boolean updateRecord(String pk, String pkValue)
+
+    public boolean updateRecord(String pkValue, String column, String newValue)
     {
+        // validate the primary key
+        try {
+            Record oldRecord = null;
+            // if primary key is valid, remove record from collection
+            if(Type.validateType(pkValue, primaryAttribute)){
+                oldRecord = recordsByPK.remove(pkValue);
+            }
+
+            // validate column name
+            if(isValidColumn(column)){
+                // TODO: update the value at column
+            }
+
+        } catch (InvalidDataTypeException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+
+        // TODO catch exception form isValidTableName
+        
+        return true;
+    }
+
+    /*
+     * checks if the provided column name exists in this table
+     * @param column the name of the column
+     */
+    public boolean isValidColumn(String column){
+        for (Attribute attribute : attributes) {
+            if(attribute.getName().equals(column)){
+                return true;
+            }
+        }
+        // TODO: raise a table exception of invalid column name
         return false;
     }
 
