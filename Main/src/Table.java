@@ -6,6 +6,8 @@ public class Table{
     private int tableID;
     private ArrayList<Attribute> attributes;
     private ArrayList<Record> records;
+    private Attribute primaryAttribute;
+    private HashMap<Attribute, Record> recordsByPK;
 
     public Table(String name, int tid, ArrayList<Attribute> attr, ArrayList<Record> recs)
     {
@@ -44,6 +46,10 @@ public class Table{
         this.tableID = tableID;
     }
 
+    public void setPrimaryAttribute(Attribute primaryAttribute) {
+        this.primaryAttribute = primaryAttribute;
+    }
+
     /**
      * @return ArrayList<Attribute> return the attributes
      */
@@ -72,9 +78,18 @@ public class Table{
         this.records = records;
     }
 
-    public boolean insertRecord(Record rec)
+    public boolean insertRecord(String[] values)
     {
-        return false;
+        Record record = new Record(values);
+        this.records.add(record);
+
+        try {
+            record.validateDataTypeS(attributes);
+            return true;
+        } catch (Exception e) {
+            // if exception is raised, record was not created
+            return false;
+        }
     }
 
     public boolean removeRecord(String pk, String pkValue)
