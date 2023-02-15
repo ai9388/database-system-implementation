@@ -1,9 +1,10 @@
 import java.util.*;
 
 public class Parser {
-     enum commands {
+    enum commands {
         CREATE_TABLE, DISPLAY_SCHEMA, DISPLAY_INFO, SELECT, INSERT, HELP, QUIT
-     }
+    }
+
     private final String user_input;
     private commands command;
 
@@ -36,29 +37,48 @@ public class Parser {
             case CREATE_TABLE -> {
                 String input = user_input.replaceFirst("create table", "").strip();
                 int start_index = input.indexOf("(");
-                int end_index = input.indexOf(")");
-                String table_name = user_input.substring(0, start_index);
-                String columns = user_input.substring(start_index, end_index);
+                int end_index = input.indexOf(");");
+                String table_name = input.substring(0, start_index);
+                String columns = input.substring(start_index + 1, end_index).strip();
                 String[] attr = columns.split(",");
                 ArrayList<Attribute> attributes = new ArrayList<>();
                 // Check if table exists
                 // If it doesn't create it with table
-                for (String attribute: attr) {
-                    String[] components = attribute.split(" ");
-                    String attr_name = components[1];
-                    boolean primarykey = components.length > 2 ;
-                    switch (components[0]) {
-                        //check component after char to know length
-                        case "char": attributes.add(new Attribute(components[2], Type.CHAR, components.length > 3, Integer.parseInt(components[1])));
-                        //check component after char to know length
-                        case "varchar": attributes.add(new Attribute(components[2], Type.VARCHAR, components.length > 3, Integer.parseInt(components[1])));
-                        case "bool": attributes.add(new Attribute(attr_name, Type.BOOLEAN, primarykey, 0));
-                        case "integer": attributes.add(new Attribute(attr_name, Type.INTEGER, primarykey, 0));
-                        case "double": attributes.add(new Attribute(attr_name, Type.DOUBLE, primarykey, 0));
+                boolean hasOnePK = false;
+                for (String attribute : attr) {
+                    String[] components = attribute.strip().replaceAll("\\(", " ").split(" ");
+                    String attr_name = components[0];
+                    boolean primarykey = components.length > 2;
+                    switch (components[1]) {
+                        case "char" -> {
+                            hasOnePK = components.length > 3 && !hasOnePK;
+                            attributes.add(new Attribute(attr_name, Type.CHAR, components.length > 3, Integer.parseInt(components[1])));
+                            //check component after char to know length
+                        }
+                        case "varchar" -> {
+                            hasOnePK = components.length > 3 && !hasOnePK;
+                            attributes.add(new Attribute(components[1], Type.VARCHAR, components.length > 3, Integer.parseInt(components[1])));
+                        }
+                        case "bool" -> {
+                            hasOnePK = primarykey && !hasOnePK;
+                            attributes.add(new Attribute(attr_name, Type.BOOLEAN, primarykey, 0));
+                        }
+                        case "integer" -> {
+                            hasOnePK = primarykey && !hasOnePK;
+                            attributes.add(new Attribute(attr_name, Type.INTEGER, primarykey, 0));
+                        }
+                        case "double" -> {
+                            hasOnePK = primarykey && !hasOnePK;
+                            attributes.add(new Attribute(attr_name, Type.DOUBLE, primarykey, 0));
+                        }
                     }
                 }
-                Table table = new Table(table_name, 1, attributes, new ArrayList<Record>());
-                // send to db through storage manager
+                if (!hasOnePK) {
+                    System.out.println("ERROR!");
+                } else {
+                    Table table = new Table(table_name, 1, attributes, new ArrayList<Record>());
+                    // send to db through storage manager
+                }
             }
             case DISPLAY_SCHEMA -> displaySchema();
             case DISPLAY_INFO -> {
@@ -69,7 +89,7 @@ public class Parser {
                 String input = user_input.replaceFirst("select", "").strip();
                 int start_index = input.indexOf("from");
                 int end_index = input.indexOf("m", start_index);
-                String table_name = input.substring(end_index+1).replaceAll(";", "").strip();
+                String table_name = input.substring(end_index + 1).replaceAll(";", "").strip();
                 select("*", table_name);
             }
             case INSERT -> {
@@ -77,9 +97,9 @@ public class Parser {
                 String table_name = input.split(" ")[0];
                 ArrayList<Record> table_values = new ArrayList<>();
                 int start_index = input.indexOf("(");
-                input = input.substring(start_index-1);
+                input = input.substring(start_index - 1);
                 String[] vals = input.split(",");
-                for (String value: vals) {
+                for (String value : vals) {
                     String[] values = value.replaceAll("[();]", "").strip().split(" ");
                     table_values.add(new Record(values));
                 }
