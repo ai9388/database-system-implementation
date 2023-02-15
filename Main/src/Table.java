@@ -46,6 +46,10 @@ public class Table{
         this.tableID = tableID;
     }
 
+    /**
+     * sets the primary attribute
+     * @param primaryAttribute Attribute object that represents primary col
+     */
     public void setPrimaryAttribute(Attribute primaryAttribute) {
         this.primaryAttribute = primaryAttribute;
     }
@@ -96,6 +100,15 @@ public class Table{
         }
     }
 
+    /**
+     * find a record based on primary 
+     * @param pkValue value of primary key
+     * @return the found record
+     */
+    public Record getRecordByPK(String pkValue){
+        // TODO: implement
+        return null;
+    }
     /**
      * finds record based on primary key from all table collections
      * @param pkValue value of primary key
@@ -151,7 +164,7 @@ public class Table{
     /**
      * checks if the provided column name exists in this table
      * @param column the name of the column
-    **/
+     */
     public boolean isValidColumn(String column){
         for (Attribute attribute : attributes) {
             if(attribute.getName().equals(column)){
