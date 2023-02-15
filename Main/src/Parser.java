@@ -1,12 +1,15 @@
 import java.util.*;
 
 public class Parser {
-    enum commands {
+     enum commands {
         CREATE_TABLE, DISPLAY_SCHEMA, DISPLAY_INFO, SELECT, INSERT, HELP, QUIT
     }
 
     private final String user_input;
     private commands command;
+    private String dbLocation;
+    private int pageSize;
+    private int bufferSize;
 
     public Parser(String str_input) {
         this.user_input = str_input.toLowerCase();
@@ -27,6 +30,16 @@ public class Parser {
         } else {
             System.out.println("Invalid Command.");
         }
+    }
+
+    /**
+     * Args need to be saved to pass into catalog
+     */
+    public void saveArgs(String[] args)
+    {
+        this.dbLocation = args[0];
+        this.pageSize = Integer.parseInt(args[1]);
+        this.bufferSize = Integer.parseInt(args[2]);
     }
 
     /**
@@ -73,11 +86,15 @@ public class Parser {
                         }
                     }
                 }
+
+                // send to db through storage manager
                 if (!hasOnePK) {
                     System.out.println("ERROR!");
                 } else {
                     Table table = new Table(table_name, 1, attributes, new ArrayList<Record>());
-                    // send to db through storage manager
+                    // testing byte array stuff
+                    Catalog c = new Catalog(this.dbLocation, attributes, this.pageSize, this.bufferSize);
+                    c.writeToFile();
                 }
             }
             case DISPLAY_SCHEMA -> displaySchema();

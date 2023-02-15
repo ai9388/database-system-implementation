@@ -7,7 +7,7 @@ public class Attribute
     
     private String name;
     private Type type;
-    private boolean primarykey;
+    private boolean primaryKey;
     /*
      * lenght of the value
      * only applicable for char/varchar
@@ -18,9 +18,10 @@ public class Attribute
     {
         this.name = name;
         this.type = type;
-        this.primarykey = primarykey;
+        this.primaryKey = primarykey;
         this.N = N;
     }
+
 
     /**
      * @return String return the name
@@ -45,7 +46,7 @@ public class Attribute
     }
 
     /**
-     * @return String return the type
+     * @return Type return the type
      */
     public Type getType() {
 
@@ -57,6 +58,20 @@ public class Attribute
      */
     public void setType(Type type) {
         this.type = type;
+    }
+
+    /**
+     * @return boolean return the isPrimaryKey
+     */
+    public boolean isIsPrimaryKey() {
+        return this.primaryKey;
+    }
+
+    /**
+     * @param isPrimaryKey the isPrimaryKey to set
+     */
+    public void setIsPrimaryKey(boolean primaryKey) {
+        this.primaryKey = primaryKey;
     }
 
 }
