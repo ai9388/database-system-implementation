@@ -194,9 +194,9 @@ public class Table{
                 // validate the type of new value
                 if(Type.validateType(newEntry, attributesByCol.get(column))){
                     // update the old record, copy and re-add
-                    oldRecord.updateByColumn(column, newEntry);
-                    Record newRecord = new Record(oldRecord.getEntries(), attributes);
-                    records.add(newRecord);
+                    // oldRecord.updateByColumn(column, newEntry);
+                    // Record newRecord = new Record(oldRecord.getEntries(), attributes);
+                    // records.add(newRecord);
                 }
             }
 
