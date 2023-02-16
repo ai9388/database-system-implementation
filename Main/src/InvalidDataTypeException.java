@@ -2,19 +2,29 @@ import java.util.ArrayList;
 
 public class InvalidDataTypeException extends Exception{
 
-    String message;
+    private String expected;
+    private String got;
+    private String message;
     /*
      * when a single value is incorrect
-     * ussually raised when updating
+     * usually raised when updating a single value and it needs validation
      */
-    public InvalidDataTypeException(String value, Type type){
+    public InvalidDataTypeException(String value, Attribute attribute){
         super();
-        this.message = "Expected " + type + " got " + Type.identifyType(value);
+        if(attribute.getType() == Type.CHAR || attribute.getType() == Type.VARCHAR){
+            this.expected = (attribute.getType().getName() + "(" + attribute.getN() + ")");
+            this.got = (Type.identifyType(value) + " (" + value.length() + ")");
+        }
+        else{
+            this.expected = attribute.getType().getName();
+            got += Type.identifyType(value);
+        }
     }
 
     @Override
     public String getMessage() {
-        // TODO Auto-generated method stub
+        this.message = "Invalid Data Type: Expected( " + expected + ") got( " 
+         + got + ")";
         return this.message;
     }
 
@@ -23,22 +33,23 @@ public class InvalidDataTypeException extends Exception{
      */
     public InvalidDataTypeException(ArrayList<String> values, ArrayList<Attribute> attributes){
         super();
-        String expected = "(";
-        String got = "(";
-        
+        expected = "";
+        got = "";
         for (int i = 0; i < values.size(); i++) {
-            expected += (attributes.get(i).getType().getName() + " ");
-            Type type = Type.identifyType(values.get(i));
-            if(type == Type.CHAR){
-                got += (Type.identifyType(values.get(i)) + " (" + values.get(i).length() + ")");
+            Attribute a = attributes.get(i);
+            String v = values.get(i);
+            if(a.getType() == Type.CHAR || a.getType() == Type.VARCHAR){
+                this.expected += (a.getType().getName() + "(" + a.getN() + ")");
+                this.got += (Type.identifyType(v) + "(" + v.length() + ")");
             }
             else{
-                got += (Type.identifyType(values.get(i)) + " ");
+                this.expected += a.getType().getName() ;
+                this.got += Type.identifyType(v);
             }
+
+            expected += " ";
+            got += " ";
         }
-        expected = expected.strip() + ")"; 
-        got = expected.strip() + ")"; 
-        this.message = "Expected " + expected + " got " + got;
     }
     
 }
