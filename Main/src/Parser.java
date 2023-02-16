@@ -45,7 +45,7 @@ public class Parser {
     /**
      * Assume user passes in database
      */
-    public void parse() {
+    public void parse() throws PrimaryKeyException {
         switch (command) {
             case CREATE_TABLE -> {
                 String input = user_input.replaceFirst("create table", "").strip();

@@ -13,9 +13,8 @@ public class Record {
 
     public Record(ArrayList<String> entries, ArrayList<Attribute> attributes) throws InvalidDataTypeException
     {
-        data = new ArrayList<String>(Arrays.asList(values));
-        validateDataTypeS(attributes);
-
+        this.entries = entries;
+        this.dataByColumn = new HashMap<>();
         // insert all values into map
         for (int i = 0; i < entries.size(); i++) {
             dataByColumn.put(attributes.get(i).getName(), entries.get(i));
@@ -32,10 +31,10 @@ public class Record {
 
     /**
      * sets the data collection
-     * @param entries the data to set
+     * @param newEntries the data to set
      */
-    public void setEntries(ArrayList<String> newData) {
-        this.entries = newData;
+    public void setEntries(ArrayList<String> newEntries) {
+        this.entries = newEntries;
     }
 
     /**
