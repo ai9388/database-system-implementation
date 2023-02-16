@@ -2,9 +2,9 @@ import java.util.ArrayList;
 
 public class InvalidDataTypeException extends Exception{
 
-    String expected;
-    String got;
-    String message;
+    private String expected;
+    private String got;
+    private String message;
     /*
      * when a single value is incorrect
      * usually raised when updating a single value and it needs validation

@@ -8,6 +8,7 @@ public enum Type {
     VARCHAR ("varchar");
     
     private String name;
+    private static String nullVal = "null";
 
     Type(String name){
         this.name = name;
@@ -27,8 +28,19 @@ public enum Type {
      * @param attribute attribute value is expected to belong to
      * @return true if value valid
      * @throws InvalidDataTypeException if validation fails
+     * @throws PrimaryKeyException
      */
-    public static boolean validateType(String value, Attribute attribute) throws InvalidDataTypeException{
+    public static boolean validateType(String value, Attribute attribute) 
+    throws InvalidDataTypeException, PrimaryKeyException{
+        // verify if null regardless of data type
+        // null values are always allowed
+        if(value.equals("null")){
+            // primary key cannot be null
+            if(attribute.isIsPrimaryKey()){
+                throw new PrimaryKeyException(1, null);
+            }
+            return true;
+        }
         switch(attribute.getType()){
             case INTEGER:
                 try {
@@ -67,8 +79,10 @@ public enum Type {
      * @param attributes attributes containing types of collection
      * @return true if none of the values fail validation
      * @throws InvalidDataTypeException at least one of the values fails 
+     * @throws PrimaryKeyException
      */
-    public static boolean validateAll(ArrayList<String> values, ArrayList<Attribute> attributes) throws InvalidDataTypeException{
+    public static boolean validateAll(ArrayList<String> values, ArrayList<Attribute> attributes) 
+    throws InvalidDataTypeException, PrimaryKeyException{
         for (int i = 0; i < values.size(); i++) {
             Attribute attribute = attributes.get(i);
             String value = values.get(i);
