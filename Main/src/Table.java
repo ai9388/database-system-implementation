@@ -8,6 +8,7 @@ public class Table{
     private ArrayList<Record> records;
     private Attribute primaryAttribute;
     private HashMap<String, Record> recordsByPK;
+    private HashMap<String, Attribute> attributesByCol;
 
     public Table(String name, int tid, ArrayList<Attribute> attr, ArrayList<Record> recs)
     {
@@ -15,8 +16,8 @@ public class Table{
         this.tableID = tid;
         this.attributes = attr;
         this.records = recs;
+        setAttributesByCol();
     }
-
 
     /**
      * @return String return the name
@@ -66,6 +67,18 @@ public class Table{
      */
     public void setAttributes(ArrayList<Attribute> attributes) {
         this.attributes = attributes;
+        setAttributesByCol();
+    }
+
+    /**
+     * returns the attribute object that corresponds to a 
+     * specific column name
+     */
+    public void setAttributesByCol() {
+        this.attributesByCol = new HashMap<>();
+        for(Attribute attribute: this.attributes){
+            attributesByCol.put(attribute.getName(), attribute);
+        }
     }
 
     /**
@@ -90,7 +103,10 @@ public class Table{
     public boolean insertRecord(String[] values)
     {
         try {
-            Record record = new Record(values, attributes);
+            ArrayList<String> entries = new ArrayList<String>(Arrays.asList(values));
+            Type.validateAll(entries, attributes); // if this fails exception is raised
+            // assuming valid, create record
+            Record record = new Record(entries, attributes);
             records.add(record);
             return true;
         } catch (InvalidDataTypeException e) {
@@ -133,22 +149,30 @@ public class Table{
      * finds a record based on primary key and updates it
      * @param pkValue value of primary key
      * @param column column to update
-     * @param newValue new value to insert
+     * @param newEntry new value to insert
      * @return true if update successful
      */
-    public boolean updateRecordByPK(String pkValue, String column, String newValue)
+    public boolean updateRecordByPK(String pkValue, String column, String newEntry)
     {
         // validate the primary key
         try {
             Record oldRecord = null;
-            // if primary key is valid, remove record from collection
+            // if primary key is valid, remove record from collections
             if(Type.validateType(pkValue, primaryAttribute)){
                 oldRecord = recordsByPK.remove(pkValue);
+                // TODO: there might be a pk exception here if pk does not exist
+                records.remove(oldRecord);
             }
 
             // validate column name
             if(isValidColumn(column)){
-                // TODO: update the value at column
+                // validate the type of new value
+                if(Type.validateType(newEntry, attributesByCol.get(column))){
+                    // update the old record, copy and re-add
+                    oldRecord.updateByColumn(column, newEntry);
+                    Record newRecord = new Record(oldRecord.getEntries(), attributes);
+                    records.add(newRecord);
+                }
             }
 
         } catch (InvalidDataTypeException e) {
@@ -156,7 +180,7 @@ public class Table{
             return false;
         }
 
-        // TODO catch exception form isValidTableName
+        // TODO: catch exception form inValidColumnName
         
         return true;
     }
