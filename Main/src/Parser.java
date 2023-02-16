@@ -55,6 +55,8 @@ public class Parser {
                 String columns = input.substring(start_index + 1, end_index).strip();
                 String[] attr = columns.split(",");
                 ArrayList<Attribute> attributes = new ArrayList<>();
+                Attribute primaryAttribute = null;
+                int primaryIndex = 0;
                 // Check if table exists
                 // If it doesn't create it with table
                 boolean hasOnePK = false;
@@ -65,24 +67,39 @@ public class Parser {
                     switch (components[1]) {
                         case "char" -> {
                             hasOnePK = components.length > 3 && !hasOnePK;
-                            attributes.add(new Attribute(attr_name, Type.CHAR, components.length > 3, Integer.parseInt(components[1])));
+                            Attribute a = new Attribute(attr_name, Type.CHAR, components.length > 3, Integer.parseInt(components[1]));
+                            primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
+                            primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
+                            attributes.add(a);
                             //check component after char to know length
                         }
                         case "varchar" -> {
                             hasOnePK = components.length > 3 && !hasOnePK;
-                            attributes.add(new Attribute(components[1], Type.VARCHAR, components.length > 3, Integer.parseInt(components[1])));
+                            Attribute a = new Attribute(components[1], Type.VARCHAR, components.length > 3, Integer.parseInt(components[1]));
+                            primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
+                            primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
+                            attributes.add(a);
                         }
                         case "bool" -> {
                             hasOnePK = primarykey && !hasOnePK;
-                            attributes.add(new Attribute(attr_name, Type.BOOLEAN, primarykey, 0));
+                            Attribute a = new Attribute(attr_name, Type.BOOLEAN, primarykey, 0);
+                            primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
+                            primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
+                            attributes.add(a);
                         }
                         case "integer" -> {
                             hasOnePK = primarykey && !hasOnePK;
-                            attributes.add(new Attribute(attr_name, Type.INTEGER, primarykey, 0));
+                            Attribute a = new Attribute(attr_name, Type.INTEGER, primarykey, 0);
+                            primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
+                            primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
+                            attributes.add(a);
                         }
                         case "double" -> {
                             hasOnePK = primarykey && !hasOnePK;
-                            attributes.add(new Attribute(attr_name, Type.DOUBLE, primarykey, 0));
+                            Attribute a = new Attribute(attr_name, Type.DOUBLE, primarykey, 0);
+                            primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
+                            primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
+                            attributes.add(a);
                         }
                     }
                 }
@@ -91,7 +108,7 @@ public class Parser {
                 if (!hasOnePK) {
                     System.out.println("ERROR!");
                 } else {
-                    Table table = new Table(table_name, 1, attributes, new ArrayList<Record>());
+                    Table table = new Table(table_name, 1, attributes, new ArrayList<Record>(), primaryAttribute, primaryIndex);
                     // testing byte array stuff
                     Catalog c = new Catalog(this.dbLocation, attributes, this.pageSize, this.bufferSize);
                     c.writeToFile();
@@ -118,7 +135,8 @@ public class Parser {
                 String[] vals = input.split(",");
                 for (String value : vals) {
                     String[] values = value.replaceAll("[();]", "").strip().split(" ");
-                    table_values.add(new Record(values));
+                    // need to get attributes from table to do this...
+                    //table_values.add(new Record(values, ));
                 }
                 insert(table_name, table_values);
             }

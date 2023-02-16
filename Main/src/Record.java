@@ -13,7 +13,7 @@ public class Record {
 
     public Record(String[] values, ArrayList<Attribute> attributes) throws InvalidDataTypeException
     {
-        data = new ArrayList<String>(Arrays.asList(values));
+        data = new ArrayList<>(Arrays.asList(values));
         validateDataTypeS(attributes);
 
         // insert all values into map
@@ -30,7 +30,7 @@ public class Record {
         return dataByColumn.get(column);
     }
     /**
-     * @param data the data to set
+     * @param newData the data to set
      */
     public void setData(ArrayList<String> newData) {
         this.data = newData;
@@ -50,7 +50,7 @@ public class Record {
         }
         }
         catch(InvalidDataTypeException idte){
-            // this means at least one of the attribute entries 
+            // this means at least one of the attribute entries
             // is incorrect
             throw new InvalidDataTypeException(data, attributes);
         }

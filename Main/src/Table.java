@@ -7,14 +7,20 @@ public class Table{
     private ArrayList<Attribute> attributes;
     private ArrayList<Record> records;
     private Attribute primaryAttribute;
+    private int primaryIndex;
     private HashMap<String, Record> recordsByPK;
 
-    public Table(String name, int tid, ArrayList<Attribute> attr, ArrayList<Record> recs)
+    public Table(String name, int tid, ArrayList<Attribute> attr, ArrayList<Record> recs, Attribute primaryAttribute, int primaryIndex)
     {
         this.name = name;
         this.tableID = tid;
         this.attributes = attr;
         this.records = recs;
+        this.primaryIndex = primaryIndex;
+        this.recordsByPK = new HashMap<>();
+        for (Record r: records) {
+            recordsByPK.put(primaryAttribute.getName(), r);
+        }
     }
 
 
@@ -80,7 +86,7 @@ public class Table{
 
     /*
      * inserts a record into collection
-     * 
+     *
      */
     public boolean insertRecord(String[] values)
     {
@@ -107,19 +113,33 @@ public class Table{
             System.out.println(e.getMessage());
             return false;
         }
-        
+
         return true;
     }
 
+    public Record getRecord(String pkValue) {
+        return this.recordsByPK.get(pkValue);
+    }
 
     public boolean updateRecord(String pkValue, String column, String newValue)
     {
         // validate the primary key
         try {
-            Record oldRecord = null;
+            Record oldRecord;
+            ArrayList<String> values = new ArrayList<>();
             // if primary key is valid, remove record from collection
             if(Type.validateType(pkValue, primaryAttribute)){
                 oldRecord = recordsByPK.remove(pkValue);
+                for (Attribute a : attributes) {
+                    if (a.getName().equals(column)) {
+                        values.add(newValue);
+                    } else {
+                        values.add(oldRecord.getvalueAtColumn(a.getName()));
+                    }
+                }
+                Record r = new Record(values.toArray(new String[0]), attributes);
+                this.records.add(r);
+                this.recordsByPK.put(pkValue, r);
             }
 
             // validate column name
@@ -133,7 +153,7 @@ public class Table{
         }
 
         // TODO catch exception form isValidTableName
-        
+
         return true;
     }
 
