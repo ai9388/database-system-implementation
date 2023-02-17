@@ -193,5 +193,12 @@ public class Table{
         // TODO: raise a table exception of invalid column name
         return false;
     }
+ 
+    /***
+     * TODO
+     * getting a record by primary key
+    • getting a page by table and page number
+     * 
+     */
 
 }

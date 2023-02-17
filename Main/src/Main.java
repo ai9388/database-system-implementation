@@ -4,6 +4,10 @@ import java.io.File;
 public class Main {
 
     public void checkDatabase(String path, int pageSize, int bufferSize){
+
+        //TODO: do we need the pageSize and bufferSize for the parameter rn?
+
+        
         //look for the database from the path and get the table from the database
         // Path dire = Paths.get(path);
         File directory = new File(path);

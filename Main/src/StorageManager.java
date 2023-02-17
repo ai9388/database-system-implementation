@@ -11,12 +11,13 @@ import java.util.*;
 
 public class StorageManager {
 
-    public Record getRecordFromPrimaryKey(String key){
+    public Record getRecordFromPrimaryKey(Table table, String key){
         //get the record from the table
+        // return table.getRecordsPK(key);
         return null;
     }
     
-    public Page getPage(Table table, int pageNumber){
+    public Page getPageByPNumber(Database db, Table table, int pageNumber){
 
         return null;
     }
@@ -25,16 +26,16 @@ public class StorageManager {
         return null;
     }
 
-    public void insertRecordIntoTable(Table table){
-
+    public void insertRecordIntoTable(Table table, String[] record){
+        table.insertRecord(record);
     }
 
     public void deleteRecord(String primaryKey, Table table){
-
+        table.removeRecordByPK(primaryKey);
     }
 
-    public void updateRecord(String primaryKey, Table table){
-
+    public void updateRecord(String primaryKey, Table table,  String column, String newEntry){
+        table.updateRecordByPK(primaryKey, column, newEntry);
     }
 
     public String byteToString(){
@@ -48,11 +49,5 @@ public class StorageManager {
     public void rewrite(){
 
     }
-
-    public static void main(String[] args) {
-        lookForDatabase("/Users/hai-yennguyen/Desktop/RIT/database-system-implementation/Main/src/test", 4096, 10);   
-    }
-
-
 
 }
