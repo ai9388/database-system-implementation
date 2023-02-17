@@ -5,38 +5,11 @@ import java.nio.file.Paths;
 import java.util.*;
 
 
+//TODO: need to implement a page buffer
+//not write into the file until the user said quit
+
+
 public class StorageManager {
-
-    private Table table;
-
-    public static Table accessTable(String path, int pageSize, int bufferSize, String tableName){
-        //look for the database from the path and get the table from the database
-        // Path dire = Paths.get(path);
-        File directory = new File(path);
-        Database db = null;
-        
-        if(directory.exists()){
-            if(directory.length() > 0){
-                System.out.println("db exists");
-            }
-            else{
-                System.out.println("No existing db found");
-                System.out.println("Creating new db at" + path);
-                directory.mkdir();
-                db = new Database(path, null, null, path);
-            }
-        }
-        else{
-            System.out.println("No existing db found");
-            System.out.println("Creating new db at" + path);
-            directory.mkdir();
-            db = new Database(path, null, null, path);
-            //need to add a catalog into the folder.
-        }
-
-        return db.getSingleTable(path);
-    }
-
 
     public Record getRecordFromPrimaryKey(String key){
         //get the record from the table
@@ -63,7 +36,19 @@ public class StorageManager {
     public void updateRecord(String primaryKey, Table table){
 
     }
+
+    public String byteToString(){
+        return null;
+    }
     
+    public void LRU(){
+
+    }
+
+    public void rewrite(){
+
+    }
+
     public static void main(String[] args) {
         lookForDatabase("/Users/hai-yennguyen/Desktop/RIT/database-system-implementation/Main/src/test", 4096, 10);   
     }
