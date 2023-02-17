@@ -12,21 +12,12 @@ public class Table{
     private HashMap<String, Record> recordsByPK;
     private HashMap<String, Attribute> attributesByCol;
 
-    public Table(String name, int tableID, ArrayList<Attribute> attributes, ArrayList<Record> records, Attribute primaryAttribute, int primaryIndex) throws PrimaryKeyException {
+    public Table(String name, int tableID, ArrayList<Attribute> attributes, ArrayList<Record> records, Attribute primaryAttribute, int primaryIndex){
         this.name = name;
         this.tableID = tableID;
         this.attributes = attributes;
         this.records = records;
 
-        // iterate attributes to validate pk uniqueness
-        for(Attribute a: attributes){
-            if(primaryAttribute != null && a.isIsPrimaryKey()){
-                throw new PrimaryKeyException(3, null);
-            }
-            else{
-                primaryAttribute = a;
-            }
-        }
         setAttributesByCol();
         this.primaryIndex = primaryIndex;
         this.recordsByPK = new HashMap<>();
@@ -123,17 +114,9 @@ public class Table{
             Type.validateAll(entries, attributes); // if this fails exception is raised
             // assuming valid, create record
             Record record = new Record(entries, attributes);
-            // check for duplicate keys
-            if(validatePK(record)){
-                records.add(record);           
-                return true;
-            }
         } catch (InvalidDataTypeException e) {
             // creation of record failed
             System.out.println(e.getMessage());
-        } catch (PrimaryKeyException pke){
-            // primary key invalid/null
-            System.out.println(pke.getMessage());
         }
         return false;
     }
@@ -150,10 +133,6 @@ public class Table{
                 recordsByPK.remove(pkValue);
             }
         } catch (InvalidDataTypeException e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
-        catch (PrimaryKeyException e) {
             System.out.println(e.getMessage());
             return false;
         }
@@ -195,10 +174,6 @@ public class Table{
             System.out.println(e.getMessage());
             return false;
         }
-        catch (PrimaryKeyException e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
 
         // TODO: catch exception form inValidColumnName
         
@@ -219,17 +194,4 @@ public class Table{
         return false;
     }
 
-
-    public boolean validatePK(Record record) throws PrimaryKeyException{
-        String argument = "";
-        String col = primaryAttribute.getName();
-        String newRecPKVal = record.getValueAtColumn(col);
-        for(int i = 0; i < records.size(); i++){
-            Record r = records.get(i);
-            if(r.getValueAtColumn(col).equals(newRecPKVal)){
-                throw new PrimaryKeyException(2, (i + ""));
-            }
-        }
-        return true;
-    }
 }
