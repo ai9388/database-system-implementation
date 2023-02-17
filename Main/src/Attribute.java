@@ -74,4 +74,9 @@ public class Attribute
         this.primaryKey = primaryKey;
     }
 
+    @Override
+    public String toString() {
+        return String.format(this.name + " " + this.type.toString(), N == 0 ? "" : this.N);
+    }
+
 }

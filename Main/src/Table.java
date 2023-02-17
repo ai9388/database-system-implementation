@@ -175,10 +175,12 @@ public class Table{
             Record oldRecord;
             ArrayList<String> values = new ArrayList<>();
             // if primary key is valid, remove record from collection
-            if(Type.validateType(pkValue, primaryAttribute)){
+            if(Type.validateType(pkValue, primaryAttribute) && isValidColumn(column)){
                 oldRecord = recordsByPK.remove(pkValue);
                 for (Attribute a : attributes) {
                     if (a.getName().equals(column)) {
+                        // validate new entry 
+                        Type.validateType(newEntry, a);
                         values.add(newEntry);
                     } else {
                         values.add(oldRecord.getValueAtColumn(a.getName()));
@@ -187,17 +189,6 @@ public class Table{
                 Record r = new Record(values, attributes);
                 this.records.add(r);
                 this.recordsByPK.put(pkValue, r);
-            }
-
-            // validate column name
-            if(isValidColumn(column)){
-                // validate the type of new value
-                if(Type.validateType(newEntry, attributesByCol.get(column))){
-                    // update the old record, copy and re-add
-                    // oldRecord.updateByColumn(column, newEntry);
-                    // Record newRecord = new Record(oldRecord.getEntries(), attributes);
-                    // records.add(newRecord);
-                }
             }
 
         } catch (InvalidDataTypeException e) {
