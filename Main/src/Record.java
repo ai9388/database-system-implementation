@@ -58,7 +58,7 @@ public class Record {
     @Override
     public String toString() {
         // TODO: format record and make it pretty **
-        return "";
+        return String.join(" ", entries);
     }
 
     /**
