@@ -3,11 +3,10 @@ import java.io.File;
 
 public class Main {
 
-    public static Database checkDatabase(String path, int pageSize, int bufferSize){
+    public void checkDatabase(String path, int pageSize, int bufferSize){
         //look for the database from the path and get the table from the database
         // Path dire = Paths.get(path);
         File directory = new File(path);
-        Database db = null;
         
         if(directory.exists()){
             if(directory.length() > 0){
@@ -17,18 +16,14 @@ public class Main {
                 System.out.println("No existing db found");
                 System.out.println("Creating new db at" + path);
                 directory.mkdir();
-                db = new Database(path, null, null, path);
             }
         }
         else{
             System.out.println("No existing db found");
             System.out.println("Creating new db at" + path);
             directory.mkdir();
-            db = new Database(path, null, null, path);
             //need to add a catalog into the folder.
         }
-
-        return db;
     }
 
 
