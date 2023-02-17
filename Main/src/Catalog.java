@@ -2,13 +2,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.nio.file.*;
 import java.util.*;
 
 public class Catalog {
 
-    public final String READ = "r";
-    public final String WRITE = "rw";
+    public static final String READ = "r";
+    public static final String WRITE = "rw";
     
     private String path;
     private ArrayList<Attribute> attributes;
@@ -56,11 +55,12 @@ public class Catalog {
     public byte[] convertStringToByteArray(String st)
     {
         byte[] bb = new byte[st.length()];
-        
-        for (int i = 0; i < bb.length; i++) {
-            bb[i] = (byte)st.charAt(i);
-        }
 
+        char[] ch = st.toCharArray();
+
+        for (char c : ch) {
+            bb = concat(bb, convertCharToByteArray(c));
+        }
         return bb;
     }
 
@@ -76,12 +76,32 @@ public class Catalog {
             File file = new File(this.path + "Catalog");
             RandomAccessFile raf = new RandomAccessFile(file, WRITE);
 
-            raf.write(convertStringToByteArray(content));
+            raf.write(convertStringToByteArray("something"));
 
             raf.close();
         } catch (IOException e) {
             System.out.println("oh no...");
             e.printStackTrace();
         }
+    }
+
+    public byte[] concat(byte[]... arrays) {
+        // Determine the length of the result array
+        int totalLength = 0;
+        for (int i = 0; i < arrays.length; i++) {
+            totalLength += arrays[i].length;
+        }
+
+        // create the result array
+        byte[] result = new byte[totalLength];
+
+        // copy the source arrays into the result array
+        int currentIndex = 0;
+        for (int i = 0; i < arrays.length; i++) {
+            System.arraycopy(arrays[i], 0, result, currentIndex, arrays[i].length);
+            currentIndex += arrays[i].length;
+        }
+
+        return result;
     }
 }
