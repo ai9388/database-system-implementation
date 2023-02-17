@@ -55,4 +55,27 @@ public class Record {
         entries = new ArrayList<>(dataByColumn.values());
     }
 
+    @Override
+    public String toString() {
+        // TODO: format record and make it pretty **
+        return String.join(" ", entries);
+    }
+
+    /**
+     * compacts the record so it can be written to page
+     * @return
+     */
+    public String compact(){
+        String info = "";
+
+        for(String data: entries){
+            if(Type.identifyType(data).equals(Type.VARCHAR) || Type.identifyType(data).equals(Type.CHAR)){
+                info += (data.length() + data);
+                continue;
+            }
+            info += data;
+        }
+
+        return info;
+    }
 }

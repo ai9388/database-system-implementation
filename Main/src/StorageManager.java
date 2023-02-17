@@ -5,45 +5,19 @@ import java.nio.file.Paths;
 import java.util.*;
 
 
+//TODO: need to implement a page buffer
+//not write into the file until the user said quit
+
+
 public class StorageManager {
 
-    private Table table;
-
-    public static Table accessTable(String path, int pageSize, int bufferSize, String tableName){
-        //look for the database from the path and get the table from the database
-        // Path dire = Paths.get(path);
-        File directory = new File(path);
-        Database db = null;
-        
-        if(directory.exists()){
-            if(directory.length() > 0){
-                System.out.println("db exists");
-            }
-            else{
-                System.out.println("No existing db found");
-                System.out.println("Creating new db at" + path);
-                directory.mkdir();
-                db = new Database(path, null, null, path);
-            }
-        }
-        else{
-            System.out.println("No existing db found");
-            System.out.println("Creating new db at" + path);
-            directory.mkdir();
-            db = new Database(path, null, null, path);
-            //need to add a catalog into the folder.
-        }
-
-        return db.getSingleTable(path);
-    }
-
-
-    public Record getRecordFromPrimaryKey(String key){
+    public Record getRecordFromPrimaryKey(Table table, String key){
         //get the record from the table
+        // return table.getRecordsPK(key);
         return null;
     }
     
-    public Page getPage(Table table, int pageNumber){
+    public Page getPageByPNumber(Database db, Table table, int pageNumber){
 
         return null;
     }
@@ -52,22 +26,28 @@ public class StorageManager {
         return null;
     }
 
-    public void insertRecordIntoTable(Table table){
-
+    public void insertRecordIntoTable(Table table, String[] record){
+        table.insertRecord(record);
     }
 
     public void deleteRecord(String primaryKey, Table table){
-
+        table.removeRecordByPK(primaryKey);
     }
 
-    public void updateRecord(String primaryKey, Table table){
+    public void updateRecord(String primaryKey, Table table,  String column, String newEntry){
+        table.updateRecordByPK(primaryKey, column, newEntry);
+    }
 
+    public String byteToString(){
+        return null;
     }
     
-    public static void main(String[] args) {
-        lookForDatabase("/Users/hai-yennguyen/Desktop/RIT/database-system-implementation/Main/src/test", 4096, 10);   
+    public void LRU(){
+
     }
 
+    public void rewrite(){
 
+    }
 
 }
