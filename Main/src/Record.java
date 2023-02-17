@@ -4,70 +4,55 @@ public class Record {
     /*
      * Arraylist of entries within record
      */
-    private ArrayList<String> data;
+    private ArrayList<String> entries;
 
-    public Record(String[] values)
+    /*
+     * data by columnName
+     */
+    private HashMap<String, String> dataByColumn;
+
+    public Record(ArrayList<String> entries, ArrayList<Attribute> attributes) throws InvalidDataTypeException
     {
-        data = new ArrayList<String>(Arrays.asList(values));
+        this.entries = entries;
+        this.dataByColumn = new HashMap<>();
+        // insert all values into map
+        for (int i = 0; i < entries.size(); i++) {
+            dataByColumn.put(attributes.get(i).getName(), entries.get(i));
+        }
     }
 
     /**
-     * @param data the data to set
+     * returns the value of this record at a specific column
+     * @param column the name of the column
      */
-    public void setData(ArrayList<String> newData) {
-        this.data = newData;
+    public String getValueAtColumn(String column){
+        return dataByColumn.get(column);
     }
 
-    /*
-     * compare the value types with the ones from the schema
+    /**
+     * sets the data collection
+     * @param newEntries the data to set
      */
-    public void validateDataTypeS(ArrayList<Attribute> attributes) throws Exception{
-        for (int i = 0; i < data.size(); i++) {
-            Attribute attribute = attributes.get(i);
-            String value = data.get(i);
+    public void setEntries(ArrayList<String> newEntries) {
+        this.entries = newEntries;
+    }
 
-            switch(attribute.getType()){
-                case INTEGER:
-                    try {
-                        Integer.parseInt(value);
-                    } catch (Exception e) {
-                        // TODO: handle exception
-                        // throw custom exception with message
-                    }
-                case DOUBLE:
-                    try {
-                        Double.parseDouble(value);
-                    } catch (Exception e) {
-                        // TODO: handle exception
-                        // throw custom exception with message
-                    }
-                case BOOLEAN:
-                    try {
-                        Boolean.parseBoolean(value);
-                    } catch (Exception e) {
-                        // TODO: handle exception
-                        // throw custom exception with message
-                    }
-                case CHAR:
-                    try {
-                        if(value.length() > attribute.getN()){
-                            // throw custom exception
-                        }
-                    } catch (Exception e) {
-                        // TODO: handle exception
-                        // throw custom exception with message
-                    }
-                case VARCHAR:
-                    try {
-                        if(value.length() > attribute.getN()){
-                            // throw custom exception
-                        }
-                    } catch (Exception e) {
-                        // TODO: handle exception
-                        // throw custom exception with message
-                    }
-            }
-        }
+    /**
+     * returns all the data
+     * @return
+     */
+    public ArrayList<String> getEntries() {
+        return entries;
+    }
+
+    /**
+     * update value at column and update data collection
+     * @param column column where update is happening
+     * @param newValue new value replacing old at column
+     */
+    public void updateByColumn(String column, String newValue){
+        dataByColumn.replace(column, dataByColumn.get(column), newValue);
+        entries = new ArrayList<>(dataByColumn.values());
     }
 
 }
