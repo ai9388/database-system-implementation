@@ -17,16 +17,6 @@ public class Table{
         this.tableID = tableID;
         this.attributes = attributes;
         this.records = records;
-
-        // iterate attributes to validate pk uniqueness
-        for(Attribute a: attributes){
-            if(primaryAttribute != null && a.isIsPrimaryKey()){
-                throw new PrimaryKeyException(3, null);
-            }
-            else{
-                primaryAttribute = a;
-            }
-        }
         setAttributesByCol();
         this.primaryIndex = primaryIndex;
         this.recordsByPK = new HashMap<>();
