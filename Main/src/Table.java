@@ -11,7 +11,7 @@ public class Table{
     private HashMap<String, Record> recordsByPK;
     private HashMap<String, Attribute> attributesByCol;
 
-    public Table(String name, int tableID, ArrayList<Attribute> attributes, ArrayList<Record> records, Attribute primaryAttribute, int primaryIndex) {
+    public Table(String name, int tableID, ArrayList<Attribute> attributes, ArrayList<Record> records, Attribute primaryAttribute, int primaryIndex) throws PrimaryKeyException {
         this.name = name;
         this.tableID = tableID;
         this.attributes = attributes;
