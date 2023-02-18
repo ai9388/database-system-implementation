@@ -36,6 +36,10 @@ public class Database {
         return tables;
     }
 
+    public Table getSingleTable(String name){
+        return tables.get(name);
+    }
+
     /**
      * @param tables the tables to set
      */

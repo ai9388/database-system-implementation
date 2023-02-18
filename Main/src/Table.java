@@ -11,7 +11,7 @@ public class Table{
     private HashMap<String, Record> recordsByPK;
     private HashMap<String, Attribute> attributesByCol;
 
-    public Table(String name, int tableID, ArrayList<Attribute> attributes, ArrayList<Record> records, Attribute primaryAttribute, int primaryIndex) throws PrimaryKeyException {
+    public Table(String name, int tableID, ArrayList<Attribute> attributes, ArrayList<Record> records, Attribute primaryAttribute, int primaryIndex) {
         this.name = name;
         this.tableID = tableID;
         this.attributes = attributes;
@@ -122,17 +122,9 @@ public class Table{
             Type.validateAll(entries, attributes); // if this fails exception is raised
             // assuming valid, create record
             Record record = new Record(entries, attributes);
-            // check for duplicate keys
-            if(validatePK(record)){
-                records.add(record);           
-                return true;
-            }
         } catch (InvalidDataTypeException e) {
             // creation of record failed
             System.out.println(e.getMessage());
-        } catch (PrimaryKeyException pke){
-            // primary key invalid/null
-            System.out.println(pke.getMessage());
         }
         return false;
     }
@@ -149,10 +141,6 @@ public class Table{
                 recordsByPK.remove(pkValue);
             }
         } catch (InvalidDataTypeException e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
-        catch (PrimaryKeyException e) {
             System.out.println(e.getMessage());
             return false;
         }
@@ -174,10 +162,12 @@ public class Table{
             Record oldRecord;
             ArrayList<String> values = new ArrayList<>();
             // if primary key is valid, remove record from collection
-            if(Type.validateType(pkValue, primaryAttribute)){
+            if(Type.validateType(pkValue, primaryAttribute) && isValidColumn(column)){
                 oldRecord = recordsByPK.remove(pkValue);
                 for (Attribute a : attributes) {
                     if (a.getName().equals(column)) {
+                        // validate new entry 
+                        Type.validateType(newEntry, a);
                         values.add(newEntry);
                     } else {
                         values.add(oldRecord.getValueAtColumn(a.getName()));
@@ -188,22 +178,7 @@ public class Table{
                 this.recordsByPK.put(pkValue, r);
             }
 
-            // validate column name
-            if(isValidColumn(column)){
-                // validate the type of new value
-                if(Type.validateType(newEntry, attributesByCol.get(column))){
-                    // update the old record, copy and re-add
-                    // oldRecord.updateByColumn(column, newEntry);
-                    // Record newRecord = new Record(oldRecord.getEntries(), attributes);
-                    // records.add(newRecord);
-                }
-            }
-
         } catch (InvalidDataTypeException e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
-        catch (PrimaryKeyException e) {
             System.out.println(e.getMessage());
             return false;
         }
@@ -227,17 +202,11 @@ public class Table{
         return false;
     }
 
+    /***
+     * TODO
+     * getting a record by primary key
+    • getting a page by table and page number
+     *
+     */
 
-    public boolean validatePK(Record record) throws PrimaryKeyException{
-        String argument = "";
-        String col = primaryAttribute.getName();
-        String newRecPKVal = record.getValueAtColumn(col);
-        for(int i = 0; i < records.size(); i++){
-            Record r = records.get(i);
-            if(r.getValueAtColumn(col).equals(newRecPKVal)){
-                throw new PrimaryKeyException(2, (i + ""));
-            }
-        }
-        return true;
-    }
 }

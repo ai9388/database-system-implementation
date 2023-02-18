@@ -1,6 +1,36 @@
 import java.util.*;
+import java.io.File;
 
 public class Main {
+
+    public void checkDatabase(String path, int pageSize, int bufferSize){
+
+        //TODO: do we need the pageSize and bufferSize for the parameter rn?
+
+        
+        //look for the database from the path and get the table from the database
+        // Path dire = Paths.get(path);
+        File directory = new File(path);
+        
+        if(directory.exists()){
+            if(directory.length() > 0){
+                System.out.println("db exists");
+            }
+            else{
+                System.out.println("No existing db found");
+                System.out.println("Creating new db at" + path);
+                directory.mkdir();
+            }
+        }
+        else{
+            System.out.println("No existing db found");
+            System.out.println("Creating new db at" + path);
+            directory.mkdir();
+            //need to add a catalog into the folder.
+        }
+    }
+
+
     public static void main(String[] args) throws Exception {
         System.out.println("Starting up 11QL...");
         // Check for DB

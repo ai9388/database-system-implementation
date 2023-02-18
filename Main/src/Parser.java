@@ -47,7 +47,7 @@ public class Parser {
     /**
      * Assume user passes in database
      */
-    public void parse() throws PrimaryKeyException {
+    public void parse() {
         switch (command) {
             case CREATE_TABLE -> {
                 String input = user_input.replaceFirst("create table", "").strip();
@@ -59,9 +59,9 @@ public class Parser {
                 ArrayList<Attribute> attributes = new ArrayList<>();
                 Attribute primaryAttribute = null;
                 int primaryIndex = 0;
-                // Check if table exists
-                // If it doesn't create it with table
-                boolean hasOnePK = false;
+                // TODO: Check if table exists - storage manager
+                // If it doesn't create it below
+                boolean hasOnePK = false; //character.bytes dont hardcode vals
                 for (String attribute : attr) {
                     String[] components = attribute.strip().replaceAll("\\(", " ").split(" ");
                     String attr_name = components[0];
@@ -110,14 +110,14 @@ public class Parser {
                         }
                     }
                 }
-
-                // send to db through storage manager
                 if (!hasOnePK) {
                     System.out.println("ERROR!");
                     System.out.println("No primary key defined");
                 } else {
                     System.out.println(attributes.toString());
                     Table table = new Table(table_name, 1, attributes, new ArrayList<Record>(), primaryAttribute, primaryIndex);
+                    // TODO: send table to db through storage manager
+                    System.out.println("SUCCESS! You've created " + table_name);
                     // testing byte array stuff
                     Catalog c = new Catalog(this.dbLocation, attributes, this.pageSize, this.bufferSize);
                     c.writeToFile();
@@ -142,12 +142,15 @@ public class Parser {
                 int start_index = input.indexOf("(");
                 input = input.substring(start_index - 1);
                 String[] vals = input.split(",");
+                // Todo: get table from storage manager
+                // add in values if table exists
                 for (String value : vals) {
                     String[] values = value.replaceAll("[();]", "").strip().split(" ");
-                    // need to get attributes from table to do this...
+                    // todo: need to get attributes from table to do below...
                     //table_values.add(new Record(values, ));
                 }
                 insert(table_name, table_values);
+                // if error stop processing/quit
             }
             case HELP -> System.out.println();
             case QUIT -> {
@@ -160,7 +163,7 @@ public class Parser {
     }
 
     private void displayInfo(String name) {
-        // Call storage manager to display information
+        // Todo: Call storage manager to display information
         System.out.println("Table name: " + name);
         System.out.println("Table schema: "); // Print table schema
         System.out.println("Number of pages: "); // Print # of pages
@@ -168,7 +171,7 @@ public class Parser {
     }
 
     private void displaySchema() {
-        // Data needs to be gotten from storage manager
+        // Todo: Data needs to be gotten from storage manager
         System.out.println("Database Location: ");
         System.out.println("Page Size: ");
         System.out.println("Buffer Size: ");
@@ -180,15 +183,14 @@ public class Parser {
     }
 
     private void insert(String tableName, ArrayList<Record> vals) {
-
-        // Call storage manager insert pass in table name and record to insert
+        // Todo: Call storage manager insert pass in table name and record to insert
     }
 
     private void select(String attr, String tableName) {
         String[] attributes = attr.split(",");
         String t = tableName;
-
-        // Call storage manager select and pass in attributes selected + table name
+        // TODO: Call storage manager select and pass in attributes selected + table name
+        // If table doesn't exist print error otherwise print selected data
     }
 
     private void createTable(String tableName, String[] args) {

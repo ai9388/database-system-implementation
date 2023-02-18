@@ -31,14 +31,10 @@ public enum Type {
      * @throws PrimaryKeyException
      */
     public static boolean validateType(String value, Attribute attribute) 
-    throws InvalidDataTypeException, PrimaryKeyException{
+    throws InvalidDataTypeException{
         // verify if null regardless of data type
         // null values are always allowed
         if(value.equals("null")){
-            // primary key cannot be null
-            if(attribute.isIsPrimaryKey()){
-                throw new PrimaryKeyException(1, null);
-            }
             return true;
         }
         switch(attribute.getType()){
@@ -61,7 +57,7 @@ public enum Type {
                     throw new InvalidDataTypeException(value, attribute);
                 }
             case CHAR:
-                if(value.length() > attribute.getN()){
+                if(value.length() != attribute.getN()){
                     throw new InvalidDataTypeException(value, attribute);
                 }
 
@@ -82,7 +78,7 @@ public enum Type {
      * @throws PrimaryKeyException
      */
     public static boolean validateAll(ArrayList<String> values, ArrayList<Attribute> attributes) 
-    throws InvalidDataTypeException, PrimaryKeyException{
+    throws InvalidDataTypeException{
         for (int i = 0; i < values.size(); i++) {
             Attribute attribute = attributes.get(i);
             String value = values.get(i);
