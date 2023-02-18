@@ -114,4 +114,12 @@ public enum Type {
         }
         return Type.CHAR;
     }
+
+    @Override
+    public String toString() {
+        if (this.equals(CHAR) || this.equals(VARCHAR)) {
+            return this.name + "(%s)";
+        }
+        return this.name;
+    }
 }

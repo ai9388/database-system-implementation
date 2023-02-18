@@ -9,9 +9,13 @@ public class PrimaryKeyException extends Exception {
 
     public PrimaryKeyException(int errorCode, String argument){
         super();
-        this.message += errorMessages[errorCode];
+        this.message += errorMessages[errorCode - 1];
         if(errorCode == 2){
             this.message += argument;
+        }
+        else
+        {
+            this.message = errorMessages[errorCode - 1];
         }
 
     }

@@ -1,5 +1,4 @@
 import java.util.*;
-import java.util.random.RandomGenerator.ArbitrarilyJumpableGenerator;
 
 public class Table{
     
@@ -20,7 +19,7 @@ public class Table{
 
         // iterate attributes to validate pk uniqueness
         for(Attribute a: attributes){
-            if(primaryAttribute != null && a.isIsPrimaryKey()){
+            if(!a.equals(primaryAttribute) && a.isIsPrimaryKey()){
                 throw new PrimaryKeyException(3, null);
             }
             else{
