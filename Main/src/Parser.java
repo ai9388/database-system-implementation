@@ -1,5 +1,7 @@
 import java.util.*;
 
+import javax.sound.sampled.SourceDataLine;
+
 public class Parser {
      enum commands {
         CREATE_TABLE, DISPLAY_SCHEMA, DISPLAY_INFO, SELECT, INSERT, HELP, QUIT
@@ -44,8 +46,9 @@ public class Parser {
 
     /**
      * Assume user passes in database
+     * @throws PrimaryKeyException
      */
-    public void parse() {
+    public void parse() throws PrimaryKeyException {
         switch (command) {
             case CREATE_TABLE -> {
                 String input = user_input.replaceFirst("create table", "").strip();
@@ -63,10 +66,11 @@ public class Parser {
                 for (String attribute : attr) {
                     String[] components = attribute.strip().replaceAll("\\(", " ").split(" ");
                     String attr_name = components[0];
-                    boolean primarykey = components.length > 2;
+                    boolean primarykey = components.length > 2 && components[2].equals("primarykey");
                     switch (components[1]) {
                         case "char" -> {
-                            hasOnePK = components.length > 3 && !hasOnePK;
+                            // originally had A XOR B, should be !(A XOR B)
+                            hasOnePK = !(components.length > 3 && !hasOnePK);
                             Attribute a = new Attribute(attr_name, Type.CHAR, components.length > 3, Integer.parseInt(components[1]));
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
@@ -74,38 +78,44 @@ public class Parser {
                             //check component after char to know length
                         }
                         case "varchar" -> {
-                            hasOnePK = components.length > 3 && !hasOnePK;
+                            hasOnePK = !(components.length > 3 && !hasOnePK);
                             Attribute a = new Attribute(components[1], Type.VARCHAR, components.length > 3, Integer.parseInt(components[1]));
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
                         }
                         case "bool" -> {
-                            hasOnePK = primarykey && !hasOnePK;
+                            hasOnePK = !(primarykey && !hasOnePK);
                             Attribute a = new Attribute(attr_name, Type.BOOLEAN, primarykey, 0);
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
                         }
                         case "integer" -> {
-                            hasOnePK = primarykey && !hasOnePK;
+                            hasOnePK = !(primarykey && !hasOnePK);
                             Attribute a = new Attribute(attr_name, Type.INTEGER, primarykey, 0);
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
                         }
                         case "double" -> {
-                            hasOnePK = primarykey && !hasOnePK;
+                            hasOnePK = !(primarykey && !hasOnePK);
                             Attribute a = new Attribute(attr_name, Type.DOUBLE, primarykey, 0);
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
                         }
+                        default -> {
+                            System.out.println("ERROR!");
+                            System.out.println("one or more attributes have a poorly written type");
+                        }
                     }
                 }
                 if (!hasOnePK) {
                     System.out.println("ERROR!");
+                    System.out.println("No primary key defined");
                 } else {
+                    System.out.println(attributes.toString());
                     Table table = new Table(table_name, 1, attributes, new ArrayList<Record>(), primaryAttribute, primaryIndex);
                     // TODO: send table to db through storage manager
                     System.out.println("SUCCESS! You've created " + table_name);

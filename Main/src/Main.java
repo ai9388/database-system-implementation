@@ -44,7 +44,6 @@ public class Main {
         // starting the user input
         Scanner userInput = new Scanner(System.in);
         String strInput = userInput.nextLine().toLowerCase();
-        System.out.println(strInput);
 
         // looping until <quit> is taken in
         while (!strInput.equals("<quit>")) {

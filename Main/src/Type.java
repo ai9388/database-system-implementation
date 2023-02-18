@@ -113,7 +113,7 @@ public enum Type {
 
     @Override
     public String toString() {
-        if(this.equals(CHAR) || this.equals(VARCHAR)){
+        if (this.equals(CHAR) || this.equals(VARCHAR)) {
             return this.name + "(%s)";
         }
         return this.name;
