@@ -11,21 +11,12 @@ public class Table{
     private HashMap<String, Record> recordsByPK;
     private HashMap<String, Attribute> attributesByCol;
 
-    public Table(String name, int tableID, ArrayList<Attribute> attributes, ArrayList<Record> records, Attribute primaryAttribute, int primaryIndex) throws PrimaryKeyException {
+    public Table(String name, int tableID, ArrayList<Attribute> attributes, ArrayList<Record> records, Attribute primaryAttribute, int primaryIndex) {
         this.name = name;
         this.tableID = tableID;
         this.attributes = attributes;
         this.records = records;
-
-        // iterate attributes to validate pk uniqueness
-        for(Attribute a: attributes){
-            if(!a.equals(primaryAttribute) && a.isIsPrimaryKey()){
-                throw new PrimaryKeyException(3, null);
-            }
-            else{
-                primaryAttribute = a;
-            }
-        }
+        this.primaryAttribute = primaryAttribute;
         setAttributesByCol();
         this.primaryIndex = primaryIndex;
         this.recordsByPK = new HashMap<>();
@@ -127,6 +118,12 @@ public class Table{
             System.out.println(e.getMessage());
         }
         return false;
+    }
+
+    public Table insertRecord(Record record) {
+        this.records.add(record);
+        this.recordsByPK.put(primaryAttribute.getName(), record);
+        return this;
     }
     /**
      * finds record based on primary key from all table collections
