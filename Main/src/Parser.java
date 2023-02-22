@@ -115,7 +115,12 @@ public class Parser {
                     System.out.println("No primary key defined");
                 } else {
                     System.out.println(attributes.toString());
-                    Table table = new Table(table_name, 1, attributes, new ArrayList<Record>(), primaryAttribute, primaryIndex);
+                    try{
+                        Table table = new Table(table_name, 1, attributes, new ArrayList<Record>(), primaryAttribute, primaryIndex);
+                    }
+                    catch(PrimaryKeyException pke){
+                        System.out.println(pke.getMessage());
+                    }
                     // TODO: send table to db through storage manager
                     System.out.println("SUCCESS! You've created " + table_name);
                     // testing byte array stuff
