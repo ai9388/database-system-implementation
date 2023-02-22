@@ -122,6 +122,7 @@ public class Table{
             Type.validateAll(entries, attributes); // if this fails exception is raised
             // assuming valid, create record
             Record record = new Record(entries, attributes);
+            //TODO: insert record into collections
         } catch (InvalidDataTypeException e) {
             // creation of record failed
             System.out.println(e.getMessage());
