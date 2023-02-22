@@ -115,8 +115,16 @@ public class Parser {
                     System.out.println("ERROR!");
                     System.out.println("No primary key defined.");
                 } else {
-                    Table table = new Table(table_name, 1, attributes, new ArrayList<Record>(), primaryAttribute, primaryIndex);
-                    StorageManager.addTable(table);
+                    System.out.println(attributes.toString());
+                    try{
+                        Table table = new Table(table_name, 1, attributes, new ArrayList<Record>(), primaryAttribute, primaryIndex);
+                        StorageManager.addTable(table);
+                        System.out.println("SUCCESS! You've created " + table_name);
+                    }
+                    catch(PrimaryKeyException pke){
+                        System.out.println(pke.getMessage());
+                    }
+                    // testing byte array stuff
                     Catalog c = new Catalog(this.dbLocation, attributes, this.pageSize, this.bufferSize);
                     byte[] catalogAsBytes = c.createCatalog();
                     c.writeToFile(catalogAsBytes);

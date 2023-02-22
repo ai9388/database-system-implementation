@@ -113,6 +113,7 @@ public class Table{
             Type.validateAll(entries, attributes); // if this fails exception is raised
             // assuming valid, create record
             Record record = new Record(entries, attributes);
+            //TODO: insert record into collections
         } catch (InvalidDataTypeException e) {
             // creation of record failed
             System.out.println(e.getMessage());
@@ -167,7 +168,7 @@ public class Table{
                         Type.validateType(newEntry, a);
                         values.add(newEntry);
                     } else {
-                        values.add(oldRecord.getValueAtColumn(a.getName()));
+                        values.add(oldRecord.getValueAtColumn(a));
                     }
                 }
                 Record r = new Record(values, attributes);
@@ -176,6 +177,10 @@ public class Table{
             }
 
         } catch (InvalidDataTypeException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+        catch (TableException e){
             System.out.println(e.getMessage());
             return false;
         }
@@ -189,14 +194,13 @@ public class Table{
      * checks if the provided column name exists in this table
      * @param column the name of the column
      */
-    public boolean isValidColumn(String column){
+    public boolean isValidColumn(String column) throws TableException{
         for (Attribute attribute : attributes) {
             if(attribute.getName().equals(column)){
                 return true;
             }
         }
-        // TODO: raise a table exception of invalid column name
-        return false;
+        throw new TableException(1);
     }
 
     /***
