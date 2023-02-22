@@ -59,8 +59,11 @@ public class Parser {
                 ArrayList<Attribute> attributes = new ArrayList<>();
                 Attribute primaryAttribute = null;
                 int primaryIndex = 0;
-                // TODO: Check if table exists - storage manager
-                // If it doesn't create it below
+                Table t = StorageManager.getTable(table_name);
+                if (t != null) {
+                    System.out.println("This table already exists.");
+                    break;
+                }
                 boolean hasOnePK = false; //character.bytes dont hardcode vals
                 for (String attribute : attr) {
                     String[] components = attribute.strip().replaceAll("\\(", " ").split(" ");
@@ -106,23 +109,23 @@ public class Parser {
                         }
                         default -> {
                             System.out.println("ERROR!");
-                            System.out.println("one or more attributes have a poorly written type");
+                            System.out.println("one or more attributes have a poorly written type.");
                         }
                     }
                 }
                 if (!hasOnePK) {
                     System.out.println("ERROR!");
-                    System.out.println("No primary key defined");
+                    System.out.println("No primary key defined.");
                 } else {
                     System.out.println(attributes.toString());
                     try{
                         Table table = new Table(table_name, 1, attributes, new ArrayList<Record>(), primaryAttribute, primaryIndex);
+                        StorageManager.addTable(table);
+                        System.out.println("SUCCESS! You've created " + table_name);
                     }
                     catch(PrimaryKeyException pke){
                         System.out.println(pke.getMessage());
                     }
-                    // TODO: send table to db through storage manager
-                    System.out.println("SUCCESS! You've created " + table_name);
                     // testing byte array stuff
                     Catalog c = new Catalog(this.dbLocation, attributes, this.pageSize, this.bufferSize);
                     c.writeToFile();
@@ -147,15 +150,24 @@ public class Parser {
                 int start_index = input.indexOf("(");
                 input = input.substring(start_index - 1);
                 String[] vals = input.split(",");
-                // Todo: get table from storage manager
-                // add in values if table exists
+                Table table = StorageManager.getTable(table_name);
+                if(table == null) {
+                    System.out.println("ERROR! Table " + table_name + "does not exist.");
+                    command = commands.QUIT;
+                    break;
+                }
                 for (String value : vals) {
                     String[] values = value.replaceAll("[();]", "").strip().split(" ");
-                    // todo: need to get attributes from table to do below...
-                    //table_values.add(new Record(values, ));
+                    ArrayList<Attribute> a = table.getAttributes();
+                    try {
+                        table_values.add(new Record(new ArrayList<>(Arrays.asList(values)), a));
+                    } catch (InvalidDataTypeException e) {
+                        System.out.println("ERROR! Invalid data entered.");
+                        command = commands.QUIT;
+                        break;
+                    }
                 }
                 insert(table_name, table_values);
-                // if error stop processing/quit
             }
             case HELP -> System.out.println();
             case QUIT -> {
@@ -167,12 +179,8 @@ public class Parser {
         }
     }
 
-    private void displayInfo(String name) {
-        // Todo: Call storage manager to display information
-        System.out.println("Table name: " + name);
-        System.out.println("Table schema: "); // Print table schema
-        System.out.println("Number of pages: "); // Print # of pages
-        System.out.println("Number of records: "); // Print # of records
+    private void displayInfo(String table_name) {
+        StorageManager.displayInfo(table_name);
     }
 
     private void displaySchema() {
@@ -180,22 +188,47 @@ public class Parser {
         System.out.println("Database Location: ");
         System.out.println("Page Size: ");
         System.out.println("Buffer Size: ");
-        // If table
-        System.out.println("Table schema: ");
-        // otherwise
-        System.out.println("No tables to display");
+        if (StorageManager.hasTable()) {
+            StorageManager.displaySchema("table");
+        }
+        else {
+            System.out.println("No tables to display");
+        }
         System.out.println("SUCCESS");
     }
 
     private void insert(String tableName, ArrayList<Record> vals) {
-        // Todo: Call storage manager insert pass in table name and record to insert
+        StorageManager.insertRecords(tableName, vals);
     }
 
     private void select(String attr, String tableName) {
-        String[] attributes = attr.split(",");
-        String t = tableName;
-        // TODO: Call storage manager select and pass in attributes selected + table name
-        // If table doesn't exist print error otherwise print selected data
+        if (attr.equals("*")) {
+            Table t = StorageManager.getTable(tableName);
+            if (t == null) {
+                System.out.println("ERROR!");
+            }
+            else {
+                t.getRecords().forEach(System.out::println);
+            }
+        }
+        else {
+            String[] attributes = attr.strip().split(",");
+            Table t = StorageManager.getTable(tableName);
+            if (t != null) {
+                ArrayList<Record> records = t.getRecords();
+                ArrayList<String> selected = new ArrayList<>();
+                for (int i = 0; i < records.size(); i++) {
+                    for (String attribute : attributes) {
+                        attribute = attribute.strip();
+                        // TODO: this needs to be edited but rough idea...
+                        selected.add(i, records.get(i).getValueAtColumn(attribute));
+                    }
+                }
+            }
+            else {
+                System.out.println("ERROR!");
+            }
+        }
     }
 
     private void createTable(String tableName, String[] args) {

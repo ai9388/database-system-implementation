@@ -15,6 +15,47 @@ public class StorageManager {
     // empty constructor
     public StorageManager(){}
 
+    public static Table getTable(String table_name) {
+        // TODO: for parser be able to get the table with the given table name
+        return null;
+    }
+
+    public static void insertRecords(String tableName, ArrayList<Record> records) {
+        // TODO: insert records into given table from parser
+        Table t = null;
+        for (Record record: records) {
+            t = getTable(tableName);
+            t = t != null ? t.insertRecord(record): null;
+        }
+        // TODO: write table out to storage?
+    }
+
+    public static void addTable(Table table) {
+        // This is used in Parser
+        // TODO: write table to the database?
+    }
+
+    public static void displaySchema(String table_name) {
+        // Used in parser...
+        // TODO: get the schema from the table?
+        Table t = getTable(table_name);
+        if (t!= null) {
+            System.out.println("Table name: " + table_name);
+            System.out.println("Table Schema: ");
+        }
+    }
+
+    public static void displayInfo(String table_name) {
+        displaySchema(table_name);
+        System.out.println("Number of pages: "); // Print # of pages
+        System.out.println("Number of records: "); // Print # of records
+    }
+
+    public static boolean hasTable() {
+        // TODO: check if there are any tables in the database for parser
+        return true;
+    }
+
     public Record getRecordFromPrimaryKey(Table table, String key){
         //get the record from the table
         // return table.getRecordsPK(key);
