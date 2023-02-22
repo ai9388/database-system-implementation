@@ -1,7 +1,5 @@
 import java.util.*;
 
-import javax.sound.sampled.SourceDataLine;
-
 public class Parser {
      enum commands {
         CREATE_TABLE, DISPLAY_SCHEMA, DISPLAY_INFO, SELECT, INSERT, HELP, QUIT
@@ -72,7 +70,7 @@ public class Parser {
                     switch (components[1]) {
                         case "char" -> {
                             // originally had A XOR B, should be !(A XOR B)
-                            hasOnePK = !(components.length > 3 && !hasOnePK);
+                            hasOnePK = !((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
                             Attribute a = new Attribute(attr_name, Type.CHAR, components.length > 3, Integer.parseInt(components[1]));
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
@@ -80,28 +78,28 @@ public class Parser {
                             //check component after char to know length
                         }
                         case "varchar" -> {
-                            hasOnePK = !(components.length > 3 && !hasOnePK);
+                            hasOnePK = !((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
                             Attribute a = new Attribute(components[1], Type.VARCHAR, components.length > 3, Integer.parseInt(components[1]));
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
                         }
                         case "bool" -> {
-                            hasOnePK = !(primarykey && !hasOnePK);
+                            hasOnePK = !((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
                             Attribute a = new Attribute(attr_name, Type.BOOLEAN, primarykey, 0);
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
                         }
                         case "integer" -> {
-                            hasOnePK = !(primarykey && !hasOnePK);
+                            hasOnePK = !((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
                             Attribute a = new Attribute(attr_name, Type.INTEGER, primarykey, 0);
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
                         }
                         case "double" -> {
-                            hasOnePK = !(primarykey && !hasOnePK);
+                            hasOnePK = !((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
                             Attribute a = new Attribute(attr_name, Type.DOUBLE, primarykey, 0);
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
@@ -117,13 +115,13 @@ public class Parser {
                     System.out.println("ERROR!");
                     System.out.println("No primary key defined.");
                 } else {
-                    System.out.println(attributes.toString());
                     Table table = new Table(table_name, 1, attributes, new ArrayList<Record>(), primaryAttribute, primaryIndex);
                     StorageManager.addTable(table);
-                    System.out.println("SUCCESS! You've created " + table_name);
-                    // testing byte array stuff
                     Catalog c = new Catalog(this.dbLocation, attributes, this.pageSize, this.bufferSize);
-                    c.writeToFile();
+                    byte[] catalogAsBytes = c.createCatalog();
+                    c.writeToFile(catalogAsBytes);
+                    System.out.println(StorageManager.convertBytesToString(c.getStringAttributes(), catalogAsBytes));
+                    System.out.println("SUCCESS! You've created " + table_name);
                 }
             }
             case DISPLAY_SCHEMA -> displaySchema();

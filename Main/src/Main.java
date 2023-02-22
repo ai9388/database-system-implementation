@@ -3,7 +3,7 @@ import java.io.File;
 
 public class Main {
 
-    public void checkDatabase(String path, int pageSize, int bufferSize){
+    public boolean checkDatabase(String path, int pageSize, int bufferSize){
 
         //TODO: do we need the pageSize and bufferSize for the parameter rn?
 
@@ -15,17 +15,19 @@ public class Main {
         if(directory.exists()){
             if(directory.length() > 0){
                 System.out.println("db exists");
+                return true;
             }
             else{
                 System.out.println("No existing db found");
                 System.out.println("Creating new db at" + path);
-                directory.mkdir();
+                return directory.mkdir();
             }
         }
         else{
             System.out.println("No existing db found");
             System.out.println("Creating new db at" + path);
-            directory.mkdir();
+            return directory.mkdir();
+
             //need to add a catalog into the folder.
         }
     }
