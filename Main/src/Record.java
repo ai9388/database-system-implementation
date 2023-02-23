@@ -19,7 +19,9 @@ public class Record {
                         entries.add(Double.parseDouble(value));
                 case BOOLEAN:
                         entries.add(Boolean.parseBoolean(value));
-                case default:
+                case VARCHAR:
+                    entries.add(value);
+                case CHAR:
                     entries.add(value);
             }
         }
