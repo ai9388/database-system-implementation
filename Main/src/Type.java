@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 
+import javax.swing.text.html.HTMLDocument.RunElement;
+
 public enum Type {
     INTEGER ("int"),
     DOUBLE ("double"),
@@ -30,43 +32,43 @@ public enum Type {
      * @throws InvalidDataTypeException if validation fails
      * @throws PrimaryKeyException
      */
-    public static boolean validateType(String value, Attribute attribute) 
-    throws InvalidDataTypeException{
+    public static boolean validateType(String value, Attribute attribute) throws InvalidDataTypeException{
         // verify if null regardless of data type
         // null values are always allowed
-        if(value.equals("null")){
+        if(value.equalsIgnoreCase("null")){
             return true;
         }
-        switch(attribute.getType()){
-            case INTEGER:
-                try {
+        try{
+            switch(attribute.getType()){
+                case INTEGER:
                     Integer.parseInt(value);
-                } catch (Exception e) {
-                    throw new InvalidDataTypeException(value, attribute);
-                }
-            case DOUBLE:
-                try {
-                    Double.parseDouble(value);
-                } catch (Exception e) {
-                    throw new InvalidDataTypeException(value, attribute);
-                }
-            case BOOLEAN:
-                try {
-                    Boolean.parseBoolean(value);
-                } catch (Exception e) {
-                    throw new InvalidDataTypeException(value, attribute);
-                }
-            case CHAR:
-                if(value.length() != attribute.getN()){
-                    throw new InvalidDataTypeException(value, attribute);
-                }
-
-            case VARCHAR:
-                if(value.length() > attribute.getN()){
-                    throw new InvalidDataTypeException(value, attribute);
-                }
+                    return true;
+                case DOUBLE:
+                        Double.parseDouble(value);
+                        return true;
+                case BOOLEAN:
+                        Boolean.parseBoolean(value);
+                        return true;
+                case CHAR:
+                    if(value.length() != attribute.getN()){
+                        break;
+                    }
+                    else{
+                        return true;
+                    }
+                case VARCHAR:
+                    if(value.length() > attribute.getN()){
+                        break;
+                    }
+                    else{
+                        return true;
+                    }
+            }
         }
-        return true;
+        catch(NumberFormatException NFE){
+            return false;
+        }
+        throw new InvalidDataTypeException(value, attribute);
     }
 
     /**
@@ -77,15 +79,19 @@ public enum Type {
      * @throws InvalidDataTypeException at least one of the values fails 
      * @throws PrimaryKeyException
      */
-    public static boolean validateAll(ArrayList<String> values, ArrayList<Attribute> attributes) 
-    throws InvalidDataTypeException{
-        for (int i = 0; i < values.size(); i++) {
+    public static boolean validateAll(String[] values, ArrayList<Attribute> attributes) throws InvalidDataTypeException {
+        for (int i = 0; i < values.length; i++) {
             Attribute attribute = attributes.get(i);
-            String value = values.get(i);
+            String value = values[i];
 
             // if this validation fails an exception is raised
-            Type.validateType(value, attribute);
+            try {
+                Type.validateType(value, attribute);
+            } catch (InvalidDataTypeException e) {
+                System.out.println(e.getMessage());
+                throw new InvalidDataTypeException(values, attributes);
         }
+    }
         return true;
     }
 
@@ -93,22 +99,25 @@ public enum Type {
      * Identify the type of the provided value
      * @param value values to identify
      */
-    public static Type identifyType(String value){
+    public static Type identifyType(String value, Attribute a){
         try {
             Integer.parseInt(value);
             return Type.INTEGER;
         }
         catch(Exception e){
-
+            
         }
         try {
-            Boolean.parseBoolean(value);
-            return Type.BOOLEAN;
+            Double.parseDouble(value);
+            return Type.DOUBLE;
         }
         catch(Exception e){
-
+            
         }
-        return Type.CHAR;
+        if(value.strip().equalsIgnoreCase("true") || value.strip().equalsIgnoreCase("true")) {
+            return Type.BOOLEAN;
+        }
+        return Type.VARCHAR;
     }
 
     @Override
