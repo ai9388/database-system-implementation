@@ -20,7 +20,7 @@ public class TableTest {
     @Before
     public void testCreateTable(){
         // test adding a record to a table
-        columns = new String[]{"name", "lastName", "age"};
+        columns = new String[]{"name", "lastname", "age"};
         types = new Type[]{Type.VARCHAR, Type.VARCHAR, Type.INTEGER};
         pkidx = new int[]{1};
         attributes = new ArrayList<>();
@@ -51,6 +51,14 @@ public class TableTest {
         assertTrue(table.getNumberOfRecords() == 2);
     }
 
+    @Test
+    public void testTableSelect(){
+        try {
+            System.out.println(table.select(new String[]{"name", "lastname"}));
+        } catch (TableException e) {
+            System.out.println(e.getMessage());
+        }
+    }
     public void testTableRecords(){
         System.out.println(table.displayTable());
     }
@@ -73,5 +81,6 @@ public class TableTest {
         test.testCreateTable();
         test.testAddRecordAsObject();
         test.testTableRecords();
+        test.testTableSelect();
     }
 }
