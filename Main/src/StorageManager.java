@@ -25,7 +25,7 @@ public class StorageManager {
         Table t = null;
         for (Record record: records) {
             t = getTable(tableName);
-            t = t != null ? t.insertRecord(record): null;
+            t.insertRecord(record);
         }
         // TODO: write table out to storage?
     }
