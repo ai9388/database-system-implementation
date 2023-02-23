@@ -189,12 +189,13 @@ public class Table{
      * @param column the name of the column
      */
     public boolean isValidColumn(String column) throws TableException{
-        for (Attribute attribute : attributes) {
-            if(attribute.getName().equals(column)){
-                return true;
-            }
+        boolean res = attributesByCol.keySet().contains(column);
+
+        if(res){
+            return res;
+        }else{
+            throw new TableException(1, column);
         }
-        throw new TableException(1);
     }
 
     public int getNumberOfRecords(){
@@ -205,15 +206,15 @@ public class Table{
      * returns the table as a string in a nice format
      * @return formatted table
      */
-    public String displayTable(){
+    public String formatResults(ArrayList<Attribute> columnAttr, ArrayList<Record> recordsToShow){
         String format = "|";
         String result = "";
         int len = 1;
         String dash;
-        Object[] headers = new Object[attributes.size()];
-        for(int i = 0; i < attributes.size(); i++){
-            Attribute a = attributes.get(i);
-            headers[i] = attributes.get(i).getName().toUpperCase();
+        Object[] headers = new Object[columnAttr.size()];
+        for(int i = 0; i < columnAttr.size(); i++){
+            Attribute a = columnAttr.get(i);
+            headers[i] = columnAttr.get(i).getName().toUpperCase();
             if(a.getType() == Type.VARCHAR || a.getType() == Type.CHAR){
                 int temp = Math.max(a.getName().length() + 2, a.getN() + 2);
                 format += "%-" + temp + "s|";
@@ -230,14 +231,33 @@ public class Table{
         // add the header to result
         result = dash + "\n" + String.format(format, headers) + "\n" + dash;
 
-        // add all the records
-        for(Record r: records){
-            result += "\n" + String.format(format, r.getEntries().toArray());
+        // specific columns from all the records
+        for(Record r: recordsToShow){
+            ArrayList<Object> entries = new ArrayList<>();
+            for(Attribute a: columnAttr){
+                entries.add(r.getValueAtColumn(getColNum(a.getName())));
+            }
+            result += "\n" + String.format(format, entries.toArray());
         }
 
         // bottom line
         result += "\n" + dash;
         return result;
+    }
+
+    public String displayTable(){
+        return formatResults(attributes, this.records);
+    }
+
+    public String select(String[] columns) throws TableException{
+        ArrayList<Attribute> selectAttributes = new ArrayList<>();
+        // validate all columns
+        for(String c: columns){
+            isValidColumn(c);
+            selectAttributes.add(attributesByCol.get(c));
+        }
+        
+        return formatResults(selectAttributes, this.records);   
     }
 
     /***
