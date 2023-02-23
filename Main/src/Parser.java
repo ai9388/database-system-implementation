@@ -119,7 +119,7 @@ public class Parser {
                 } else {
                     System.out.println(attributes.toString());
                     try{
-                        Table table = new Table(table_name, 1, attributes, new ArrayList<Record>(), primaryAttribute, primaryIndex);
+                        Table table = new Table(table_name, 1, attributes, primaryAttribute, primaryIndex);
                         StorageManager.addTable(table);
                         System.out.println("SUCCESS! You've created " + table_name);
                     }
@@ -202,33 +202,33 @@ public class Parser {
     }
 
     private void select(String attr, String tableName) {
-        if (attr.equals("*")) {
-            Table t = StorageManager.getTable(tableName);
-            if (t == null) {
-                System.out.println("ERROR!");
-            }
-            else {
-                t.getRecords().forEach(System.out::println);
-            }
-        }
-        else {
-            String[] attributes = attr.strip().split(",");
-            Table t = StorageManager.getTable(tableName);
-            if (t != null) {
-                ArrayList<Record> records = t.getRecords();
-                ArrayList<String> selected = new ArrayList<>();
-                for (int i = 0; i < records.size(); i++) {
-                    for (String attribute : attributes) {
-                        attribute = attribute.strip();
-                        // TODO: this needs to be edited but rough idea...
-                        selected.add(i, records.get(i).getValueAtColumn(attribute));
-                    }
-                }
-            }
-            else {
-                System.out.println("ERROR!");
-            }
-        }
+        // if (attr.equals("*")) {
+        //     Table t = StorageManager.getTable(tableName);
+        //     if (t == null) {
+        //         System.out.println("ERROR!");
+        //     }
+        //     else {
+        //         t.getRecords().forEach(System.out::println);
+        //     }
+        // }
+        // else {
+        //     String[] attributes = attr.strip().split(",");
+        //     Table t = StorageManager.getTable(tableName);
+        //     if (t != null) {
+        //         ArrayList<Record> records = t.getRecords();
+        //         ArrayList<String> selected = new ArrayList<>();
+        //         for (int i = 0; i < records.size(); i++) {
+        //             for (String attribute : attributes) {
+        //                 attribute = attribute.strip();
+        //                 // TODO: this needs to be edited but rough idea...
+        //                 selected.add(i, records.get(i).getValueAtColumn(attribute));
+        //             }
+        //         }
+        //     }
+        //     else {
+        //         System.out.println("ERROR!");
+        //     }
+        //}
     }
 
     private void createTable(String tableName, String[] args) {
