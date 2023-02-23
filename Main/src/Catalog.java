@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 import java.util.*;
 
 public class Catalog {
@@ -22,15 +21,31 @@ public class Catalog {
         this.bufferSize = bufferSize;
     }
 
-    public void writeToFile()
+    /**
+     * helper method for later use
+     */
+    public ArrayList<String> getStringAttributes()
+    {
+        ArrayList<String> strings = new ArrayList<String>();
+        
+        for (int i = 0; i < attributes.size(); i++) 
+        {
+            strings.add(attributes.get(i).getType().toString());
+        }
+
+        return strings;
+    }
+        
+
+    public byte[] createCatalog()
     {
         // allocate space for the page size and table number
         int catalog_size = 8;
         System.out.println(attributes.size());
 
-        for (Attribute attr : attributes)
+        for (Attribute attr : attributes) 
         {
-            switch (attr.getType())
+            switch (attr.getType()) 
             {
                 case BOOLEAN:
                     catalog_size += 1;
@@ -58,16 +73,24 @@ public class Catalog {
 
         // get num of pages, placeholder of 1 for now
         byte[] pageNum = sm.convertIntToByteArray(1);
-        for (int i = 0; i < pageNum.length; i++) {
+        for (int i = 0; i < pageNum.length; i++) 
+        {
             bytes[i] = pageNum[i];
         }
 
         // getting the page size in the schema
         byte[] page = sm.convertIntToByteArray(this.pageSize);
-        for (int i = 0; i < page.length; i++) {
+        for (int i = 0; i < page.length; i++) 
+        {
             bytes[i + 4] = page[i];
         }
 
+        return bytes;
+    }
+
+    public void writeToFile(byte[] bytes)
+    {
+        
         try {
             File file = new File(this.path + "Catalog");
             RandomAccessFile raf = new RandomAccessFile(file, WRITE);
@@ -77,7 +100,8 @@ public class Catalog {
             System.out.println(Arrays.toString(bytes));
 
             raf.close();
-        } catch (IOException e) {
+        } catch (IOException e) 
+        {
             System.out.println("oh no...");
             e.printStackTrace();
         }

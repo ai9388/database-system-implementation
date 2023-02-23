@@ -95,30 +95,48 @@ public class StorageManager {
 
     }
 
+    /**
+     * converts int to a byte array
+     * @param i integer we want to change
+     * @return byte array
+     */
     public byte[] convertIntToByteArray(int i) {
-        return ByteBuffer.allocate(4).putInt(i).array();
+        return ByteBuffer.allocate(Integer.BYTES).putInt(i).array();
     }
 
-    public int convertByteArrayToInt(byte[] bytes) {
-        return ByteBuffer.wrap(bytes).getInt();
-    }
-
+    /**
+     * convert boolean to byte
+     * @param bool boolean we wnat to change
+     * @return byte
+     */
     public byte convertBooleanToByte(boolean bool) {
         return (byte) (bool ? 1 : 0);
     }
 
-    public boolean convertByteToBoolean(byte b) {
-        return b != 0;
-    }
-
+    /**
+     * converts double to a byte array
+     * @param d double we want to change
+     * @return byte array
+     */
     public byte[] convertDoubleToByteArray(double d) {
-        return ByteBuffer.allocate(8).putDouble(d).array();
+        return ByteBuffer.allocate(Double.BYTES).putDouble(d).array();
     }
 
+    /**
+     * converts char to a byte array
+     * @param c char we want to change
+     * @return byte array
+     */
     public byte[] convertCharToByteArray(char c) {
-        return ByteBuffer.allocate(8).putChar(c).array();
+        return ByteBuffer.allocate(Character.BYTES).putChar(c).array();
     }
 
+    /**
+     * converts string to a byte array
+     * 
+     * @param st string we want to change
+     * @return byte array
+     */
     public byte[] convertStringToByteArray(String st) {
         byte[] bb = new byte[st.length()];
 
@@ -130,6 +148,44 @@ public class StorageManager {
         return bb;
     }
 
+    /**
+     * turning the bytes into a string that we can use for records later
+     * @param attributes string version of all of the schema's attributes
+     * @param bytes bytes we want to change
+     * @return concatenated string seprated by spaces(?)
+     */
+    public static String convertBytesToString(ArrayList<String> attributes, byte[] bytes)
+    {
+        String result = "";
+        for (int i = 0; i < attributes.size(); i++) {
+            switch (attributes.get(i))
+            {
+                case "int" -> {
+                    result.concat(String.valueOf(ByteBuffer.wrap(bytes).getInt()));
+                }
+                case "bool" -> {
+                    result.concat(String.valueOf(ByteBuffer.wrap(bytes).get()));
+                }
+                case "double" -> {
+                    result.concat(String.valueOf(ByteBuffer.wrap(bytes).getDouble()));
+                }
+                case "char" -> {
+                    result.concat(String.valueOf(ByteBuffer.wrap(bytes).getChar()));
+                }
+                case "varchar" -> {
+                    result.concat(String.valueOf(ByteBuffer.wrap(bytes).getChar()));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * helper method to concatenate multiple byte arrays
+     * @param arrays any N number of byte[]
+     * @return concated cyte[]
+     */
     public byte[] concat(byte[]... arrays) {
         // Determine the length of the result array
         int totalLength = 0;
