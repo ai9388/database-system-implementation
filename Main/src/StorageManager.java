@@ -154,26 +154,26 @@ public class StorageManager {
      * @param bytes bytes we want to change
      * @return concatenated string seprated by spaces(?)
      */
-    public static String convertBytesToString(ArrayList<String> attributes, byte[] bytes)
+    public static ArrayList<Object> convertBytesToObjects(ArrayList<String> attributes, byte[] bytes)
     {
-        String result = "";
+        ArrayList<Object> result = new ArrayList<Object>();
         for (int i = 0; i < attributes.size(); i++) {
             switch (attributes.get(i))
             {
                 case "int" -> {
-                    result.concat(String.valueOf(ByteBuffer.wrap(bytes).getInt()));
+                    result.add(ByteBuffer.wrap(bytes).getInt());
                 }
                 case "bool" -> {
-                    result.concat(String.valueOf(ByteBuffer.wrap(bytes).get()));
+                    result.add(ByteBuffer.wrap(bytes).get());
                 }
                 case "double" -> {
-                    result.concat(String.valueOf(ByteBuffer.wrap(bytes).getDouble()));
+                    result.add(ByteBuffer.wrap(bytes).getDouble());
                 }
                 case "char" -> {
-                    result.concat(String.valueOf(ByteBuffer.wrap(bytes).getChar()));
+                    result.add(ByteBuffer.wrap(bytes).getChar());
                 }
                 case "varchar" -> {
-                    result.concat(String.valueOf(ByteBuffer.wrap(bytes).getChar()));
+                    result.add(ByteBuffer.wrap(bytes).getChar());
                 }
             }
         }

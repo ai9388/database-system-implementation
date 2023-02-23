@@ -23,9 +23,9 @@ public class Parser {
             command = commands.SELECT;
         } else if (user_input.startsWith("insert into")) {
             command = commands.INSERT;
-        } else if (user_input.startsWith("<help>")) {
+        } else if (user_input.startsWith("help")) {
             command = commands.HELP;
-        } else if (user_input.startsWith("<quit>")) {
+        } else if (user_input.startsWith("quit")) {
             command = commands.QUIT;
         } else {
             System.out.println("Invalid Command.");
@@ -115,21 +115,19 @@ public class Parser {
                     System.out.println("ERROR!");
                     System.out.println("No primary key defined.");
                 } else {
-                    System.out.println(attributes.toString());
-                    try{
+                    try
+                    {
                         Table table = new Table(table_name, 1, attributes, new ArrayList<Record>(), primaryAttribute, primaryIndex);
                         StorageManager.addTable(table);
                         System.out.println("SUCCESS! You've created " + table_name);
                     }
-                    catch(PrimaryKeyException pke){
+                    catch(Exception pke){
                         System.out.println(pke.getMessage());
                     }
                     // testing byte array stuff
                     Catalog c = new Catalog(this.dbLocation, attributes, this.pageSize, this.bufferSize);
                     byte[] catalogAsBytes = c.createCatalog();
                     c.writeToFile(catalogAsBytes);
-                    System.out.println(StorageManager.convertBytesToString(c.getStringAttributes(), catalogAsBytes));
-                    System.out.println("SUCCESS! You've created " + table_name);
                 }
             }
             case DISPLAY_SCHEMA -> displaySchema();
@@ -162,7 +160,7 @@ public class Parser {
                     ArrayList<Attribute> a = table.getAttributes();
                     try {
                         table_values.add(new Record(new ArrayList<>(Arrays.asList(values)), a));
-                    } catch (InvalidDataTypeException e) {
+                    } catch (Exception e) {
                         System.out.println("ERROR! Invalid data entered.");
                         command = commands.QUIT;
                         break;
@@ -170,8 +168,9 @@ public class Parser {
                 }
                 insert(table_name, table_values);
             }
-            case HELP -> System.out.println();
+            case HELP -> displayHelp();
             case QUIT -> {
+                System.out.println("Shutting down 11QL...");
                 System.out.println("Shutting down the database...");
                 System.out.println("Purging the page buffer...");
                 System.out.println("Saving catalog...");
@@ -222,7 +221,7 @@ public class Parser {
                     for (String attribute : attributes) {
                         attribute = attribute.strip();
                         // TODO: this needs to be edited but rough idea...
-                        selected.add(i, records.get(i).getValueAtColumn(attribute));
+                        //selected.add(i, records.get(i).getValueAtColumn(attribute));
                     }
                 }
             }
@@ -245,5 +244,16 @@ public class Parser {
             }
         }
         // Call storage manager create Table with name, attrname, attrtype, and primary key if true
+    }
+
+    public void displayHelp() {
+        System.out.println("\n To run 11QL, use");
+        System.out.println("java Main <db loc> <page size> <buffer size>");
+        System.out.println("Available functions are:");
+        System.out.println("\tdisplay schema");
+        System.out.println("\tdisplay table <table name>");
+        System.out.println("\tselect * from <table name>");
+        System.out.println("\tinsert into <table name> values");
+        System.out.println("\tcreate table <table name> (<values>)");
     }
 }

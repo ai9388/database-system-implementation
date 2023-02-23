@@ -48,33 +48,22 @@ public class Main {
         String strInput = userInput.nextLine().toLowerCase();
 
         // looping until <quit> is taken in
-        while (!strInput.equals("<quit>")) {
+        while (!strInput.equals("quit")) {
             // oh no the user needs help, have to display it   
-            if (strInput.equals("<help>")) {
-                displayHelp();
-            } else {
-                // keep asking user for input
-                Parser parser = new Parser(strInput);
-                parser.saveArgs(args);
-                parser.parse();
-            }
+            // keep asking user for input
+            Parser parser = new Parser(strInput);
+            parser.saveArgs(args);
+            parser.parse();
 
             System.out.print(">");
             strInput = userInput.nextLine();
         }
         System.out.println("Shutting down 11QL...");
+        System.out.println("Shutting down the database...");
+        System.out.println("Purging the page buffer...");
+        System.out.println("Saving catalog...");
+        System.out.println("\nExiting the database...");
         userInput.close();
 
-    }
-
-    public static void displayHelp() {
-        System.out.println("\n To run 11QL, use");
-        System.out.println("java Main <db loc> <page size> <buffer size>");
-        System.out.println("Available functions are:");
-        System.out.println("\tdisplay schema");
-        System.out.println("\tdisplay table <table name>");
-        System.out.println("\tselect * from <table name>");
-        System.out.println("\tinsert into <table name> values");
-        System.out.println("\tcreate table <table name> (<values>)");
     }
 }
