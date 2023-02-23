@@ -1,12 +1,12 @@
 public class TableException extends Exception{
     private String[] errorMessages = new String[]{
-        "Column Error: Invalid name",
+        "Invalid Column Name: ",
     };
     private String message = "Table Error:";
 
-    public TableException(int errorCode){
+    public TableException(int errorCode, String arg){
         super();
-        this.message = errorMessages[errorCode - 1];
+        this.message = errorMessages[errorCode - 1] + arg;
 
     }
 

@@ -11,18 +11,15 @@ public class Table{
     private HashMap<String, Record> recordsByPK;
     private HashMap<String, Attribute> attributesByCol;
 
-    public Table(String name, int tableID, ArrayList<Attribute> attributes, ArrayList<Record> records, Attribute primaryAttribute, int primaryIndex) {
+    public Table(String name, int tableID, ArrayList<Attribute> attributes, Attribute primaryAttribute, int primaryIndex) {
         this.name = name;
         this.tableID = tableID;
         this.attributes = attributes;
-        this.records = records;
+        this.records = new ArrayList<>();
         this.primaryAttribute = primaryAttribute;
         setAttributesByCol();
         this.primaryIndex = primaryIndex;
         this.recordsByPK = new HashMap<>();
-        for (Record r: records) {
-            recordsByPK.put(primaryAttribute.getName(), r);
-        }
     }
 
     /**
@@ -109,16 +106,15 @@ public class Table{
     public boolean insertRecord(String[] values)
     {
         try {
-            ArrayList<String> entries = new ArrayList<String>(Arrays.asList(values));
-            Type.validateAll(entries, attributes); // if this fails exception is raised
-            // assuming valid, create record
-            Record record = new Record(entries, attributes);
-            //TODO: insert record into collections
+            Type.validateAll(values, attributes);
+            Record record = new Record(values, attributes);
+            this.insertRecord(record);
+            return true;
         } catch (InvalidDataTypeException e) {
             // creation of record failed
             System.out.println(e.getMessage());
+            return false;
         }
-        return false;
     }
 
     public Table insertRecord(Record record) {
@@ -155,25 +151,11 @@ public class Table{
      */
     public boolean updateRecordByPK(String pkValue, String column, String newEntry)
     {
-        // validate the primary key
         try {
-            Record oldRecord;
-            ArrayList<String> values = new ArrayList<>();
-            // if primary key is valid, remove record from collection
+            // TODO: primary key might not exist
+            // if primary key is valid, update the record
             if(Type.validateType(pkValue, primaryAttribute) && isValidColumn(column)){
-                oldRecord = recordsByPK.remove(pkValue);
-                for (Attribute a : attributes) {
-                    if (a.getName().equals(column)) {
-                        // validate new entry 
-                        Type.validateType(newEntry, a);
-                        values.add(newEntry);
-                    } else {
-                        values.add(oldRecord.getValueAtColumn(a));
-                    }
-                }
-                Record r = new Record(values, attributes);
-                this.records.add(r);
-                this.recordsByPK.put(pkValue, r);
+                 recordsByPK.get(pkValue).updateAtColumn(getColNum(column), newEntry);        
             }
 
         } catch (InvalidDataTypeException e) {
@@ -190,17 +172,99 @@ public class Table{
         return true;
     }
 
+    private int getColNum(String colName){
+        int idx = 0;
+        for (int i = 0; i < attributes.size(); i++) {
+            Attribute a = attributes.get(i);
+            if(a.getName().equalsIgnoreCase(colName)){
+                idx = i;
+                break;
+            }
+        }
+        return idx;
+    }
+
     /**
      * checks if the provided column name exists in this table
      * @param column the name of the column
      */
     public boolean isValidColumn(String column) throws TableException{
-        for (Attribute attribute : attributes) {
-            if(attribute.getName().equals(column)){
-                return true;
+        boolean res = attributesByCol.keySet().contains(column);
+
+        if(res){
+            return res;
+        }else{
+            throw new TableException(1, column);
+        }
+    }
+
+    public int getNumberOfRecords(){
+        return records.size();
+    }
+
+    /**
+     * returns the table as a string in a nice format
+     * @return formatted table
+     */
+    public String formatResults(ArrayList<Attribute> columnAttr, ArrayList<Record> recordsToShow){
+        String format = "|";
+        String result = "";
+        int len = 1;
+        String dash;
+        Object[] headers = new Object[columnAttr.size()];
+        for(int i = 0; i < columnAttr.size(); i++){
+            Attribute a = columnAttr.get(i);
+            headers[i] = columnAttr.get(i).getName().toUpperCase();
+            if(a.getType() == Type.VARCHAR || a.getType() == Type.CHAR){
+                int temp = Math.max(a.getName().length() + 2, a.getN() + 2);
+                format += "%-" + temp + "s|";
+                len += temp + 1;
+            }
+            else{
+                int temp = (a.getName().length() + 2) ;
+                format += "%-" + temp + "s|";
+                len += temp + 1;
             }
         }
-        throw new TableException(1);
+        // create dashed line
+        dash = String.format("%0" + len + "d", 0).replace("0", "-");
+        // add the header to result
+        result = dash + "\n" + String.format(format, headers) + "\n" + dash;
+
+        // specific columns from all the records
+        for(Record r: recordsToShow){
+            ArrayList<Object> entries = new ArrayList<>();
+            for(Attribute a: columnAttr){
+                entries.add(r.getValueAtColumn(getColNum(a.getName())));
+            }
+            result += "\n" + String.format(format, entries.toArray());
+        }
+
+        // bottom line
+        result += "\n" + dash;
+        return result;
+    }
+
+    public String displayTable(){
+        return formatResults(attributes, this.records);
+    }
+
+    public String select(String[] columns) throws TableException{
+        ArrayList<Attribute> selectAttributes = new ArrayList<>();
+        // validate all columns
+        for(String c: columns){
+            isValidColumn(c);
+            selectAttributes.add(attributesByCol.get(c));
+        }
+        
+        return formatResults(selectAttributes, this.records);   
+    }
+
+
+    // this might be redundant but lets keep it bc in later phases will be adding conditions
+    public String selectAll(){
+        return formatResults(this.attributes, this.records);   
+
     }
 
     /***

@@ -4,67 +4,70 @@ public class Record {
     /*
      * Arraylist of entries within record
      */
-    private ArrayList<String> entries;
+    private ArrayList<Object> entries;
 
-    /*
-     * data by attribute object
-     */
-    private HashMap<Attribute, String> entriesByAttribute;
-
-    public Record(ArrayList<String> entries, ArrayList<Attribute> attributes){
-        this.entries = entries;
-        this.entriesByAttribute = new HashMap<>();
-        // insert all values into map
-        for (int i = 0; i < entries.size(); i++) {
-            entriesByAttribute.put(attributes.get(i), entries.get(i));
+    public Record(String[] values, ArrayList<Attribute> attributes){
+        ArrayList<Object> entries = new ArrayList<>();
+        
+        for(int i = 0 ; i < values.length; i++){
+            String value = values[i];
+            Attribute attribute = attributes.get(i);
+            switch(attribute.getType()){
+                case INTEGER:
+                    entries.add(Integer.parseInt(value));
+                case DOUBLE:
+                        entries.add(Double.parseDouble(value));
+                case BOOLEAN:
+                        entries.add(Boolean.parseBoolean(value));
+                case default:
+                    entries.add(value);
+            }
         }
+
+        this.entries = entries;
     }
 
+    public Record(ArrayList<Object> entries){
+        this.entries = entries;
+        
+    }
     /**
      * returns the value of this record at a specific column
      * @param attribute attribute containing the name of the column
      */
-    public String getValueAtColumn(Attribute attribute){
-        String value = "";
-        for (Attribute a : entriesByAttribute.keySet()) {
-            if(a.getName().equals(attribute.getName())){
-                value = entriesByAttribute.get(a);
-            }
-        }
-
-        return value;
+    public Object getValueAtColumn(int idx){
+        return this.entries.get(idx);
     }
 
     /**
-     * sets the data collection
+     * sets the entries array to a new collection
      * @param newEntries the data to set
      */
-    public void setEntries(ArrayList<String> newEntries) {
+    public void setEntries(ArrayList<Object> newEntries) {
         this.entries = newEntries;
     }
 
     /**
-     * returns all the data
-     * @return
+     * returns all the entries as an array
+     * @return array of entries
      */
-    public ArrayList<String> getEntries() {
+    public ArrayList<Object> getEntries() {
         return entries;
     }
 
     /**
-     * update value at column and update data collection
-     * @param column column where update is happening
+     * update value at column
+     * @param index column index where update is happening
      * @param newValue new value replacing old at column
      */
-    public void updateByColumn(Attribute attribute, String newValue){
-        entriesByAttribute.replace(attribute, entriesByAttribute.get(attribute), newValue);
-        entries = new ArrayList<>(entriesByAttribute.values());
+    public void updateAtColumn(int index, Object newValue){
+        this.entries.set(index, newValue);
     }
 
     @Override
     public String toString() {
         // TODO: format record and make it pretty **
-        return String.join(" ", entries);
+        return "";
     }
 
     /**
@@ -74,12 +77,15 @@ public class Record {
     public String compact(){
         String info = "";
 
-        for(String data: entries){
-            if(Type.identifyType(data).equals(Type.VARCHAR) || Type.identifyType(data).equals(Type.CHAR)){
-                info += (data.length() + data);
+        for(Object entry: entries){
+
+            if(entry instanceof String){
+                String temp = (String) entry;
+                info += temp.length() + temp.strip();
                 continue;
             }
-            info += data;
+
+            info += entry.toString();
         }
 
         return info;
