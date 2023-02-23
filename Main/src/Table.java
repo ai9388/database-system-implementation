@@ -260,6 +260,13 @@ public class Table{
         return formatResults(selectAttributes, this.records);   
     }
 
+
+    // this might be redundant but lets keep it bc in later phases will be adding conditions
+    public String selectAll(){
+        return formatResults(this.attributes, this.records);   
+
+    }
+
     /***
      * TODO
      * getting a record by primary key
