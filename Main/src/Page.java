@@ -136,6 +136,14 @@ public class Page {
         return sm.concat(sm.convertIntToByteArray(this.id), sm.convertIntToByteArray(this.size));
     }
 
+    public byte[] recordsAsBytes(){
+        
+        byte[] recordsAsBytes = null;
+        
+        // TODO: implement
+        return recordsAsBytes;
+    }
+ 
     public Page split(Record record){
         // add the record
         this.records.add(record);
@@ -150,6 +158,10 @@ public class Page {
         this.setSize();
 
         return otherPage;
+    }
+
+    public byte[] getPageAsBytes(){
+        return sm.concat(getHeader(), recordsAsBytes());
     }
     
 }

@@ -77,27 +77,6 @@ public class Record {
         return "";
     }
 
-    /**
-     * compacts the record so it can be written to page
-     * @return
-     */
-    public String compact(){
-        String info = "";
-
-        for(Object entry: entries){
-
-            if(entry instanceof String){
-                String temp = (String) entry;
-                info += temp.length() + temp.strip();
-                continue;
-            }
-
-            info += entry.toString();
-        }
-
-        return info;
-    }
-
     public byte[] recordToBytes()
     {
         StorageManager sm = new StorageManager();
