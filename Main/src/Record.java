@@ -20,9 +20,10 @@ public class Record {
                     entries.add(Double.parseDouble(value));
                     break;
                 case BOOLEAN:
-                    entries.add(Boolean.parseBoolean(value));
-                    break;
-                default:
+                        entries.add(Boolean.parseBoolean(value));
+                case VARCHAR:
+                    entries.add(value);
+                case CHAR:
                     entries.add(value);
                     break;
             }

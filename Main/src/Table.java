@@ -117,10 +117,10 @@ public class Table{
         }
     }
 
-    public Table insertRecord(Record record) {
+    public boolean insertRecord(Record record) {
         this.records.add(record);
         this.recordsByPK.put(primaryAttribute.getName(), record);
-        return this;
+        return true;
     }
     /**
      * finds record based on primary key from all table collections
