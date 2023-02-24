@@ -107,7 +107,7 @@ public class Table{
     {
         try {
             Type.validateAll(values, attributes);
-            Record record = new Record(values, attributes);
+            Record record = new Record(new ArrayList<String>(Arrays.asList(values)), attributes);
             this.insertRecord(record);
             return true;
         } catch (InvalidDataTypeException e) {

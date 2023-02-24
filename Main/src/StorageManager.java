@@ -1,4 +1,7 @@
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,12 +18,14 @@ public class StorageManager {
     // empty constructor
     public StorageManager(){}
 
-    public static Table getTable(String table_name) {
+    public ArrayList<Page> pageBuffer = new ArrayList<>();
+
+    public Table getTable(String table_name) {
         // TODO: for parser be able to get the table with the given table name
         return null;
     }
 
-    public static void insertRecords(String tableName, ArrayList<Record> records) {
+    public void insertRecords(String tableName, ArrayList<Record> records) {
         // TODO: insert records into given table from parser
         Table t = null;
         for (Record record: records) {
@@ -30,12 +35,12 @@ public class StorageManager {
         // TODO: write table out to storage?
     }
 
-    public static void addTable(Table table) {
+    public void addTable(Table table) {
         // This is used in Parser
         // TODO: write table to the database?
     }
 
-    public static void displaySchema(String table_name) {
+    public void displaySchema(String table_name) {
         // Used in parser...
         // TODO: get the schema from the table?
         Table t = getTable(table_name);
@@ -45,13 +50,13 @@ public class StorageManager {
         }
     }
 
-    public static void displayInfo(String table_name) {
+    public void displayInfo(String table_name) {
         displaySchema(table_name);
         System.out.println("Number of pages: "); // Print # of pages
         System.out.println("Number of records: "); // Print # of records
     }
 
-    public static boolean hasTable() {
+    public boolean hasTable() {
         // TODO: check if there are any tables in the database for parser
         return true;
     }
@@ -109,8 +114,8 @@ public class StorageManager {
      * @param bool boolean we wnat to change
      * @return byte
      */
-    public byte convertBooleanToByte(boolean bool) {
-        return (byte) (bool ? 1 : 0);
+    public byte[] convertBooleanToByteArray(boolean bool) {
+        return ByteBuffer.allocate(1).put((byte) (bool ? 1 : 0)).array();
     }
 
     /**
@@ -154,7 +159,7 @@ public class StorageManager {
      * @param bytes bytes we want to change
      * @return concatenated string seprated by spaces(?)
      */
-    public static ArrayList<Object> convertBytesToObjects(ArrayList<String> attributes, byte[] bytes)
+    public ArrayList<Object> convertBytesToObjects(ArrayList<String> attributes, byte[] bytes)
     {
         ArrayList<Object> result = new ArrayList<Object>();
         for (int i = 0; i < attributes.size(); i++) {
@@ -205,5 +210,41 @@ public class StorageManager {
 
         return result;
     }
+
+
+    /**
+     * adding the initial information to the file
+     * this includes the file id, number of pages, and number of records
+     */
+    public void addIntialInfoToTable(File new_table, int fileID, int numOfPages, int numOfRecords)
+    {
+        RandomAccessFile raf;
+        try {
+            raf = new RandomAccessFile(new_table, "rw");
+
+            byte[] bytes = new byte[3 * Integer.BYTES];
+            // writing the file id
+            for (int i = 0; i < Integer.BYTES; i++) {
+                concat(bytes, convertIntToByteArray(fileID));
+            }
+
+            // writing the number of pages
+            for (int i = Integer.BYTES; i < 2 * Integer.BYTES; i++) {
+                concat(bytes, convertIntToByteArray(numOfPages));
+            }
+
+            // writing the number of records
+            for (int i = 2 * Integer.BYTES; i < 3 * Integer.BYTES; i++) {
+                concat(bytes, convertIntToByteArray(numOfRecords));
+            }
+
+            raf.write(bytes);
+            raf.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
 }

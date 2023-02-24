@@ -46,8 +46,6 @@ public class Page {
     public Page(String content){
         this.content = content;
         this.size = content.length() * BYTESIZE;
-
-
     }
 
     /**
@@ -79,6 +77,16 @@ public class Page {
         int recordSize = compactedRecord.length() * BYTESIZE;
        
         return recordSize <= getSpace();
+    }
+
+    /**
+     * Turns all of the page's records to bytes
+     * @return byte array
+     */
+    public byte[] turnAllRecordsToBytes()
+    {
+
+        return new byte[0];
     }
     
 }

@@ -5,13 +5,15 @@ public class Record {
      * Arraylist of entries within record
      */
     private ArrayList<Object> entries;
+    private ArrayList<Attribute> attributes;
 
-    public Record(String[] values, ArrayList<Attribute> attributes){
-        ArrayList<Object> entries = new ArrayList<>();
+    public Record(ArrayList<String> values, ArrayList<Attribute> attr){
+        this.entries = new ArrayList<>();
+        this.attributes = attr;
         
-        for(int i = 0 ; i < values.length; i++){
-            String value = values[i];
-            Attribute attribute = attributes.get(i);
+        for(int i = 0 ; i < values.size(); i++){
+            String value = values.get(i);
+            Attribute attribute = attr.get(i);
             switch(attribute.getType()){
                 case INTEGER:
                     entries.add(Integer.parseInt(value));
@@ -20,22 +22,22 @@ public class Record {
                     entries.add(Double.parseDouble(value));
                     break;
                 case BOOLEAN:
-                        entries.add(Boolean.parseBoolean(value));
+                    entries.add(Boolean.parseBoolean(value));
+                    break;
                 case VARCHAR:
                     entries.add(value);
+                    break;
                 case CHAR:
                     entries.add(value);
                     break;
             }
         }
-
-        this.entries = entries;
     }
 
     public Record(ArrayList<Object> entries){
-        this.entries = entries;
-        
+        this.entries = entries;    
     }
+
     /**
      * returns the value of this record at a specific column
      * @param attribute attribute containing the name of the column
@@ -95,4 +97,32 @@ public class Record {
 
         return info;
     }
+
+    public byte[] recordToBytes()
+    {
+        StorageManager sm = new StorageManager();
+
+        byte[] bb = new byte[0];
+
+        for (Object entry : this.entries) 
+        {
+            if (entry instanceof Integer)
+            {
+                sm.concat(bb, sm.convertIntToByteArray( (int) entry));
+            }
+            else if (entry instanceof Double)
+            {
+                sm.concat(bb, sm.convertDoubleToByteArray( (double) entry));
+            }
+            else if (entry instanceof Boolean)
+            {
+                sm.concat(bb, sm.convertBooleanToByteArray( (boolean) entry));
+            }
+            else if (entry instanceof String)
+            {
+                sm.concat(bb, sm.convertStringToByteArray( (String) entry));
+            }
+        }
+        return bb;
+    }  
 }

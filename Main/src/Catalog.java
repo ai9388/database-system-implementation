@@ -41,7 +41,6 @@ public class Catalog {
     {
         // allocate space for the page size and table number
         int catalog_size = 8;
-        System.out.println(attributes.size());
 
         for (Attribute attr : attributes) 
         {
@@ -96,8 +95,6 @@ public class Catalog {
             RandomAccessFile raf = new RandomAccessFile(file, WRITE);
 
             raf.write(bytes);
-
-            System.out.println(Arrays.toString(bytes));
 
             raf.close();
         } catch (IOException e) 
