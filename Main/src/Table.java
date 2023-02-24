@@ -1,14 +1,37 @@
 import java.util.*;
 
 public class Table{
-    
+    /**
+     * the table name
+     */
     private String name;
+    /**
+     * unique table id assigned to table
+     */
     private int tableID;
+    /**
+     * the attributes for all the columns in this table
+     */
     private ArrayList<Attribute> attributes;
+    /**
+     * collection of all the records in this table
+     */
     private ArrayList<Record> records;
+    /**
+     * object attribute for the primary key of this table
+     */
     private Attribute primaryAttribute;
+    /**
+     * index of the primary attribute in the columns
+     */
     private int primaryIndex;
+    /**
+     * maps the primary key of a record to a record object
+     */
     private HashMap<String, Record> recordsByPK;
+    /**
+     * maps the name of a column to its attribute object
+     */
     private HashMap<String, Attribute> attributesByCol;
 
     public Table(String name, int tableID, ArrayList<Attribute> attributes, Attribute primaryAttribute, int primaryIndex) {
@@ -273,5 +296,7 @@ public class Table{
     • getting a page by table and page number
      *
      */
+
+     // TODO: add record to page and split if full
 
 }
