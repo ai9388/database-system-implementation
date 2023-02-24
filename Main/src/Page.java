@@ -40,12 +40,20 @@ public class Page {
     private static final int BYTESIZE = 2;
 
     /**
+     * the id of this page
+     */
+    private int id;
+
+    StorageManager sm;
+
+    /**
      * used to convert an existing page from memory into records
      * @param content
      */
     public Page(String content){
         this.content = content;
         this.size = content.length() * BYTESIZE;
+        sm = new StorageManager();
     }
 
     /**
@@ -73,20 +81,11 @@ public class Page {
     }
 
     public boolean fit(Record record){
-        String compactedRecord = record.compact();
-        int recordSize = compactedRecord.length() * BYTESIZE;
-       
-        return recordSize <= getSpace();
+        return record.recordToBytes().length <= getSpace();
     }
 
-    /**
-     * Turns all of the page's records to bytes
-     * @return byte array
-     */
-    public byte[] turnAllRecordsToBytes()
-    {
-
-        return new byte[0];
+    public byte[] getHeader(){
+        return sm.concat(sm.convertIntToByteArray(this.id), sm.convertIntToByteArray(this.size));
     }
     
 }
