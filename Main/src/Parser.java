@@ -72,21 +72,19 @@ public class Parser {
                     String[] components = attribute.strip().replaceAll("\\(", " ").split(" ");
                     String attr_name = components[0];
                     boolean primarykey = components.length > 2 && components[2].equals("primarykey");
-                    System.out.println(primarykey);
                     switch (components[1]) {
                         case "char" -> {
-                            hasOnePK = !((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
-                            String char_length = components[2].split("\\)")[0];
-                            Attribute a = new Attribute(attr_name, Type.CHAR, components.length > 3, Integer.parseInt(char_length));
+                            // originally had A XOR B, should be !(A XOR B)
+                            hasOnePK = ((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
+                            Attribute a = new Attribute(attr_name, Type.CHAR, components.length > 3, Integer.parseInt(components[2].replace(')', ' ').strip()));
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
                             //check component after char to know length
                         }
                         case "varchar" -> {
-                            hasOnePK = !((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
-                            String varchar_length = components[2].split("\\)")[0];
-                            Attribute a = new Attribute(components[1], Type.VARCHAR, components.length > 3, Integer.parseInt(varchar_length));
+                            hasOnePK = ((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
+                            Attribute a = new Attribute(components[1], Type.VARCHAR, components.length > 3, Integer.parseInt(components[2].replace(')', ' ').strip()));
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
@@ -122,12 +120,13 @@ public class Parser {
                     System.out.println("ERROR!");
                     System.out.println("No primary key defined.");
                 } else {
+                    System.out.println(attributes.toString());
                     try{
                         Table table = new Table(table_name, 1, attributes, primaryAttribute, primaryIndex);
                         storageManager.addTable(table);
                         File new_table = new File(dbLocation + table_name);
                         storageManager.addIntialInfoToTable(new_table, 0, 0, 0);
-                        
+
                         System.out.println("SUCCESS! You've created " + table_name);
                     }
                     catch(Exception pke){
