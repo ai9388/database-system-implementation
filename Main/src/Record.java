@@ -15,12 +15,16 @@ public class Record {
             switch(attribute.getType()){
                 case INTEGER:
                     entries.add(Integer.parseInt(value));
+                    break;
                 case DOUBLE:
-                        entries.add(Double.parseDouble(value));
+                    entries.add(Double.parseDouble(value));
+                    break;
                 case BOOLEAN:
-                        entries.add(Boolean.parseBoolean(value));
-                case default:
+                    entries.add(Boolean.parseBoolean(value));
+                    break;
+                default:
                     entries.add(value);
+                    break;
             }
         }
 
