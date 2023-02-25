@@ -34,6 +34,8 @@ public class Table{
      */
     private HashMap<String, Attribute> attributesByCol;
 
+    ArrayList<Page> pages;
+
     public Table(String name, int tableID, ArrayList<Attribute> attributes, Attribute primaryAttribute, int primaryIndex) {
         this.name = name;
         this.tableID = tableID;
@@ -43,6 +45,7 @@ public class Table{
         setAttributesByCol();
         this.primaryIndex = primaryIndex;
         this.recordsByPK = new HashMap<>();
+        pages = new ArrayList<>();
     }
 
     /**
@@ -143,6 +146,11 @@ public class Table{
     public boolean insertRecord(Record record) {
         this.records.add(record);
         this.recordsByPK.put(primaryAttribute.getName(), record);
+        // if there are no pages create one
+        if(this.pages.size() == 0){
+            Page page  = new Page(this.primaryIndex);
+            addRecordToPage(record);
+        }
         return true;
     }
     /**
@@ -290,17 +298,24 @@ public class Table{
 
     }
 
+    public void addRecordToPage(Record r){
+        Page page;
+        for (int i = 0; i < pages.size(); i++) {
+            page = pages.get(i);
+            // does the record beolong in this page?
+            if(page.addRecordInOrder(r) > -1){
+                page.insertRecordAt(r, i);
+
+                // if the addition overflows the page split
+                if(page.overflow()){
+                    pages.add(i, page.split());
+                }
+            }
+        }
+    }
+
     public void getPagebyPNum(int num){
         //return page by page number
     }
-
-    /***
-     * TODO
-     * getting a record by primary key
-    • getting a page by table and page number
-     *
-     */
-
-     // TODO: add record to page and split if full
 
 }
