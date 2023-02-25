@@ -123,6 +123,10 @@ public class Table{
         this.records = records;
     }
 
+    public Record getRecordbyPK(String pkValue){
+        return recordsByPK.get(pkValue);
+    }
+
     /**
      * creates a record and inserts it into all table collections
      * @param values values of the record
@@ -294,14 +298,8 @@ public class Table{
 
     public void getPagebyPNum(int num){
         //return page by page number
+        
     }
-
-    /***
-     * TODO
-     * getting a record by primary key
-    • getting a page by table and page number
-     *
-     */
 
      // TODO: add record to page and split if full
 
