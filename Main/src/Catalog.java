@@ -76,25 +76,23 @@ public class Catalog {
         }
 
         byte[] bytes = new byte[catalog_size];
-
-        StorageManager sm = new StorageManager();
         
         // getting the page size in the schema
-        byte[] page = sm.convertIntToByteArray(this.pageSize);
+        byte[] page = Type.convertIntToByteArray(this.pageSize);
         for (int i = 0; i < page.length; i++) 
         {
             bytes[i] = page[i];
         }
 
         // get num of pages, placeholder of 1 for now
-        byte[] numOfPages = sm.convertIntToByteArray(1);
+        byte[] numOfPages = Type.convertIntToByteArray(1);
         for (int i = 0; i < numOfPages.length; i++) 
         {
             bytes[i + 4] = numOfPages[i];
         }
 
         // getting the last used page id
-        byte[] lup = sm.convertIntToByteArray(1);
+        byte[] lup = Type.convertIntToByteArray(1);
         for (int i = 0; i < page.length; i++) 
         {
             bytes[i + 8] = lup[i];

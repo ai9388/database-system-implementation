@@ -46,14 +46,12 @@ public class Page {
     
     public Page(int pkIdx, int pageSize){
         this.size = 0;
-        sm = new StorageManager();
         this.pkIdx = pkIdx;
         this.size = pageSize;
     }
 
     public Page(ArrayList<Record> records){
         this.records = records;
-        sm = new StorageManager();
         setSize();
     }
 
@@ -102,7 +100,7 @@ public class Page {
     }
 
     public byte[] getHeader(){
-        return sm.concat(sm.convertIntToByteArray(this.id), sm.convertIntToByteArray(this.size));
+        return Type.concat(Type.convertIntToByteArray(this.id), Type.convertIntToByteArray(this.size));
     }
 
     public byte[] recordsAsBytes()
@@ -111,7 +109,7 @@ public class Page {
 
         for (Record record : this.records)
         {
-            sm.concat(bb, record.recordToBytes());
+            Type.concat(bb, record.recordToBytes());
         }
 
         return bb;
@@ -134,7 +132,7 @@ public class Page {
     }
 
     public byte[] getPageAsBytes(){
-        return sm.concat(getHeader(), recordsAsBytes());
+        return Type.concat(getHeader(), recordsAsBytes());
     }
     
 

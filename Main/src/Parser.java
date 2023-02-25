@@ -18,7 +18,7 @@ public class Parser {
     public Parser(String str_input) {
 
         database = new Database("db", new HashMap<String, Table>(), null, dbLocation);
-        storageManager = new StorageManager(database);
+        storageManager = new StorageManager(database, bufferSize);
 
         this.user_input = str_input.toLowerCase();
         if (user_input.startsWith("create table")) {
