@@ -40,9 +40,9 @@ public class Catalog {
 
     /**
      * Catalog is formatted as
-     * 4 Bytes - 
-     * 4 Bytes - 
-     * 4 Bytes - last page number 
+     * 4 Bytes - page size (taken from user)
+     * 4 Bytes - number of pages that the catalog has
+     * 4 Bytes - page number of most recently used page
      * 
      * @return
      */
@@ -141,5 +141,10 @@ public class Catalog {
             System.out.println("oh no...");
             e.printStackTrace();
         }
+    }
+
+    public void displayCatalogInfo()
+    {
+
     }
 }

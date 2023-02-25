@@ -188,20 +188,18 @@ public class Parser {
     }
 
     private void displayInfo(String table_name) {
-        //StorageManager.displayInfo(table_name);
+        
+
+
     }
 
     private void displaySchema() {
-        // Todo: Data needs to be gotten from storage manager
-        System.out.println("Database Location: ");
-        System.out.println("Page Size: ");
-        System.out.println("Buffer Size: ");
-        // if (StorageManager.hasTable()) {
-        //     StorageManager.displaySchema("table");
-        // }
-        // else {
-        //     System.out.println("No tables to display");
-        // }
+        System.out.println("DB Location: " + this.dbLocation);
+        System.out.println("Page Size: " + this.pageSize);
+        System.out.println("Buffer Size: " + this.bufferSize);
+
+        StorageManager.displaySchema();
+
         System.out.println("SUCCESS");
     }
 

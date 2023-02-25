@@ -48,40 +48,7 @@ public class Page {
         this.size = 0;
         sm = new StorageManager();
         this.pkIdx = pkIdx;
-        this.size = pageSize; 
-    }
-
-
-
-    public void setRecordsOrder() {
-        Collections.sort(records, new Comparator<Record>() {
-            @Override
-            public int compare(Record r1, Record r2){
-                Object pkValue1 = r1.getValueAtColumn(pkIdx);
-                Object pkValue2 = r2.getValueAtColumn(pkIdx);
-
-                // INT
-                if(pkValue1 instanceof Integer){
-                    return Integer.compare((int)pkValue1, (int)pkValue2);
-                }
-
-                // DOUBLE
-                else if(pkValue1 instanceof Double){
-                    return Double.compare((double)pkValue1, (double)pkValue2);
-                }
-
-                // BOOLEAN
-                else if(pkValue1 instanceof Boolean){
-                    return Boolean.compare((boolean)pkValue1, (boolean)pkValue2);
-                }
-
-                // String
-                else{
-                    return String.valueOf(pkValue1).compareTo(String.valueOf(pkValue2));
-                }
-                
-            }
-        });
+        this.size = pageSize;
     }
 
     public Page(ArrayList<Record> records){
@@ -111,6 +78,14 @@ public class Page {
     public int getSpace(){
         return capacity - size;
     }
+    
+    /**
+     * return the current capacity
+     * @return int
+     */
+    public static int getCapacity() {
+        return capacity;
+    }
 
     public boolean addRecord(Record record){
         if(fit(record)){
@@ -122,14 +97,6 @@ public class Page {
         return false;
     }
 
-    /**
-     * return the current capacity
-     * @return int
-     */
-    public static int getCapacity() {
-        return capacity;
-    }
-
     public boolean fit(Record record){
         return record.recordToBytes().length <= getSpace();
     }
@@ -138,12 +105,16 @@ public class Page {
         return sm.concat(sm.convertIntToByteArray(this.id), sm.convertIntToByteArray(this.size));
     }
 
-    public byte[] recordsAsBytes(){
-        
-        byte[] recordsAsBytes = null;
-        
-        // TODO: implement
-        return recordsAsBytes;
+    public byte[] recordsAsBytes()
+    {
+        byte[] bb = new byte[0];
+
+        for (Record record : this.records)
+        {
+            sm.concat(bb, record.recordToBytes());
+        }
+
+        return bb;
     }
  
     public Page split(Record record){
@@ -166,4 +137,36 @@ public class Page {
         return sm.concat(getHeader(), recordsAsBytes());
     }
     
+
+    public void setRecordsOrder() {
+        Collections.sort(records, new Comparator<Record>() {
+            @Override
+            public int compare(Record r1, Record r2) {
+                Object pkValue1 = r1.getValueAtColumn(pkIdx);
+                Object pkValue2 = r2.getValueAtColumn(pkIdx);
+
+                // INT
+                if (pkValue1 instanceof Integer) {
+                    return Integer.compare((int) pkValue1, (int) pkValue2);
+                }
+
+                // DOUBLE
+                else if (pkValue1 instanceof Double) {
+                    return Double.compare((double) pkValue1, (double) pkValue2);
+                }
+
+                // BOOLEAN
+                else if (pkValue1 instanceof Boolean) {
+                    return Boolean.compare((boolean) pkValue1, (boolean) pkValue2);
+                }
+
+                // String
+                else {
+                    return String.valueOf(pkValue1).compareTo(String.valueOf(pkValue2));
+                }
+
+            }
+        });
+    }
+
 }

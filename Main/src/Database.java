@@ -109,5 +109,10 @@ public class Database {
     {
         return table.getRecords();
     }
+
+    public ArrayList<Table> getAllTables()
+    {
+        return new ArrayList<Table>(this.tables.values());
+    }
     
 }
