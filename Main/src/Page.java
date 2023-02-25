@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -45,11 +44,14 @@ public class Page {
 
     int pkIdx;
     
-    public Page(int pkIdx){
+    public Page(int pkIdx, int pageSize){
         this.size = 0;
         sm = new StorageManager();
         this.pkIdx = pkIdx;
+        this.size = pageSize; 
     }
+
+
 
     public void setRecordsOrder() {
         Collections.sort(records, new Comparator<Record>() {
@@ -150,6 +152,18 @@ public class Page {
         this.setSize();
 
         return otherPage;
+    }
+
+    public byte[] convertRecordsToBytes()
+    {
+        byte[] bb = new byte[0];
+
+        for (Record record : this.records)
+        {
+            sm.concat(bb, record.recordToBytes());
+        }
+
+        return bb;
     }
     
 }

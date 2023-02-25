@@ -12,6 +12,7 @@ public class Catalog {
     private ArrayList<Attribute> attributes;
     private int pageSize;
     private int bufferSize;
+    public RandomAccessFile raf;
 
     public Catalog(String path, ArrayList<Attribute> attributes, int pageSize, int bufferSize)
     {
@@ -37,10 +38,18 @@ public class Catalog {
     }
         
 
+    /**
+     * Catalog is formatted as
+     * 4 Bytes - 
+     * 4 Bytes - 
+     * 4 Bytes - last page number 
+     * 
+     * @return
+     */
     public byte[] createCatalog()
     {
         // allocate space for the page size and table number
-        int catalog_size = 8;
+        int catalog_size = 12;
 
         for (Attribute attr : attributes) 
         {
@@ -69,30 +78,60 @@ public class Catalog {
         byte[] bytes = new byte[catalog_size];
 
         StorageManager sm = new StorageManager();
-
-        // get num of pages, placeholder of 1 for now
-        byte[] pageNum = sm.convertIntToByteArray(1);
-        for (int i = 0; i < pageNum.length; i++) 
-        {
-            bytes[i] = pageNum[i];
-        }
-
+        
         // getting the page size in the schema
         byte[] page = sm.convertIntToByteArray(this.pageSize);
         for (int i = 0; i < page.length; i++) 
         {
-            bytes[i + 4] = page[i];
+            bytes[i] = page[i];
+        }
+
+        // get num of pages, placeholder of 1 for now
+        byte[] numOfPages = sm.convertIntToByteArray(1);
+        for (int i = 0; i < numOfPages.length; i++) 
+        {
+            bytes[i + 4] = numOfPages[i];
+        }
+
+        // getting the last used page id
+        byte[] lup = sm.convertIntToByteArray(1);
+        for (int i = 0; i < page.length; i++) 
+        {
+            bytes[i + 8] = lup[i];
         }
 
         return bytes;
     }
 
-    public void writeToFile(byte[] bytes)
+    /**
+     * updating the number of pages in the catalog
+     */
+    public void updateNumberOfPages(int newNumOfPages)
     {
-        
+        try {
+            raf.seek(4);
+            raf.writeInt(newNumOfPages);
+            raf.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateLastUsedPageNumber(int lupn) {
+        try {
+            raf.seek(8);
+            raf.writeInt(lupn);
+            raf.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void writeToFile(byte[] bytes)
+    {  
         try {
             File file = new File(this.path + "Catalog");
-            RandomAccessFile raf = new RandomAccessFile(file, WRITE);
+            raf = new RandomAccessFile(file, WRITE);
 
             raf.write(bytes);
 
