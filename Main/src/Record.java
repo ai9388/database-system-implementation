@@ -1,34 +1,44 @@
 import java.util.*;
 
-public class Record {
+public class Record implements Comparable<Record>{
     /*
      * Arraylist of entries within record
      */
     private ArrayList<Object> entries;
     private ArrayList<Attribute> attributes;
+    private int pkid;
+    private int size;
 
-    public Record(ArrayList<String> values, ArrayList<Attribute> attr){
+    public Record(ArrayList<String> values, ArrayList<Attribute> attr) {
         this.entries = new ArrayList<>();
         this.attributes = attr;
         
         for(int i = 0 ; i < values.size(); i++){
             String value = values.get(i);
             Attribute attribute = attr.get(i);
+            if(attribute.isIsPrimaryKey()){
+                pkid = i;
+            }
             switch(attribute.getType()){
                 case INTEGER:
                     entries.add(Integer.parseInt(value));
+                    size += Integer.BYTES;
                     break;
                 case DOUBLE:
                     entries.add(Double.parseDouble(value));
+                    size += Integer.BYTES;
                     break;
                 case BOOLEAN:
                     entries.add(Boolean.parseBoolean(value));
+                    size += 1;
                     break;
                 case VARCHAR:
                     entries.add(value);
+                    size += (Character.BYTES * value.length());
                     break;
                 case CHAR:
                     entries.add(value);
+                    size += Character.BYTES * attribute.getN();
                     break;
             }
         }
@@ -103,5 +113,31 @@ public class Record {
             }
         }
         return bb;
+    }
+
+    @Override
+    public int compareTo(Record o) {
+        Object pkValue1 = this.getValueAtColumn(pkid);
+        Object pkValue2 = o.getValueAtColumn(pkid);
+
+        // INT
+        if(pkValue1 instanceof Integer){
+            return Integer.compare((int)pkValue1, (int)pkValue2);
+        }
+
+        // DOUBLE
+        else if(pkValue1 instanceof Double){
+            return Double.compare((double)pkValue1, (double)pkValue2);
+        }
+
+        // BOOLEAN
+        else if(pkValue1 instanceof Boolean){
+            return Boolean.compare((boolean)pkValue1, (boolean)pkValue2);
+        }
+
+        // String
+        else{
+            return String.valueOf(pkValue1).compareTo(String.valueOf(pkValue2));
+        }
     }  
 }
