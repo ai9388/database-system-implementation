@@ -42,7 +42,7 @@ public class TableTest {
     }
 
     @Test
-    public void testAddRecordAsArray(){
+    public void testAddRecordAsArray() throws InvalidDataTypeException{
         // test to add a record
         String[] d1 = new String[]{"jan", "Gomez", "14"};
         String[] d2 = new String[]{"Alice", "Chen", "56"};
@@ -59,8 +59,10 @@ public class TableTest {
             System.out.println(e.getMessage());
         }
     }
+
+    @Test
     public void testTableRecords(){
-        System.out.println(table.displayTable());
+        System.out.println(table.displayTableSchema());
     }
 
     public void createAttributes(){

@@ -30,10 +30,8 @@ public enum Type {
      * @param value value to check
      * @param attribute attribute value is expected to belong to
      * @return true if value valid
-     * @throws InvalidDataTypeException if validation fails
-     * @throws PrimaryKeyException
      */
-    public static boolean validateType(String value, Attribute attribute) throws InvalidDataTypeException{
+    public static boolean validateType(String value, Attribute attribute){
         // verify if null regardless of data type
         // null values are always allowed
         if(value.equalsIgnoreCase("null")){
@@ -69,7 +67,7 @@ public enum Type {
         catch(NumberFormatException NFE){
             return false;
         }
-        throw new InvalidDataTypeException(value, attribute);
+        return false;
     }
 
     /**
@@ -77,25 +75,43 @@ public enum Type {
      * @param values collection of values
      * @param attributes attributes containing types of collection
      * @return true if none of the values fail validation
-     * @throws InvalidDataTypeException at least one of the values fails 
-     * @throws PrimaryKeyException
      */
-    public static boolean validateAll(String[] values, ArrayList<Attribute> attributes) throws InvalidDataTypeException {
+    public static boolean validateAll(String[] values, ArrayList<Attribute> attributes){
         for (int i = 0; i < values.length; i++) {
             Attribute attribute = attributes.get(i);
             String value = values[i];
 
-            // if this validation fails an exception is raised
-            try {
-                Type.validateType(value, attribute);
-            } catch (InvalidDataTypeException e) {
-                System.out.println(e.getMessage());
-                throw new InvalidDataTypeException(values, attributes);
+            if(!Type.validateType(value, attribute)){
+                return false;
+            }
         }
-    }
         return true;
     }
 
+
+    /**
+     * returns an Object object depending on the type of the entry
+     * @param value value of entry
+     * @param type its attribute type
+     * @return the object
+     */
+    public static Object getObjFromType(String value, Type type){
+        Object res = value;
+        switch(type){
+            case INTEGER:
+                return (Integer.parseInt(value));
+            case DOUBLE:
+                return (Double.parseDouble(value));
+            case BOOLEAN:
+                return Boolean.parseBoolean(value);
+            case VARCHAR:
+                return value;
+            case CHAR:
+                return value;
+        }
+
+        return res;
+    }
     /**
      * Identify the type of the provided value
      * @param value values to identify

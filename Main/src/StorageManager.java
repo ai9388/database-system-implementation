@@ -96,7 +96,7 @@ public class StorageManager {
         return null;
     }
 
-    public void insertOneRecordIntoTable(String tableName, String[] record) throws TableException{
+    public void insertOneRecordIntoTable(String tableName, String[] record) throws TableException, InvalidDataTypeException{
         Table table = db.getTableByName(tableName);
         table.insertRecord(record);
     }

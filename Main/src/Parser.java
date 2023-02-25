@@ -195,6 +195,9 @@ public class Parser {
         catch(TableException e){
             System.out.println(e.getLocalizedMessage());
         }
+        catch(InvalidDataTypeException e){
+            System.out.println(e.getMessage());
+        }
     }
 
     private void displayInfo(String table_name) {
