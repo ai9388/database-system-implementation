@@ -45,14 +45,16 @@ public class Main {
         Scanner userInput = new Scanner(System.in);
         String strInput = userInput.nextLine().toLowerCase();
 
+        // parser object for this session
+        Parser parser = new Parser();
+        // save the user provided arguments
+        parser.saveArgs(args);
         // looping until <quit> is taken in
         while (!strInput.equals("quit")) {
             // oh no the user needs help, have to display it   
             // keep asking user for input
-            Parser parser = new Parser(strInput);
-            parser.saveArgs(args);
+            parser.clasifyInput(strInput);
             parser.parse();
-
             System.out.print(">");
             strInput = userInput.nextLine();
         }
