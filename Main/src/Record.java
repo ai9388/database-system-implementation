@@ -87,7 +87,12 @@ public class Record implements Comparable<Record>{
     @Override
     public String toString() {
         // TODO: format record and make it pretty **
-        return "";
+        String str = "";
+        for (Object entry : this.entries) 
+        {
+            str += String.valueOf(entry) + ", ";
+        }
+        return "("  + str + "): " + this.size + " bytes";
     }
 
     public byte[] recordToBytes()
@@ -138,7 +143,7 @@ public class Record implements Comparable<Record>{
 
         // String
         else{
-            return String.valueOf(pkValue1).compareTo(String.valueOf(pkValue2));
+            return String.valueOf(pkValue1).toLowerCase().compareTo(String.valueOf(pkValue2).toLowerCase());
         }
     }  
 }
