@@ -85,9 +85,13 @@ public class Database {
         return false;
     }
 
-    public Table getTableByName(String name)
+    public Table getTableByName(String name) throws TableException
     {
-        return this.tables.get(name);
+       try {
+        return tables.get(name);
+       } catch (NullPointerException e) {
+        throw new TableException(2, name);
+       }
     }
 
     public void updateCatalog()
@@ -116,4 +120,12 @@ public class Database {
         return new ArrayList<Table>(this.tables.values());
     }
     
+    public String selectFromTable(String tableName, String[] columns) throws TableException{
+        Table table = this.getTableByName(tableName); 
+
+        if(columns == null){
+            return table.selectAll();
+        }
+        return table.select(columns);
+    }
 }
