@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.RandomAccessFile;
+import java.security.cert.CertPath;
 import java.util.*;
 
 public class Parser {
@@ -7,7 +8,7 @@ public class Parser {
         CREATE_TABLE, DISPLAY_SCHEMA, DISPLAY_INFO, SELECT, INSERT, HELP, QUIT
     }
 
-    private final String user_input;
+    private String user_input;
     private commands command;
     private String dbLocation;
     private int pageSize;
@@ -15,8 +16,14 @@ public class Parser {
     public Database database;
     public StorageManager storageManager;
 
-    public Parser(String str_input) {
+    public Parser(){
+        // TODO: hai-yen
+        storageManager = new StorageManager(database, bufferSize);
+    }
 
+    public void clasifyInput(String str_input) {
+
+        this.user_input = str_input;
         database = new Database("db", new HashMap<String, Table>(), null, dbLocation);
         storageManager = new StorageManager(database, bufferSize);
 
@@ -47,14 +54,18 @@ public class Parser {
     {
         this.dbLocation = args[0];
         this.pageSize = Integer.parseInt(args[1]);
+        // set the page size
+        Page.setCapacity(pageSize);
         this.bufferSize = Integer.parseInt(args[2]);
+        // TODO: set the buffer size
     }
 
     /**
      * Assume user passes in database
      */
     public void parse() {
-        switch (command) {
+        try{
+            switch (command) {
             case CREATE_TABLE -> {
                 String input = user_input.replaceFirst("create table", "").strip();
                 int start_index = input.indexOf("(");
@@ -125,7 +136,7 @@ public class Parser {
                 } else {
                     System.out.println(attributes.toString());
                     try{
-                        Table table = new Table(table_name, 1, attributes, primaryAttribute, primaryIndex);
+                        Table table = new Table(table_name, attributes);
                         storageManager.addTable(table);
                         File new_table = new File(dbLocation + table_name);
                         storageManager.addIntialInfoToTable(new_table, 0, 0, 0);
@@ -151,33 +162,25 @@ public class Parser {
                 int start_index = input.indexOf("from");
                 int end_index = input.indexOf("m", start_index);
                 String table_name = input.substring(end_index + 1).replaceAll(";", "").strip();
-                select("*", table_name);
+                select("*", table_name); // This is good for now because we are not selecting by columns just yet
             }
             case INSERT -> {
                 String input = user_input.replaceFirst("insert into", "").strip();
                 String table_name = input.split(" ")[0];
-                ArrayList<Record> table_values = new ArrayList<>();
+                // ArrayList<Record> table_values = new ArrayList<>();
                 int start_index = input.indexOf("(");
                 input = input.substring(start_index - 1);
                 String[] vals = input.split(",");
-                Table table = storageManager.getTable(table_name);
-                if(table == null) {
-                    System.out.println("ERROR! Table " + table_name + "does not exist.");
-                    command = commands.QUIT;
-                    break;
-                }
+                // Table table = storageManager.getTable(table_name);
+                // if(table == null) {
+                //     System.out.println("ERROR! Table " + table_name + "does not exist.");
+                //     command = commands.QUIT;
+                //     break;
+                // }
                 for (String value : vals) {
                     String[] values = value.replaceAll("[();]", "").strip().split(" ");
-                    ArrayList<Attribute> a = table.getAttributes();
-                    try {
-                        table_values.add(new Record(new ArrayList<String>(Arrays.asList(values)), a));
-                    } catch (Exception e) {
-                        System.out.println("ERROR! Invalid data entered.");
-                        command = commands.QUIT;
-                        break;
-                    }
+                    storageManager.insertOneRecordIntoTable(table_name, values);
                 }
-                insert(table_name, table_values);
             }
             case HELP -> displayHelp();
             case QUIT -> {
@@ -187,6 +190,10 @@ public class Parser {
                 System.out.println("Saving catalog...");
                 System.out.println("\nExiting the database...");
             }
+        }
+        }
+        catch(TableException e){
+            System.out.println(e.getLocalizedMessage());
         }
     }
 
@@ -206,38 +213,37 @@ public class Parser {
         System.out.println("SUCCESS");
     }
 
-    private void insert(String tableName, ArrayList<Record> vals) {
-        //StorageManager.insertRecords(tableName, vals);
-    }
+    // this may not be needed????
+    // private void insert(String tableName, ArrayList<Record> vals) {
+    //     //StorageManager.insertRecords(tableName, vals);
+    // }
 
-    private void select(String attr, String tableName) {
-        // if (attr.equals("*")) {
-        //     Table t = StorageManager.getTable(tableName);
-        //     if (t == null) {
-        //         System.out.println("ERROR!");
-        //     }
-        //     else {
-        //         t.getRecords().forEach(System.out::println);
-        //     }
-        // }
-        // else {
-        //     String[] attributes = attr.strip().split(",");
-        //     Table t = StorageManager.getTable(tableName);
-        //     if (t != null) {
-        //         ArrayList<Record> records = t.getRecords();
-        //         ArrayList<String> selected = new ArrayList<>();
-        //         for (int i = 0; i < records.size(); i++) {
-        //             for (String attribute : attributes) {
-        //                 attribute = attribute.strip();
-        //                 // TODO: this needs to be edited but rough idea...
-        //                 selected.add(i, records.get(i).getValueAtColumn(attribute));
-        //             }
-        //         }
-        //     }
-        //     else {
-        //         System.out.println("ERROR!");
-        //     }
-        //}
+    private void select(String attr, String tableName) throws TableException {
+        if (attr.equals("*")) {
+            // Table t = StorageManager.getTable(tableName);
+            // if (t == null) {
+            //     System.out.println("ERROR!");
+            // }
+            // else {
+            //     t.getRecords().forEach(System.out::println);
+            // }
+            System.out.println(storageManager.selectFromTable(tableName, null));
+        }
+        else {
+            String[] columns = attr.strip().split(",");
+            // Table t = StorageManager.getTable(tableName);
+            // if (t != null) {
+            //     ArrayList<Record> records = t.getRecords();
+            //     ArrayList<String> selected = new ArrayList<>();
+            //     for (int i = 0; i < records.size(); i++) {
+            //         for (String attribute : attributes) {
+            //             attribute = attribute.strip();
+            //             // TODO: this needs to be edited but rough idea...
+            //             selected.add(i, records.get(i).getValueAtColumn(attribute));
+            //         }
+            //     }
+            System.out.println(storageManager.selectFromTable(tableName, columns));
+            }
     }
 
     public void displayHelp() {
