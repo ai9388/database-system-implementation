@@ -26,14 +26,14 @@ public class TableTest {
         attributes = new ArrayList<>();
         createAttributes();
         Attribute pka = attributes.get(0);
-        table = new Table("person", 1, attributes, pka, 0);
+        table = new Table("person", attributes);
     }
 
     @Test
     public void testAddRecordAsObject(){
         // test to add a record
-        String[] d1 = new String[]{"carly", "maggiolo", "21"};
-        String[] d2 = new String[]{"Mark", "Smith", "24"};
+        ArrayList<String> d1 = new ArrayList<>(Arrays.asList(new String[]{"carly", "maggiolo", "21"}));
+        ArrayList<String> d2 = new ArrayList<>(Arrays.asList(new String[]{"mark", "smith", "24"}));
         Record r1 = new Record(d1, attributes);
         Record r2 = new Record(d2, attributes);
         table.insertRecord(r1);
