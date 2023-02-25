@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class Table{
+public class Table {
     /**
      * the table name
      */
@@ -53,7 +53,7 @@ public class Table{
         // set the primary attribute and primary index
         for (int i = 0; i < attributes.size(); i++) {
             Attribute a = attributes.get(i);
-            if(a.isIsPrimaryKey()){
+            if (a.isIsPrimaryKey()) {
                 primaryAttribute = a;
                 primaryIndex = i;
             }
@@ -64,6 +64,7 @@ public class Table{
     /**
      * sets the static offset for table id's
      * table id's start at 1000
+     * 
      * @param id the table number which indicates how many tables exists
      */
     public static void setGeneralTableID(int id) {
@@ -86,6 +87,7 @@ public class Table{
 
     /**
      * sets the primary attribute
+     * 
      * @param primaryAttribute Attribute object that represents primary col
      */
     public void setPrimaryAttribute(Attribute primaryAttribute) {
@@ -108,12 +110,12 @@ public class Table{
     }
 
     /**
-     * returns the attribute object that corresponds to a 
+     * returns the attribute object that corresponds to a
      * specific column name
      */
     public void setAttributesByCol() {
         this.attributesByCol = new HashMap<>();
-        for(Attribute attribute: this.attributes){
+        for (Attribute attribute : this.attributes) {
             attributesByCol.put(attribute.getName(), attribute);
         }
     }
@@ -128,17 +130,15 @@ public class Table{
     /*
      * returns a re
      */
-    public Record getRecordByPK(String pkValue) throws PrimaryKeyException{
-        if(Type.validateType(pkValue, primaryAttribute)){
-            if(recordsByPK.containsKey(pkValue)){
+    public Record getRecordByPK(String pkValue) throws PrimaryKeyException {
+        if (Type.validateType(pkValue, primaryAttribute)) {
+            if (recordsByPK.containsKey(pkValue)) {
                 return recordsByPK.get(pkValue);
-            }
-            else{
+            } else {
                 // invalid pk value
-                throw  new PrimaryKeyException(4, pkValue);
+                throw new PrimaryKeyException(4, pkValue);
             }
-        }
-        else{
+        } else {
             throw new PrimaryKeyException(5, new InvalidDataTypeException(pkValue, primaryAttribute).getMessage());
         }
     }
@@ -146,13 +146,13 @@ public class Table{
     /**
      * creates a record and inserts it into all table collections
      * as well as pages
+     * 
      * @param values values of the record
      * @return true if record creation is successful
      * @throws InvalidDataTypeException
      */
-    public boolean insertRecord(String[] values) throws InvalidDataTypeException
-    {
-        if(Type.validateAll(values, attributes)){
+    public boolean insertRecord(String[] values) throws InvalidDataTypeException {
+        if (Type.validateAll(values, attributes)) {
             Record record = new Record(new ArrayList<String>(Arrays.asList(values)), attributes);
             this.insertRecord(record);
             return true;
@@ -166,84 +166,83 @@ public class Table{
         this.records.add(record);
         this.recordsByPK.put(record.getValueAtColumn(primaryIndex), record);
         // if there are no pages create one
-        if(this.pages.size() == 0){
-            Page page  = new Page(this.primaryIndex);
+        if (this.pages.size() == 0) {
+            Page page = new Page(this.primaryIndex);
             this.pages.add(page);
         }
         addRecordToPage(record);
         return true;
     }
+
     /**
      * finds record based on primary key from all table collections
+     * 
      * @param pkValue value of primary key
      * @return true if removal successful
      * @throws PrimaryKeyException
      * @throws InvalidDataTypeException
      */
-    public boolean removeRecordByPK(String pkValue) throws PrimaryKeyException, InvalidDataTypeException
-    {
-        if(Type.validateType(pkValue, primaryAttribute)){
+    public boolean removeRecordByPK(String pkValue) throws PrimaryKeyException, InvalidDataTypeException {
+        if (Type.validateType(pkValue, primaryAttribute)) {
             // convert the value to an object
             Object pkObject = Type.getObjFromType(pkValue, primaryAttribute.getType());
 
             // validate key value
-            if(recordsByPK.containsKey(pkObject)){
+            if (recordsByPK.containsKey(pkObject)) {
                 recordsByPK.remove(pkObject);
                 return true;
-            }
-            else{
+            } else {
                 throw new PrimaryKeyException(4, pkValue);
             }
-        } else{
+        } else {
             throw new PrimaryKeyException(5, new InvalidDataTypeException(pkValue, primaryAttribute).getMessage());
         }
     }
 
     /**
      * finds a record based on primary key and updates it
-     * @param pkValue value of primary key
-     * @param column column to update
+     * 
+     * @param pkValue  value of primary key
+     * @param column   column to update
      * @param newEntry new value to insert
      * @return true if update successful
      * @throws TableException
      * @throws PrimaryKeyException
      * @throws InvalidDataTypeException
      */
-    public boolean updateRecordByPK(String pkValue, String column, String newEntry) throws TableException, PrimaryKeyException, InvalidDataTypeException
-    {
-        if(Type.validateType(pkValue, primaryAttribute)){
-            if(isValidColumn(column)){
+    public boolean updateRecordByPK(String pkValue, String column, String newEntry)
+            throws TableException, PrimaryKeyException, InvalidDataTypeException {
+        if (Type.validateType(pkValue, primaryAttribute)) {
+            if (isValidColumn(column)) {
                 Record r = getRecordByPK(pkValue);
                 Attribute a = attributesByCol.get(column);
                 // if both the column and the pk are valid, then validate data type
-                if(Type.validateType(pkValue, a)){
+                if (Type.validateType(pkValue, a)) {
                     Object newEntryObject = Type.getObjFromType(pkValue, a.getType());
-                    r.updateAtColumn(getColNum(column), newEntryObject);
-                } 
-                else{
+                    r.updateAtColumn(getColumnIndex(column), newEntryObject);
+                } else {
                     throw new InvalidDataTypeException(newEntry, a);
                 }
-            }
-            else{
+            } else {
                 throw new TableException(1, column);
             }
-        }
-        else{
+        } else {
             throw new PrimaryKeyException(5, new InvalidDataTypeException(pkValue, primaryAttribute).getMessage());
-        }        
+        }
         return true;
     }
 
     /**
      * returns the index of a specific attribute
-     * @param colName column name of the attribute
+     * 
+     * @param columnName column name of the attribute
      * @return the index of that attribute in table
      */
-    private int getColNum(String colName){
+    private int getColumnIndex(String columnName) {
         int idx = 0;
         for (int i = 0; i < attributes.size(); i++) {
             Attribute a = attributes.get(i);
-            if(a.getName().equalsIgnoreCase(colName)){
+            if (a.getName().equalsIgnoreCase(columnName)) {
                 idx = i;
                 break;
             }
@@ -253,40 +252,42 @@ public class Table{
 
     /**
      * checks if the provided column name exists in this table
+     * 
      * @param column the name of the column
      */
-    public boolean isValidColumn(String column){
+    public boolean isValidColumn(String column) {
         return attributesByCol.keySet().contains(column);
     }
 
     /**
      * counts how many records this table has
+     * 
      * @return
      */
-    public int getNumberOfRecords(){
+    public int getNumberOfRecords() {
         return records.size();
     }
 
     /**
      * returns the table as a string in a nice format
+     * 
      * @return formatted table
      */
-    public String formatResults(ArrayList<Attribute> columnAttr, ArrayList<Record> recordsToShow){
+    public String formatResults(ArrayList<Attribute> columnAttr, ArrayList<Record> recordsToShow) {
         String format = "|";
         String result = "";
         int len = 1;
         String dash;
         Object[] headers = new Object[columnAttr.size()];
-        for(int i = 0; i < columnAttr.size(); i++){
+        for (int i = 0; i < columnAttr.size(); i++) {
             Attribute a = columnAttr.get(i);
             headers[i] = columnAttr.get(i).getName().toUpperCase();
-            if(a.getType() == Type.VARCHAR || a.getType() == Type.CHAR){
+            if (a.getType() == Type.VARCHAR || a.getType() == Type.CHAR) {
                 int temp = Math.max(a.getName().length() + 2, a.getN() + 2);
                 format += "%-" + temp + "s|";
                 len += temp + 1;
-            }
-            else{
-                int temp = (a.getName().length() + 2) ;
+            } else {
+                int temp = (a.getName().length() + 2);
                 format += "%-" + temp + "s|";
                 len += temp + 1;
             }
@@ -297,10 +298,10 @@ public class Table{
         result = dash + "\n" + String.format(format, headers) + "\n" + dash;
 
         // specific columns from all the records
-        for(Record r: recordsToShow){
+        for (Record r : recordsToShow) {
             ArrayList<Object> entries = new ArrayList<>();
-            for(Attribute a: columnAttr){
-                entries.add(r.getValueAtColumn(getColNum(a.getName())));
+            for (Attribute a : columnAttr) {
+                entries.add(r.getValueAtColumn(getColumnIndex(a.getName())));
             }
             result += "\n" + String.format(format, entries.toArray());
         }
@@ -312,11 +313,12 @@ public class Table{
 
     /**
      * returns a view of the table (schema)
-     * @return string view 
+     * 
+     * @return string view
      */
-    public String displayTableSchema(){
+    public String displayTableSchema() {
         String str = "Table Name: " + this.getName() + "\n" + "Table Schema: \n";
-        for(Attribute a: attributes){
+        for (Attribute a : attributes) {
             str += "\t" + a + "\n";
         }
         return str;
@@ -324,78 +326,81 @@ public class Table{
 
     /**
      * returns table information
+     * 
      * @return table info as string
      */
-    public String displayTableInfo(){
-        String str = displayTableSchema() + 
-            "Pages: " + this.pages.size() + "\n" +
-            "Record: " + this.records.size();
+    public String displayTableInfo() {
+        String str = displayTableSchema() +
+                "Pages: " + this.pages.size() + "\n" +
+                "Record: " + this.records.size();
         return str;
     }
 
     /**
      * selects infomation from the current table by columns
+     * 
      * @param columns the column names
      * @return string formatted with the table info
      * @throws TableException if columns are invalid
      */
-    public String select(String[] columns) throws TableException{
+    public String select(String[] columns) throws TableException {
         ArrayList<Attribute> selectAttributes = new ArrayList<>();
         // validate all columns
-        for(String c: columns){
+        for (String c : columns) {
             isValidColumn(c);
             selectAttributes.add(attributesByCol.get(c));
         }
-        
-        return formatResults(selectAttributes, this.records);   
+
+        return formatResults(selectAttributes, this.records);
     }
 
     /**
      * selects and returns all the records from this table
+     * 
      * @return string records formatted
      */
-    public String selectAll(){
-        return formatResults(this.attributes, this.records);   
+    public String selectAll() {
+        return formatResults(this.attributes, this.records);
 
     }
 
     /**
      * adds a given record to the pages of this table
+     * 
      * @param r
      */
-    public void addRecordToPage(Record r){
+    public void addRecordToPage(Record r) {
         Page page;
         boolean inserted = false;
 
         for (int i = 0; i < pages.size(); i++) {
             page = pages.get(i);
 
-            if(inserted){
+            if (inserted) {
                 break;
             }
             // does the record belong in this page?
             int index = page.addRecordInOrder(r);
-            if(index > -1){
+            if (index > -1) {
                 page.insertRecordAt(r, index);
                 inserted = true;
-            }
-            else{ // if this is the last page
-                // and the record was not found to be less than any item
-                // then it must be greater than all
-                if(i == pages.size() - 1 && !inserted){
+            } else { // if this is the last page
+                     // and the record was not found to be less than any item
+                     // then it must be greater than all
+                if (i == pages.size() - 1 && !inserted) {
                     page.addLast(r);
                     inserted = true;
                 }
 
             }
             // if the addition overflows the page split
-            if(page.overflow()){
+            if (page.overflow()) {
                 pages.add(i + 1, page.split());
                 inserted = true;
             }
         }
 
-        // if all the pages have been iterated and the value could not be added. 
+        // if all the pages have been iterated and the value could not be added.
         // that means it is greater than all values
         //
     }
@@ -403,14 +408,14 @@ public class Table{
     /*
      * returns a page based on its number
      */
-    public Page getPageByPNum(int num){
-        return pages.get(num); 
+    public Page getPageByPNum(int num) {
+        return pages.get(num);
     }
 
     /*
      * returns all pages
      */
-    public ArrayList<Page> getPages(){
+    public ArrayList<Page> getPages() {
         return this.pages;
     }
 
