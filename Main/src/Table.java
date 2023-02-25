@@ -9,6 +9,8 @@ public class Table{
      * unique table id assigned to table
      */
     private int tableID;
+
+    private static int GENERALTABLEID;
     /**
      * the attributes for all the columns in this table
      */
@@ -34,18 +36,29 @@ public class Table{
      */
     private HashMap<String, Attribute> attributesByCol;
 
-    ArrayList<Page> pages;
+    private ArrayList<Page> pages;
 
-    public Table(String name, int tableID, ArrayList<Attribute> attributes, Attribute primaryAttribute, int primaryIndex) {
+    public Table(String name, ArrayList<Attribute> attributes) {
         this.name = name;
-        this.tableID = tableID;
+        this.tableID = GENERALTABLEID + 1;
         this.attributes = attributes;
         this.records = new ArrayList<>();
-        this.primaryAttribute = primaryAttribute;
-        setAttributesByCol();
-        this.primaryIndex = primaryIndex;
         this.recordsByPK = new HashMap<>();
         pages = new ArrayList<>();
+        // get the primary attribute and primary index
+        for (int i = 0; i < attributes.size(); i++) {
+            Attribute a = attributes.get(i);
+            if(a.isIsPrimaryKey()){
+                primaryAttribute = a;
+                primaryIndex = i;
+            }
+        }
+        setAttributesByCol();
+        
+    }
+
+    public static void setGENERALTABLEID(int id) {
+        GENERALTABLEID = id;
     }
 
     /**
@@ -124,6 +137,10 @@ public class Table{
         this.records = records;
     }
 
+    public Record getRecordbyPK(String pkValue){
+        return recordsByPK.get(pkValue);
+    }
+
     /**
      * creates a record and inserts it into all table collections
      * @param values values of the record
@@ -149,8 +166,8 @@ public class Table{
         // if there are no pages create one
         if(this.pages.size() == 0){
             Page page  = new Page(this.primaryIndex);
-            addRecordToPage(record);
         }
+        addRecordToPage(record);
         return true;
     }
     /**
@@ -314,8 +331,9 @@ public class Table{
         }
     }
 
-    public void getPagebyPNum(int num){
-        //return page by page number
+    public Page getPagebyPNum(int num){
+        return pages.get(num);
+        
     }
 
 }

@@ -102,12 +102,18 @@ public class Database {
 
     public void getPageByNum() 
     {
+        
         System.out.println("getting page by number");
     } 
 
     public ArrayList<Record> getRecordsFromTable(Table table) 
     {
         return table.getRecords();
+    }
+
+    public ArrayList<Table> getAllTables()
+    {
+        return new ArrayList<Table>(this.tables.values());
     }
     
 }

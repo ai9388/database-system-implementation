@@ -98,19 +98,19 @@ public class Record implements Comparable<Record>{
         {
             if (entry instanceof Integer)
             {
-                sm.concat(bb, sm.convertIntToByteArray( (int) entry));
+                Type.concat(bb, Type.convertIntToByteArray( (int) entry));
             }
             else if (entry instanceof Double)
             {
-                sm.concat(bb, sm.convertDoubleToByteArray( (double) entry));
+                Type.concat(bb, Type.convertDoubleToByteArray( (double) entry));
             }
             else if (entry instanceof Boolean)
             {
-                sm.concat(bb, sm.convertBooleanToByteArray( (boolean) entry));
+                Type.concat(bb, Type.convertBooleanToByteArray( (boolean) entry));
             }
             else if (entry instanceof String)
             {
-                sm.concat(bb, sm.convertStringToByteArray( (String) entry));
+                Type.concat(bb, Type.convertStringToByteArray( (String) entry));
             }
         }
         return bb;

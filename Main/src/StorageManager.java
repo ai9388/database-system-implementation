@@ -1,13 +1,9 @@
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
+import javax.swing.text.DefaultStyledDocument.ElementSpec;
 import javax.xml.crypto.Data;
 
 
@@ -19,18 +15,18 @@ import javax.xml.crypto.Data;
 
 public class StorageManager {
     private Database db;
-    private ArrayList<Table> tables;
+    private int bufferSize;
+    public ArrayList<Page> pageBuffer = new ArrayList<>();
 
-    // empty constructor
-    public StorageManager(Database database){
+    public StorageManager(Database database, int bufferSize){
         this.db = database;
+        this.bufferSize = bufferSize;
     }
 
     public Database getDb() {
         return db;
     }
 
-    public ArrayList<Page> pageBuffer = new ArrayList<>();
 
     public Table getTable(String table_name) {
         // TODO: for parser be able to get the table with the given table name
@@ -53,19 +49,25 @@ public class StorageManager {
         db.addTable(table);
     }
 
-    public void displaySchema(String table_name) {
-        // Used in parser...
-        // TODO: get the schema from the table?
-        Table t = getTable(table_name);
-        if (t!= null) {
-            System.out.println("Table name: " + table_name);
-            System.out.println("Table Schema: ");
-
-        }
+    public void displaySchema() {
+        ArrayList<Table> tables = db.getAllTables();
+        for (Table t : tables)
+        {
+            if (t != null) {
+                System.out.println("Table name: " + t.getName());
+                System.out.println("Table Schema: ");
+                for (Attribute a : t.getAttributes())
+                {
+                    System.out.println(a.toString());
+                }
+                //System.out.println("Pages: " + t.getNumberOfPages());
+                System.out.println("Records: " + t.getNumberOfRecords());
+            }
+        }   
     }
 
     public void displayInfo(String table_name) {
-        displaySchema(table_name);
+        //displaySchema(table_name);
         System.out.println("Number of pages: "); // Print # of pages
         System.out.println("Number of records: "); // Print # of records
     }
@@ -106,123 +108,20 @@ public class StorageManager {
         return null;
     }
     
-    public void LRU(){
-
+    public void LRU(Page page){
+        //old -> new
+        //adding into the linkedlist and if it full, pop the first one (the oldest one)
+        if(pageBuffer.size() > bufferSize){
+            pageBuffer.remove(0);
+            pageBuffer.add(page);
+        }
+        else{
+            pageBuffer.add(page);
+        }
     }
 
     public void rewrite(){
 
-    }
-
-    /**
-     * converts int to a byte array
-     * @param i integer we want to change
-     * @return byte array
-     */
-    public byte[] convertIntToByteArray(int i) {
-        return ByteBuffer.allocate(Integer.BYTES).putInt(i).array();
-    }
-
-    /**
-     * convert boolean to byte
-     * @param bool boolean we wnat to change
-     * @return byte
-     */
-    public byte[] convertBooleanToByteArray(boolean bool) {
-        return ByteBuffer.allocate(1).put((byte) (bool ? 1 : 0)).array();
-    }
-
-    /**
-     * converts double to a byte array
-     * @param d double we want to change
-     * @return byte array
-     */
-    public byte[] convertDoubleToByteArray(double d) {
-        return ByteBuffer.allocate(Double.BYTES).putDouble(d).array();
-    }
-
-    /**
-     * converts char to a byte array
-     * @param c char we want to change
-     * @return byte array
-     */
-    public byte[] convertCharToByteArray(char c) {
-        return ByteBuffer.allocate(Character.BYTES).putChar(c).array();
-    }
-
-    /**
-     * converts string to a byte array
-     * 
-     * @param st string we want to change
-     * @return byte array
-     */
-    public byte[] convertStringToByteArray(String st) {
-        byte[] bb = new byte[st.length()];
-
-        char[] ch = st.toCharArray();
-
-        for (char c : ch) {
-            bb = concat(bb, convertCharToByteArray(c));
-        }
-        return bb;
-    }
-
-    /**
-     * turning the bytes into a string that we can use for records later
-     * @param attributes string version of all of the schema's attributes
-     * @param bytes bytes we want to change
-     * @return concatenated string seprated by spaces(?)
-     */
-    public ArrayList<Object> convertBytesToObjects(ArrayList<String> attributes, byte[] bytes)
-    {
-        ArrayList<Object> result = new ArrayList<Object>();
-        for (int i = 0; i < attributes.size(); i++) {
-            switch (attributes.get(i))
-            {
-                case "int" -> {
-                    result.add(ByteBuffer.wrap(bytes).getInt());
-                }
-                case "bool" -> {
-                    result.add(ByteBuffer.wrap(bytes).get());
-                }
-                case "double" -> {
-                    result.add(ByteBuffer.wrap(bytes).getDouble());
-                }
-                case "char" -> {
-                    result.add(ByteBuffer.wrap(bytes).getChar());
-                }
-                case "varchar" -> {
-                    result.add(ByteBuffer.wrap(bytes).getChar());
-                }
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * helper method to concatenate multiple byte arrays
-     * @param arrays any N number of byte[]
-     * @return concated cyte[]
-     */
-    public byte[] concat(byte[]... arrays) {
-        // Determine the length of the result array
-        int totalLength = 0;
-        for (int i = 0; i < arrays.length; i++) {
-            totalLength += arrays[i].length;
-        }
-
-        // create the result array
-        byte[] result = new byte[totalLength];
-
-        // copy the source arrays into the result array
-        int currentIndex = 0;
-        for (int i = 0; i < arrays.length; i++) {
-            System.arraycopy(arrays[i], 0, result, currentIndex, arrays[i].length);
-            currentIndex += arrays[i].length;
-        }
-
-        return result;
     }
 
 
@@ -239,17 +138,17 @@ public class StorageManager {
             byte[] bytes = new byte[3 * Integer.BYTES];
             // writing the file id
             for (int i = 0; i < Integer.BYTES; i++) {
-                concat(bytes, convertIntToByteArray(fileID));
+                Type.concat(bytes, Type.convertIntToByteArray(fileID));
             }
 
             // writing the number of pages
             for (int i = Integer.BYTES; i < 2 * Integer.BYTES; i++) {
-                concat(bytes, convertIntToByteArray(numOfPages));
+                Type.concat(bytes, Type.convertIntToByteArray(numOfPages));
             }
 
             // writing the number of records
             for (int i = 2 * Integer.BYTES; i < 3 * Integer.BYTES; i++) {
-                concat(bytes, convertIntToByteArray(numOfRecords));
+                Type.concat(bytes, Type.convertIntToByteArray(numOfRecords));
             }
 
             raf.write(bytes);

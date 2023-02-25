@@ -50,6 +50,9 @@ public class Page {
         this.size = 0; 
     }
 
+        this.size = pageSize;
+    }
+
     public Page(ArrayList<Record> records){
         this.records = records;
         setSize();
@@ -90,15 +93,19 @@ public class Page {
     }
 
     public byte[] getHeader(){
-        return sm.concat(sm.convertIntToByteArray(this.id), sm.convertIntToByteArray(this.size));
+        return Type.concat(Type.convertIntToByteArray(this.id), Type.convertIntToByteArray(this.size));
     }
 
-    public byte[] recordsAsBytes(){
-        
-        byte[] recordsAsBytes = null;
-        
-        // TODO: implement
-        return recordsAsBytes;
+    public byte[] recordsAsBytes()
+    {
+        byte[] bb = new byte[0];
+
+        for (Record record : this.records)
+        {
+            Type.concat(bb, record.recordToBytes());
+        }
+
+        return bb;
     }
  
     public Page split(){
@@ -111,7 +118,39 @@ public class Page {
     }
 
     public byte[] getPageAsBytes(){
-        return sm.concat(getHeader(), recordsAsBytes());
+        return Type.concat(getHeader(), recordsAsBytes());
+    }
+    
+
+    public void setRecordsOrder() {
+        Collections.sort(records, new Comparator<Record>() {
+            @Override
+            public int compare(Record r1, Record r2) {
+                Object pkValue1 = r1.getValueAtColumn(pkIdx);
+                Object pkValue2 = r2.getValueAtColumn(pkIdx);
+
+                // INT
+                if (pkValue1 instanceof Integer) {
+                    return Integer.compare((int) pkValue1, (int) pkValue2);
+                }
+
+                // DOUBLE
+                else if (pkValue1 instanceof Double) {
+                    return Double.compare((double) pkValue1, (double) pkValue2);
+                }
+
+                // BOOLEAN
+                else if (pkValue1 instanceof Boolean) {
+                    return Boolean.compare((boolean) pkValue1, (boolean) pkValue2);
+                }
+
+                // String
+                else {
+                    return String.valueOf(pkValue1).compareTo(String.valueOf(pkValue2));
+                }
+
+            }
+        });
     }
 
     public void insertRecordAt(Record record, int index){
