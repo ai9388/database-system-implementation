@@ -5,13 +5,11 @@ public class Record implements Comparable<Record>{
      * Arraylist of entries within record
      */
     private ArrayList<Object> entries;
-    private ArrayList<Attribute> attributes;
     private int pkid;
     private int size;
 
     public Record(ArrayList<String> values, ArrayList<Attribute> attr) {
         this.entries = new ArrayList<>();
-        this.attributes = attr;
         
         for(int i = 0 ; i < values.size(); i++){
             String value = values.get(i);

@@ -128,7 +128,7 @@ public class Table{
     /*
      * returns a re
      */
-    public Record getRecordbyPK(String pkValue) throws PrimaryKeyException{
+    public Record getRecordByPK(String pkValue) throws PrimaryKeyException{
         if(Type.validateType(pkValue, primaryAttribute)){
             if(recordsByPK.containsKey(pkValue)){
                 return recordsByPK.get(pkValue);
@@ -213,7 +213,7 @@ public class Table{
     {
         if(Type.validateType(pkValue, primaryAttribute)){
             if(isValidColumn(column)){
-                Record r = getRecordbyPK(pkValue);
+                Record r = getRecordByPK(pkValue);
                 Attribute a = attributesByCol.get(column);
                 // if both the column and the pk are valid, then validate data type
                 if(Type.validateType(pkValue, a)){
@@ -230,10 +230,7 @@ public class Table{
         }
         else{
             throw new PrimaryKeyException(5, new InvalidDataTypeException(pkValue, primaryAttribute).getMessage());
-        }
-
-        // TODO: catch exception form inValidColumnName
-        
+        }        
         return true;
     }
 
@@ -325,6 +322,23 @@ public class Table{
         return str;
     }
 
+    /**
+     * returns table information
+     * @return table info as string
+     */
+    public String displayTableInfo(){
+        String str = displayTableSchema() + 
+            "Pages: " + this.pages.size() + "\n" +
+            "Record: " + this.records.size();
+        return str;
+    }
+
+    /**
+     * selects infomation from the current table by columns
+     * @param columns the column names
+     * @return string formatted with the table info
+     * @throws TableException if columns are invalid
+     */
     public String select(String[] columns) throws TableException{
         ArrayList<Attribute> selectAttributes = new ArrayList<>();
         // validate all columns
@@ -359,7 +373,7 @@ public class Table{
             if(inserted){
                 break;
             }
-            // does the record beolong in this page?
+            // does the record belong in this page?
             int index = page.addRecordInOrder(r);
             if(index > -1){
                 page.insertRecordAt(r, index);
@@ -389,7 +403,7 @@ public class Table{
     /*
      * returns a page based on its number
      */
-    public Page getPagebyPNum(int num){
+    public Page getPageByPNum(int num){
         return pages.get(num); 
     }
 

@@ -101,11 +101,11 @@ public class StorageManager {
         table.insertRecord(record);
     }
 
-    public void deleteRecord(String primaryKey, Table table){
+    public void deleteRecord(String primaryKey, Table table) throws PrimaryKeyException, InvalidDataTypeException{
         table.removeRecordByPK(primaryKey);
     }
 
-    public void updateRecord(String primaryKey, Table table,  String column, String newEntry){
+    public void updateRecord(String primaryKey, Table table,  String column, String newEntry) throws TableException, PrimaryKeyException, InvalidDataTypeException{
         table.updateRecordByPK(primaryKey, column, newEntry);
     }
 

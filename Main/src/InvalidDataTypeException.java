@@ -23,8 +23,8 @@ public class InvalidDataTypeException extends Exception{
 
     @Override
     public String getMessage() {
-        this.message = "Invalid Data Type: Expected( " + expected + ") got( " 
-         + got + ")";
+        this.message = "Invalid Data Type: Expected( " + expected + " ) got( " 
+         + got + " )";
         return this.message;
     }
 

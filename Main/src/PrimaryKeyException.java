@@ -7,7 +7,7 @@ public class PrimaryKeyException extends Exception {
         "Invalid primary key value: ",
         "Invalid primary key type: "
     };
-    private String message = "Primary Key Error: ";
+    private String message = "";
 
     public PrimaryKeyException(int errorCode, String argument){
         super();
