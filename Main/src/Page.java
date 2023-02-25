@@ -1,24 +1,9 @@
+import java.lang.reflect.RecordComponent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
 public class Page {
-    
-    /***
-     * So the page contains the list of records - need to discuss 
-     * Page have fix size, use static
-     * page have the length to see how many records in it
-     * store the pages in the table with a data structure to get the page number
-     * Have a split method to split the page to 2 pages. 
-     * 
-     * Methods needed:
-     * - method that splits the current page, and returns a new one with the second half of the content
-     * - method that takes a bunch of records and compacts them to be the page's content
-     * - constructor that takes a string of the page's contents 
-     * - method that reverts content into records
-     * + method that returns true if another record can be added to the page
-     * - we assume that the records are added in order of primary index.
-     */
     
     int numOfRecords;
 
@@ -26,7 +11,6 @@ public class Page {
      * page capacity
      */
     private static int capacity;
-
     /**
      * actual size of the page based on contents
      * size = num of bytes
@@ -47,19 +31,19 @@ public class Page {
     public Page(int pkIdx){
         this.size = 0;
         this.pkIdx = pkIdx;
-        this.size = 0; 
-    }
-
-        this.size = pageSize;
+        this.records = new ArrayList<>();
     }
 
     public Page(ArrayList<Record> records){
         this.records = records;
+        this.size = 0;
         setSize();
     }
 
     public void setSize() {
-        for(Record r: records){
+        // reset the size
+        this.size = 0;
+        for(Record r: this.records){
             this.size += r.getSize();
         }
     }
@@ -77,7 +61,7 @@ public class Page {
      * @return int
      */
     public int getSpace(){
-        return capacity - size;
+        return Page.capacity - size;
     }
 
     /**
@@ -110,8 +94,8 @@ public class Page {
  
     public Page split(){
         int idx = Math.ceilDiv(records.size(), 2); // the index to split at
-        Page otherPage = new Page(new ArrayList<>(this.records.subList(idx + 1, records.size() + 1)));
-        this.records = new ArrayList<>(this.records.subList(0, idx + 1));
+        Page otherPage = new Page(new ArrayList<>(this.records.subList(idx, records.size())));
+        this.records = new ArrayList<>(this.records.subList(0, idx));
         this.setSize();
 
         return otherPage;
@@ -159,8 +143,11 @@ public class Page {
     }
 
     public int addRecordInOrder(Record record){
+        if(records.size() == 0){
+            return 0;
+        }
         for (int i = 0; i < records.size(); i++) {
-            if(record.compareTo(records.get(i)) == -1){
+            if(record.compareTo(records.get(i)) < 0){
                 return i;
             }
         }
@@ -168,5 +155,20 @@ public class Page {
         return -1;
     }
 
-    
+    public void addLast(Record r){
+        this.records.add(r);
+        this.size += r.getSize();
+    }
+
+    @Override
+    public String toString() {
+        String str0 = "--------------------------------------------------------------------\n";
+        String str = String.format("Page: %d\tCapacity: %d\tSize: %d\tRecords: %d\n", id, capacity, size, records.size());
+        String str2 = "";
+        for(Record r: records){
+            str2 += r + "\n";
+        }
+        return str0 + str + str2 + str0;
+    }
+
 }

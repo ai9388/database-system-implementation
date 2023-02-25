@@ -171,6 +171,7 @@ public class Table{
         // if there are no pages create one
         if(this.pages.size() == 0){
             Page page  = new Page(this.primaryIndex);
+            this.pages.add(page);
         }
         addRecordToPage(record);
         return true;
@@ -322,23 +323,47 @@ public class Table{
 
     public void addRecordToPage(Record r){
         Page page;
+        boolean inserted = false;
+
         for (int i = 0; i < pages.size(); i++) {
             page = pages.get(i);
-            // does the record beolong in this page?
-            if(page.addRecordInOrder(r) > -1){
-                page.insertRecordAt(r, i);
 
-                // if the addition overflows the page split
-                if(page.overflow()){
-                    pages.add(i, page.split());
+            if(inserted){
+                break;
+            }
+            // does the record beolong in this page?
+            int index = page.addRecordInOrder(r);
+            if(index > -1){
+                page.insertRecordAt(r, index);
+                inserted = true;
+            }
+            else{ // if this is the last page
+                // and the record was not found to be less than any item
+                // then it must be greater than all
+                if(i == pages.size() - 1 && !inserted){
+                    page.addLast(r);
+                    inserted = true;
                 }
+
+            }
+            // if the addition overflows the page split
+            if(page.overflow()){
+                pages.add(i + 1, page.split());
+                inserted = true;
             }
         }
+
+        // if all the pages have been iterated and the value could not be added. 
+        // that means it is greater than all values
+        //
     }
 
     public Page getPagebyPNum(int num){
-        return pages.get(num);
-        
+        return pages.get(num); 
+    }
+
+    public ArrayList<Page> getPages(){
+        return this.pages;
     }
 
 }
