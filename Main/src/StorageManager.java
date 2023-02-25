@@ -3,21 +3,33 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.*;
 
+import javax.xml.crypto.Data;
+
 
 //TODO: need to implement a page buffer
 //not write into the file until the user said quit
 
+//creating new database in the main and pass it in the storage manager
+
 
 public class StorageManager {
+    private Database db;
+    private ArrayList<Table> tables;
 
     // empty constructor
-    public StorageManager(){}
+    public StorageManager(Database database){
+        this.db = database;
+    }
+
+    public Database getDb() {
+        return db;
+    }
 
     public ArrayList<Page> pageBuffer = new ArrayList<>();
 
     public Table getTable(String table_name) {
         // TODO: for parser be able to get the table with the given table name
-        return null;
+        return db.getSingleTable(table_name);
     }
 
     public void insertRecords(String tableName, ArrayList<Record> records) {
@@ -33,6 +45,7 @@ public class StorageManager {
     public void addTable(Table table) {
         // This is used in Parser
         // TODO: write table to the database?
+        db.addTable(table);
     }
 
     public void displaySchema() {
@@ -69,16 +82,16 @@ public class StorageManager {
         return null;
     }
     
-    public Page getPageByPNumber(Database db, Table table, int pageNumber){
-
-        return null;
+    public void getPageByTablePNumber(Table table, int pageNumber){
+        //TODO: change void back to Page
+        // return table.getPagebyPNum(pageNumber);
     }
 
     public ArrayList<Record> getAllRecords(int tableNumber){
         return null;
     }
 
-    public void insertRecordIntoTable(Table table, String[] record){
+    public void insertOneRecordIntoTable(Table table, String[] record){
         table.insertRecord(record);
     }
 
