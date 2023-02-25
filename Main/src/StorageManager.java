@@ -3,6 +3,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.*;
 
+import javax.swing.text.DefaultStyledDocument.ElementSpec;
 import javax.xml.crypto.Data;
 
 
@@ -14,19 +15,19 @@ import javax.xml.crypto.Data;
 
 public class StorageManager {
     private Database db;
-    
-    // empty constructor
-    public StorageManager(){};
+    private int bufferSize;
+    public ArrayList<Page> pageBuffer = new ArrayList<>();
 
-    public StorageManager(Database database){
+    // empty constructor
+    public StorageManager(Database database, int bufferSize){
         this.db = database;
+        this.bufferSize = bufferSize;
     }
 
     public Database getDb() {
         return db;
     }
 
-    public ArrayList<Page> pageBuffer = new ArrayList<>();
 
     public Table getTable(String table_name) {
         // TODO: for parser be able to get the table with the given table name
@@ -108,8 +109,16 @@ public class StorageManager {
         return null;
     }
     
-    public void LRU(){
-
+    public void LRU(Page page){
+        //old -> new
+        //adding into the linkedlist and if it full, pop the first one (the oldest one)
+        if(pageBuffer.size() > bufferSize){
+            pageBuffer.remove(0);
+            pageBuffer.add(page);
+        }
+        else{
+            pageBuffer.add(page);
+        }
     }
 
     public void rewrite(){
