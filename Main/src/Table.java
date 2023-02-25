@@ -290,6 +290,10 @@ public class Table{
 
     }
 
+    public void getPagebyPNum(int num){
+        //return page by page number
+    }
+
     /***
      * TODO
      * getting a record by primary key
