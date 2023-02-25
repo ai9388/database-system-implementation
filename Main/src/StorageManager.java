@@ -77,6 +77,10 @@ public class StorageManager {
         return true;
     }
 
+    public String selectFromTable(String tableName, String[] columns) throws TableException{
+        return db.selectFromTable(tableName, columns);
+    }
+
     public Record getRecordFromPrimaryKey(Table table, String key){
         //get the record from the table
         // return table.getRecordsPK(key);
@@ -92,7 +96,8 @@ public class StorageManager {
         return null;
     }
 
-    public void insertOneRecordIntoTable(Table table, String[] record){
+    public void insertOneRecordIntoTable(String tableName, String[] record) throws TableException{
+        Table table = db.getTableByName(tableName);
         table.insertRecord(record);
     }
 
