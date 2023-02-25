@@ -34,6 +34,8 @@ public class Table{
      */
     private HashMap<String, Attribute> attributesByCol;
 
+    private ArrayList<Page> pages;
+
     public Table(String name, int tableID, ArrayList<Attribute> attributes, Attribute primaryAttribute, int primaryIndex) {
         this.name = name;
         this.tableID = tableID;

@@ -1,11 +1,6 @@
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 
@@ -40,18 +35,25 @@ public class StorageManager {
         // TODO: write table to the database?
     }
 
-    public void displaySchema(String table_name) {
-        // Used in parser...
-        // TODO: get the schema from the table?
-        Table t = getTable(table_name);
-        if (t!= null) {
-            System.out.println("Table name: " + table_name);
-            System.out.println("Table Schema: ");
-        }
+    public void displaySchema() {
+        ArrayList<Table> tables = db.getAllTables();
+        for (Table t : tables)
+        {
+            if (t != null) {
+                System.out.println("Table name: " + t.getName());
+                System.out.println("Table Schema: ");
+                for (Attribute a : t.getAttributes())
+                {
+                    System.out.println(a.toString());
+                }
+                System.out.println("Pages: ");
+                System.out.println("Records: " + t.getNumberOfRecords());
+            }
+        }   
     }
 
     public void displayInfo(String table_name) {
-        displaySchema(table_name);
+        //displaySchema(table_name);
         System.out.println("Number of pages: "); // Print # of pages
         System.out.println("Number of records: "); // Print # of records
     }
