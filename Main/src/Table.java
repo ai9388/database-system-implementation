@@ -57,8 +57,13 @@ public class Table{
         
     }
 
+    /**
+     * sets the static offset for table id's
+     * table id's start at 1000
+     * @param id the table number which indicates how many tables exists
+     */
     public static void setGENERALTABLEID(int id) {
-        GENERALTABLEID = id;
+        GENERALTABLEID = 1000 + id;
     }
 
     /**
