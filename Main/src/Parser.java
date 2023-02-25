@@ -2,8 +2,6 @@ import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.*;
 
-import javax.swing.text.html.FormView;
-
 public class Parser {
      enum commands {
         CREATE_TABLE, DISPLAY_SCHEMA, DISPLAY_INFO, SELECT, INSERT, HELP, QUIT
@@ -14,8 +12,14 @@ public class Parser {
     private String dbLocation;
     private int pageSize;
     private int bufferSize;
+    public Database database;
+    public StorageManager storageManager;
 
     public Parser(String str_input) {
+
+        database = new Database("db", new HashMap<String, Table>(), null, dbLocation);
+        storageManager = new StorageManager(database);
+
         this.user_input = str_input.toLowerCase();
         if (user_input.startsWith("create table")) {
             command = commands.CREATE_TABLE;
@@ -50,7 +54,6 @@ public class Parser {
      * Assume user passes in database
      */
     public void parse() {
-        StorageManager storageManager = new StorageManager();
         switch (command) {
             case CREATE_TABLE -> {
                 String input = user_input.replaceFirst("create table", "").strip();
@@ -198,7 +201,7 @@ public class Parser {
         System.out.println("Page Size: " + this.pageSize);
         System.out.println("Buffer Size: " + this.bufferSize);
 
-        StorageManager.displaySchema();
+        //StorageManager.displaySchema();
 
         System.out.println("SUCCESS");
     }

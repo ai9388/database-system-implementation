@@ -1,3 +1,0 @@
-DB Location: db\
-Page size: 10
-Buffer size: 569873

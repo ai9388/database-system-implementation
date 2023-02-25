@@ -14,9 +14,10 @@ import javax.xml.crypto.Data;
 
 public class StorageManager {
     private Database db;
-    private ArrayList<Table> tables;
-
+    
     // empty constructor
+    public StorageManager(){};
+
     public StorageManager(Database database){
         this.db = database;
     }
@@ -59,7 +60,7 @@ public class StorageManager {
                 {
                     System.out.println(a.toString());
                 }
-                System.out.println("Pages: ");
+                //System.out.println("Pages: " + t.getNumberOfPages());
                 System.out.println("Records: " + t.getNumberOfRecords());
             }
         }   
