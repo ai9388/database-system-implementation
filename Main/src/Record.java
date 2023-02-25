@@ -56,6 +56,9 @@ public class Record implements Comparable<Record>{
         return this.entries.get(idx);
     }
 
+    public int getSize(){
+        return size;
+    }
     /**
      * sets the entries array to a new collection
      * @param newEntries the data to set
@@ -89,8 +92,6 @@ public class Record implements Comparable<Record>{
 
     public byte[] recordToBytes()
     {
-        StorageManager sm = new StorageManager();
-
         byte[] bb = new byte[0];
 
         for (Object entry : this.entries) 
