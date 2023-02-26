@@ -1,7 +1,7 @@
 import java.util.*;
 
 public class StorageManager {
-    private Database db;
+    public Database db;
     private int bufferSize;
     public ArrayList<Page> pageBuffer = new ArrayList<>();
     public String dbPath;
