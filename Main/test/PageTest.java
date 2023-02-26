@@ -20,8 +20,8 @@ public class PageTest {
         columns = new String[]{"name", "lastname", "age"};
         types = new Type[]{Type.VARCHAR, Type.VARCHAR, Type.INTEGER};
         attributes = new ArrayList<>();
-        createAttributes(1 , columns, types);
-        Attribute pka = attributes.get(1);
+        createAttributes(0 , columns, types);
+        Attribute pka = attributes.get(0);
         table = new Table("person", attributes);
         ArrayList<String> d1 = new ArrayList<>(Arrays.asList(new String[]{"carly", "maggiolo", "21"}));
         ArrayList<String> d2 = new ArrayList<>(Arrays.asList(new String[]{"mark", "smith", "24"}));

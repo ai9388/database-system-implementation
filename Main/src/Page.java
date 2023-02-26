@@ -1,4 +1,3 @@
-import java.lang.reflect.RecordComponent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -162,6 +161,14 @@ public class Page {
     public void removeRecord(Record r){
         this.records.remove(r);
         this.size -= r.getSize();
+    }
+
+    /**
+     * checks if a specific record is contained here
+     * @param r
+     */
+    public boolean containsRecord(Record r){
+        return this.records.contains(r);
     }
 
     /**
