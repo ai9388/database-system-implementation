@@ -33,7 +33,7 @@ public class StorageManager {
         return db.getSingleTable(table_name);
     }
 
-    public void insertRecords(String tableName, ArrayList<Record> records) {
+    public void insertRecords(String tableName, ArrayList<Record> records) throws PrimaryKeyException {
         // TODO: insert records into given table from parser
         Table t = null;
         for (Record record: records) {
@@ -96,7 +96,7 @@ public class StorageManager {
         return null;
     }
 
-    public void insertOneRecordIntoTable(String tableName, String[] record) throws TableException, InvalidDataTypeException{
+    public void insertOneRecordIntoTable(String tableName, String[] record) throws TableException, InvalidDataTypeException, PrimaryKeyException{
         Table table = db.getTableByName(tableName);
         table.insertRecord(record);
     }

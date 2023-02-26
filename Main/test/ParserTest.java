@@ -14,7 +14,7 @@ public class ParserTest {
     Parser parser;
 
     @Before
-    public void setupData(){
+    public void setupData() throws PrimaryKeyException{
         // test adding a record to a table
         columns = new String[]{"name", "lastname", "age"};
         types = new Type[]{Type.VARCHAR, Type.VARCHAR, Type.INTEGER};

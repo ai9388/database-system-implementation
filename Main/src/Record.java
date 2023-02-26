@@ -82,6 +82,14 @@ public class Record implements Comparable<Record>{
         this.entries.set(index, newValue);
     }
 
+    /**
+     * returns the value of the primary entry
+     * @return
+     */
+    public Object getPrimaryObject(){
+        return getValueAtColumn(pkid);
+    }
+
     @Override
     public String toString() {
         // TODO: format record and make it pretty **
@@ -143,5 +151,15 @@ public class Record implements Comparable<Record>{
         else{
             return String.valueOf(pkValue1).toLowerCase().compareTo(String.valueOf(pkValue2).toLowerCase());
         }
-    }  
+    } 
+    
+    @Override
+    public boolean equals(Object obj) {
+        boolean res = false;
+        if(obj instanceof Record){
+            Record r = (Record)obj;
+            res = this.compareTo(r) == 0;
+        }
+        return res;
+    }
 }

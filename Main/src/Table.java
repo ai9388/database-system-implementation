@@ -150,8 +150,9 @@ public class Table {
      * @param values values of the record
      * @return true if record creation is successful
      * @throws InvalidDataTypeException
+     * @throws PrimaryKeyException
      */
-    public boolean insertRecord(String[] values) throws InvalidDataTypeException {
+    public boolean insertRecord(String[] values) throws InvalidDataTypeException, PrimaryKeyException {
         if (Type.validateAll(values, attributes)) {
             Record record = new Record(new ArrayList<String>(Arrays.asList(values)), attributes);
             this.insertRecord(record);
@@ -162,7 +163,29 @@ public class Table {
         }
     }
 
-    public boolean insertRecord(Record record) {
+    /**
+     * returns the index of a given record
+     * the index is based on the order of insertion
+     * @param record record to get the index
+     * @return
+     */
+    public int getRecordIndex(Record record){
+        for (int i = 0; i < records.size(); i++) {
+            if(records.get(i).equals(record)){
+                return i;
+            }
+        }
+        // this should not happen
+        return -1;
+    }
+
+    public boolean insertRecord(Record record) throws PrimaryKeyException {
+                    
+        // check if this primary key exists
+        if(this.recordsByPK.containsKey(record.getPrimaryObject())){
+            String rowOccupied = String.valueOf(getRecordIndex(record));
+            throw new PrimaryKeyException(2, rowOccupied);
+        }
         this.records.add(record);
         this.recordsByPK.put(record.getValueAtColumn(primaryIndex), record);
         // if there are no pages create one
