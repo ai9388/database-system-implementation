@@ -114,7 +114,15 @@ public class Catalog {
     public void writeToFile(byte[] bytes)
     {  
         try {
-            File file = new File(this.path + "Catalog");
+            String catalogPath = path;
+            if(path.contains("\\")){
+                catalogPath += "\\Catalog";
+            }
+            else{
+                catalogPath += "/Catalog";
+            }
+
+            File file = new File(catalogPath);
             raf = new RandomAccessFile(file, WRITE);
 
             raf.write(bytes);
