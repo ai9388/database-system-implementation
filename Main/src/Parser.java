@@ -93,7 +93,7 @@ public class Parser {
                         }
                         case "varchar" -> {
                             hasOnePK = ((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
-                            Attribute a = new Attribute(components[1], Type.VARCHAR, components.length > 3, Integer.parseInt(components[2].replace(')', ' ').strip()));
+                            Attribute a = new Attribute(attr_name, Type.VARCHAR, components.length > 3, Integer.parseInt(components[2].replace(')', ' ').strip()));
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
