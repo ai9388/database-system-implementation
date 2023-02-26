@@ -1,40 +1,14 @@
 import java.util.*;
 import java.io.File;
+import java.nio.file.Path;
 
 public class Main {
 
-    public boolean checkDatabase(String path, int pageSize, int bufferSize){
-
-        //TODO: do we need the pageSize and bufferSize for the parameter rn?
-        
-        //look for the database from the path and get the table from the database
-        File directory = new File(path);
-        
-        if(directory.exists()){
-            if(directory.length() > 0){
-                System.out.println("db exists");
-                return true;
-            }
-            else{
-                System.out.println("No existing db found");
-                System.out.println("Creating new db at" + path);
-                return directory.mkdir();
-            }
-        }
-        else{
-            System.out.println("No existing db found");
-            System.out.println("Creating new db at" + path);
-            return directory.mkdir();
-
-            //need to add a catalog into the folder.
-        }
-    }
-
 
     public static void main(String[] args) throws Exception {
+
         System.out.println("Starting up 11QL...");
         // Check for DB
-        // Create DB if it doesn't exist make it
 
         // Basic nice-ities for starting up the DB
         System.out.println("Enter <quit> to quit");
@@ -45,8 +19,26 @@ public class Main {
         Scanner userInput = new Scanner(System.in);
         String strInput = userInput.nextLine().toLowerCase();
 
+        String dbPath = args[1];
+        File directory = new File(dbPath);
+        
+        if(directory.exists()){
+            if(directory.length() > 0){
+                System.out.println("catalog exists");
+            }
+            // else creating new catalog
+        }
+        else{
+            System.out.println("No existing db found");
+            System.out.println("Creating new db at " + dbPath);
+            directory.mkdir();
+
+            //need to add a catalog into the folder.
+        }
+
+        
         // parser object for this session
-        Parser parser = new Parser();
+        Parser parser = new Parser(directory.getName());
         // save the user provided arguments
         parser.saveArgs(args);
         // looping until <quit> is taken in

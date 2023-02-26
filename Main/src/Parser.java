@@ -15,17 +15,17 @@ public class Parser {
     private int bufferSize;
     public Database database;
     public StorageManager storageManager;
+    public String dbName;
 
-    public Parser(){
+    public Parser(String dbName){
         // TODO: hai-yen
-        storageManager = new StorageManager(database, bufferSize);
+        this.dbName = dbName;
+        storageManager = new StorageManager(dbName, dbLocation, bufferSize);
     }
 
     public void clasifyInput(String str_input) {
 
         this.user_input = str_input;
-        database = new Database("db", new HashMap<String, Table>(), null, dbLocation);
-        storageManager = new StorageManager(database, bufferSize);
 
         this.user_input = str_input.toLowerCase();
         if (user_input.startsWith("create table")) {
@@ -53,6 +53,7 @@ public class Parser {
     public void saveArgs(String[] args)
     {
         this.dbLocation = args[0];
+        
         this.pageSize = Integer.parseInt(args[1]);
         // set the page size
         Page.setCapacity(pageSize);
@@ -76,11 +77,11 @@ public class Parser {
                 ArrayList<Attribute> attributes = new ArrayList<>();
                 Attribute primaryAttribute = null;
                 int primaryIndex = 0;
-                Table t = storageManager.getTable(table_name);
-                if (t != null) {
-                    System.out.println("This table already exists.");
-                    break;
-                }
+                // Table t = storageManager.getTable(table_name);
+                // if (t != null) {
+                //     System.out.println("This table already exists.");
+                //     break;
+                // }
                 boolean hasOnePK = false;
                 for (String attribute : attr) {
                     String[] components = attribute.strip().replaceAll("\\(", " ").split(" ");
@@ -136,10 +137,13 @@ public class Parser {
                 } else {
                     System.out.println(attributes.toString());
                     try{
-                        Table table = new Table(table_name, attributes);
-                        storageManager.addTable(table);
-                        File new_table = new File(dbLocation + table_name);
-                        storageManager.addIntialInfoToTable(new_table, 0, 0, 0);
+
+                        //TODO: the parser should call createTable from the storage manager and it will create the table and add table
+                        // Table table = new Table(table_name, attributes);
+                        storageManager.createTable(table_name, attributes);
+                        // storageManager.addTable(table);
+                        // File new_table = new File(dbLocation + table_name);
+                        // storageManager.addIntialInfoToTable(new_table, 0, 0, 0);
 
                         System.out.println("SUCCESS! You've created " + table_name);
                     }
@@ -201,7 +205,7 @@ public class Parser {
     }
 
     private void displayInfo(String table_name) {
-        
+    
 
 
     }
