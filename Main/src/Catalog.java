@@ -42,12 +42,10 @@ public class Catalog {
             File file = new File(catalogPath);
 
             RandomAccessFile raFile = new RandomAccessFile(file, READ);
-            raFile.seek(Integer.BYTES);
+            raFile.seek(0);
             int numOfTables = raFile.readInt();
 
             for (int i = 0; i < numOfTables; i++) {
-                //int numberOfBytesInTable = raFile.readInt();
-                //raFile.seek(Integer.BYTES);
                 createTableFromBytes(raFile);
             }
 
@@ -58,8 +56,9 @@ public class Catalog {
     }
 
     public Table createTableFromBytes(RandomAccessFile f)
-    {
+    {        
         try {
+            f.seek(f.getFilePointer() + 4);
             // getting the table name
             int tableNameLength = f.readInt();
 
@@ -132,10 +131,19 @@ public class Catalog {
                 boolean attributeIsPrimaryKey = f.readBoolean();
 
                 Attribute attr = new Attribute(attributeName, attributeType, attributeIsPrimaryKey, attributeN);
+
+                System.out.println(attributeName);
+                System.out.println(attributeType);
+                System.out.println(attributeIsPrimaryKey);
+                System.out.println(attributeN);
+
                 attributes.add(attr);
             }
             return new Table(tableName, attributes);
-        } catch (IOException e) {e.printStackTrace();}
+        } catch (IOException e) 
+        {
+            e.printStackTrace();
+        }
     
         return new Table(null, null);
     }
