@@ -442,4 +442,101 @@ public class Table {
         return this.pages;
     }
 
+    /**
+     * converts the entire table into Bytes for the catalog to use
+     * 
+     * @return byte[]
+     */
+    public byte[] convertTableObjectToBytes()
+    {
+        byte[] bb = new byte[0];
+
+        bb = Type.concat(bb, getTableHeaderInfoForCatalog());
+        bb = Type.concat(bb, convertAllAttributestoBytes());
+
+        int len = bb.length;
+        
+        bb = Type.concat(Type.convertIntToByteArray(len), bb);
+        return bb;
+    }
+
+    /**
+     * Turns all of the table's attributes into a byte array
+     * @return byte[]
+     */
+    public byte[] convertAllAttributestoBytes()
+    {
+        byte[] bb = new byte[0];
+
+        for (Attribute attr : this.attributes) 
+        {
+            bb = Type.concat(bb, convertAttributeToBytes(attr));
+        }
+
+        return bb;
+    }
+
+    /**
+     * Turns a single attribute into bytes
+     * 
+     * @param attr - the attribute we are converting
+     * @return byte[]
+     */
+    public byte[] convertAttributeToBytes(Attribute attr) {
+        byte[] bb = new byte[0];
+
+        int attributeNameLength = attr.getName().length();
+        String attributeName = attr.getName();
+        int attributeType;
+
+        switch (attr.getType()) {
+            case BOOLEAN:
+                attributeType = Catalog.BOOLEAN;
+                break;
+            case CHAR:
+                attributeType = Catalog.CHAR;
+                break;
+            case DOUBLE:
+                attributeType = Catalog.DOUBLE;
+                break;
+            case INTEGER:
+                attributeType = Catalog.INTEGER;
+                break;
+            case VARCHAR:
+                attributeType = Catalog.VARCHAR;
+                break;
+            default:
+                attributeType = 0;
+                break;
+        }
+
+        boolean isPrimaryKey = attr.isIsPrimaryKey();
+
+        bb = Type.concat(bb, Type.convertIntToByteArray(attributeNameLength));
+        bb = Type.concat(bb, Type.convertStringToByteArray(attributeName));
+        bb = Type.concat(bb, Type.convertIntToByteArray(attributeType));
+        bb = Type.concat(bb, Type.convertBooleanToByteArray(isPrimaryKey));
+
+        return bb;
+    }
+
+    /**
+     * Gets the length of the table name, the table name, and the number of attributes
+     * associated with the table
+     * @param tableName - name of associated table
+     * @return
+     */
+    public byte[] getTableHeaderInfoForCatalog() {
+        byte[] bb = new byte[0];
+
+        int tableNameLength = this.name.length();
+        int numOfAttributes = this.attributes.size();
+
+        bb = Type.concat(bb, Type.convertIntToByteArray(tableNameLength));
+        bb = Type.concat(bb, Type.convertStringToByteArray(this.name));
+        bb = Type.concat(bb, Type.convertIntToByteArray(numOfAttributes));
+
+        return bb;
+    }
+
 }
