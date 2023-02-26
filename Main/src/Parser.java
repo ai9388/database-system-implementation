@@ -14,15 +14,15 @@ public class Parser {
     public StorageManager storageManager;
     public String dbName;
 
-    public Parser(String dbName){
+    public Parser(String dbName, String dbLocation){
         // TODO: hai-yen
         this.dbName = dbName;
+        this.dbLocation = dbLocation;
         storageManager = new StorageManager(dbName, dbLocation, bufferSize, pageSize);
     }
 
     public void clasifyInput(String str_input) {
 
-        this.user_input = str_input;
         this.user_input = str_input.toLowerCase();
         if (user_input.startsWith("create table")) {
             command = commands.CREATE_TABLE;
@@ -143,10 +143,6 @@ public class Parser {
                     catch(Exception pke){
                         System.out.println(pke.getMessage());
                     }
-                    // testing byte array stuff
-                    Catalog c = new Catalog(this.dbLocation);
-                    byte[] catalogAsBytes = c.createCatalog();
-                    c.writeToFile(catalogAsBytes);
                 }
             }
             case DISPLAY_SCHEMA -> storageManager.displaySchema();
@@ -165,16 +161,9 @@ public class Parser {
             case INSERT -> {
                 String input = user_input.replaceFirst("insert into", "").strip();
                 String table_name = input.split(" ")[0];
-                // ArrayList<Record> table_values = new ArrayList<>();
                 int start_index = input.indexOf("(");
                 input = input.substring(start_index - 1);
                 String[] vals = input.split(",");
-                // Table table = storageManager.getTable(table_name);
-                // if(table == null) {
-                //     System.out.println("ERROR! Table " + table_name + "does not exist.");
-                //     command = commands.QUIT;
-                //     break;
-                // }
                 for (String value : vals) {
                     String[] values = value.replaceAll("[();]", "").strip().split(" ");
                     try {
@@ -187,6 +176,7 @@ public class Parser {
             }
             case HELP -> displayHelp();
             case QUIT -> {
+                storageManager.writeToCatalog();
                 System.out.println("Shutting down 11QL...");
                 System.out.println("Shutting down the database...");
                 System.out.println("Purging the page buffer...");
