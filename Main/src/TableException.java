@@ -1,7 +1,9 @@
 public class TableException extends Exception{
     private String[] errorMessages = new String[]{
         "Invalid Column Name: ",
-        "Invalid Table Name: "
+        "Invalid Table Name: ",
+        "Too many entries!",
+        "Missing Values! "
     };
     private String message = "Table Error:";
 
