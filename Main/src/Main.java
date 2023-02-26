@@ -8,6 +8,8 @@ public class Main {
     public static void main(String[] args) throws Exception {
         
         String dbPath = args[0];
+        String pageSize = args[1];
+        String buffSize = args[2];
         File directory = new File(dbPath);
 
         System.out.println("Welcome to JottOL");
@@ -38,14 +40,18 @@ public class Main {
             System.out.println("No existing db found");
             System.out.println("Creating new db at " + dbPath);
             directory.mkdir();
-
-            //need to add a catalog into the folder.
+            System.out.println("New db created successfully");
+            System.out.println("Page size: " + pageSize);
+            System.out.println("Buffer size: " + buffSize);
         }
 
         // Basic nice-ities for starting up the DB
-        System.out.println("Enter <quit> to quit");
-        System.out.println("Enter <help> for help");
-        System.out.print(">");
+        // System.out.println("Enter <quit> to quit");
+        // System.out.println("Enter <help> for help");
+        System.out.println();
+        System.out.println("Please enter commands, enter <quit> to shutdown the db");
+        System.out.println();
+        System.out.print("JottQL> ");
 
         // starting the user input
         Scanner userInput = new Scanner(System.in);
