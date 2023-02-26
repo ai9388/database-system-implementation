@@ -1,3 +1,5 @@
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -58,6 +60,7 @@ public class ParserTest {
         // db.getTables().put("person", table);
         // parser.storageManager = new StorageManager(db, 200);
     }
+
 
     public void createAttributes(int pkidx, String[] c, Type[] t){
         for(int i = 0; i < columns.length; i++){

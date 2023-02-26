@@ -3,7 +3,7 @@ import java.io.RandomAccessFile;
 import java.util.*;
 
 public class StorageManager {
-    private Database db;
+    public Database db;
     private int bufferSize;
     public ArrayList<Page> pageBuffer = new ArrayList<>();
     public String dbPath;
@@ -160,7 +160,7 @@ public class StorageManager {
      * @throws InvalidDataTypeException
      * @throws PrimaryKeyException
      */
-    public void insertARecord(Table table, String[] record) throws InvalidDataTypeException, PrimaryKeyException{
+    public void insertARecord(Table table, String[] record) throws InvalidDataTypeException, PrimaryKeyException, TableException{
         table.insertRecord(record);
         Page mostRecentPage = table.getMostRecentPage();
         LRU(mostRecentPage);
