@@ -506,7 +506,8 @@ public class Table {
      * @param attr - the attribute we are converting
      * @return byte[]
      */
-    public byte[] convertAttributeToBytes(Attribute attr) {
+    public byte[] convertAttributeToBytes(Attribute attr) 
+    {
         byte[] bb = new byte[0];
 
         int attributeNameLength = attr.getName().length();
@@ -554,7 +555,8 @@ public class Table {
      * @param tableName - name of associated table
      * @return
      */
-    public byte[] getTableHeaderInfoForCatalog() {
+    public byte[] getTableHeaderInfoForCatalog() 
+    {
         byte[] bb = new byte[0];
 
         int tableNameLength = this.name.length();

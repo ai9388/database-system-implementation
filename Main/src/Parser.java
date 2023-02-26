@@ -2,7 +2,7 @@ import java.io.File;
 import java.util.*;
 
 public class Parser {
-     enum commands {
+    enum commands {
         CREATE_TABLE, DISPLAY_SCHEMA, DISPLAY_INFO, SELECT, INSERT, HELP, QUIT, EMPTY
     }
 
@@ -15,7 +15,7 @@ public class Parser {
     public StorageManager storageManager;
     public String dbName;
 
-    public Parser(String dbName, String dbLocation){
+    public Parser(String dbName, String dbLocation) {
         // TODO: hai-yen
         this.dbName = dbName;
         this.dbLocation = dbLocation;
@@ -182,7 +182,6 @@ public class Parser {
             }
             case HELP -> displayHelp();
             case QUIT -> {
-                System.out.println("quit form parser");
                 storageManager.writeToCatalog();
                 System.out.println("Shutting down 11QL...");
                 System.out.println("Shutting down the database...");
