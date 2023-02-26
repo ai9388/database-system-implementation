@@ -73,15 +73,17 @@ public class StorageManager {
         System.out.println("DB location: " + dbPath);
         System.out.println("Page Size: " + String.valueOf(pageSize));
         System.out.println("Buffer Size: " + String.valueOf(bufferSize));
-        if (db.getAllTables().size() > 0) {
+        System.out.println();
+        
+        ArrayList<Table> tables = db.getAllTables();
+        if(tables.size() == 0){
+            System.out.println("No tables to display");
+        }
+        else{
             System.out.println("Tables: ");
-
-            ArrayList<Table> tables = db.getAllTables();
-            for (Table table : tables) {
-                table.displayTableInfo();
-            }
-        } else {
-            System.out.println("No tables to display.");
+        }
+        for (Table table : tables) {
+            table.displayTableInfo();
         }
     }
 

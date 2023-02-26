@@ -84,7 +84,7 @@ public class Catalog {
     {   
         // adding in the header for the file
         byte[] bytes = new byte[0];
-        byte[] numOfTables = Type.convertIntToByteArray(this.tables.size());
+        byte[] numOfTables = Type.convertIntToByteArray(this.tables == null ? 0 : tables.size());
 
         bytes = Type.concat(bytes, numOfTables);
 
