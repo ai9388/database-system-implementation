@@ -6,17 +6,20 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception {
-        
+
         String dbPath = args[0];
         String pageSize = args[1];
         String buffSize = args[2];
+
+        System.out.println("Welcome to JottQL....");
+
         File directory = new File(dbPath);
 
-        System.out.println("Welcome to JottOL");
         // Check for DB
         System.out.println("Looking at " + dbPath + " for existing db....");
 
         if(directory.exists()){
+            System.out.println("The db exist");
             String catalogPath = dbPath;
             if(dbPath.contains("\\")){
                 catalogPath += "\\Catalog";
@@ -25,8 +28,6 @@ public class Main {
                 catalogPath += "/Catalog";
             }
 
-            System.out.println(catalogPath);
-            
             File catalogFile = new File(catalogPath);
             if(catalogFile.exists() && !catalogFile.isDirectory()){
                 System.out.println("catalog exists - maybe delete this line later");
@@ -51,12 +52,12 @@ public class Main {
         System.out.println();
         System.out.println("Please enter commands, enter <quit> to shutdown the db");
         System.out.println();
-        System.out.print("JottQL> ");
 
         // starting the user input
         Scanner userInput = new Scanner(System.in);
+        System.out.print("JottQL> ");
         String strInput = userInput.nextLine().toLowerCase();
-
+        
         // parser object for this session
         Parser parser = new Parser(directory.getName(), dbPath);
         // save the user provided arguments
@@ -67,7 +68,7 @@ public class Main {
             // keep asking user for input
             parser.clasifyInput(strInput);
             parser.parse();
-            System.out.print(">");
+            System.out.print("JottQL> ");
             strInput = userInput.nextLine();
         }
         System.out.println("Shutting down 11QL...");

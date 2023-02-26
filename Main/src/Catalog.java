@@ -1,6 +1,8 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -19,23 +21,34 @@ public class Catalog {
     private String path;
     private ArrayList<Table> tables;
     public RandomAccessFile raf;
-    
 
     public Catalog(String path)
     {
         this.path = path;
-
-        if (new File(path).isFile())
-        {
-            readCatalog();
-        } else 
-        {
-            this.writeToFile(this.createCatalog());
-        }
-
+        // System.out.println(this.path);
     }
 
-    
+    public void createTableObjects(byte[] bb)
+    {
+        try {
+            RandomAccessFile raFile = new RandomAccessFile(new File(this.path), READ);
+            raFile.seek(4);
+
+            int lengthOfTable = raFile.readInt();
+
+            
+            
+        } catch (IOException e) {
+            System.out.println("File doesnt exist.");
+            e.printStackTrace();
+        }
+    }
+
+    public void createTableFromBytes(byte[] bb)
+    {
+        
+    }
+
     /**
      * setting the tables for the catalog
      * @param tables
@@ -63,8 +76,7 @@ public class Catalog {
 
     /**
      * Catalog is formatted as
-     * 4 Bytes - number of tables
-     * 4 Bytes - number of pages that the catalog has
+     * 4 Bytes - number of tables in the database
      * 
      * @return
      */
@@ -72,7 +84,7 @@ public class Catalog {
     {   
         // adding in the header for the file
         byte[] bytes = new byte[0];
-        byte[] numOfTables = Type.convertIntToByteArray(this.tables.size());
+        byte[] numOfTables = Type.convertIntToByteArray(this.tables == null ? 0 : tables.size());
 
         bytes = Type.concat(bytes, numOfTables);
 
