@@ -7,24 +7,44 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
+        String dbPath = args[0];
+        String pageSize = args[1];
+        String buffSize = args[2];
+
         System.out.println("Starting up 11QL...");
         // Check for DB
 
         // Basic nice-ities for starting up the DB
         System.out.println("Enter <quit> to quit");
         System.out.println("Enter <help> for help");
-        System.out.print(">");
 
         // starting the user input
         Scanner userInput = new Scanner(System.in);
         String strInput = userInput.nextLine().toLowerCase();
 
-        String dbPath = args[0];
         File directory = new File(dbPath);
-        
+
+        // Check for DB
+        System.out.println("Looking at " + dbPath + " for existing db....");
+        System.out.print(">");
+
         if(directory.exists()){
-            if(directory.length() > 0){
-                System.out.println("Directory exists");
+            String catalogPath = dbPath;
+            if(dbPath.contains("\\")){
+                catalogPath += "\\Catalog";
+            }
+            else{
+                catalogPath += "/Catalog";
+            }
+
+            System.out.println(catalogPath);
+
+            File catalogFile = new File(catalogPath);
+            if(catalogFile.exists() && !catalogFile.isDirectory()){
+                System.out.println("catalog exists - maybe delete this line later");
+            }
+            else{
+                System.out.println("catalog file not exist - delete this lien later");
             }
             // else creating new catalog
         }
@@ -32,11 +52,23 @@ public class Main {
             System.out.println("No existing db found");
             System.out.println("Creating new db at " + dbPath);
             directory.mkdir();
-
-            //need to add a catalog into the folder.
+            System.out.println("New db created successfully");
+            System.out.println("Page size: " + pageSize);
+            System.out.println("Buffer size: " + buffSize);
         }
 
-        
+        // Basic nice-ities for starting up the DB
+        // System.out.println("Enter <quit> to quit");
+        // System.out.println("Enter <help> for help");
+        System.out.println();
+        System.out.println("Please enter commands, enter <quit> to shutdown the db");
+        System.out.println();
+        System.out.print("11QL> ");
+
+        // starting the user input
+        Scanner userInput = new Scanner(System.in);
+        String strInput = userInput.nextLine().toLowerCase();
+
         // parser object for this session
         Parser parser = new Parser(directory.getName(), dbPath);
         // save the user provided arguments

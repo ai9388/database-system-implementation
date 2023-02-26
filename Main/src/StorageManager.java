@@ -211,4 +211,15 @@ public class StorageManager {
     public void setBufferSize(int bufferSize) {
         this.bufferSize = bufferSize;
     }
+
+    /**
+     * Writing the data to the catalog
+     */
+    public void writeToCatalog()
+    {
+        this.catalog.setTables(this.getAllTables());
+        byte[] bb = this.catalog.createCatalog();
+        this.catalog.writeToFile(bb);
+    }
+
 }
