@@ -73,15 +73,17 @@ public class StorageManager {
         System.out.println("DB location: " + dbPath);
         System.out.println("Page Size: " + String.valueOf(pageSize));
         System.out.println("Buffer Size: " + String.valueOf(bufferSize));
-        if (db.getAllTables().size() > 0) {
+        System.out.println();
+        
+        ArrayList<Table> tables = db.getAllTables();
+        if(tables.size() == 0){
+            System.out.println("No tables to display");
+        }
+        else{
             System.out.println("Tables: ");
-
-            ArrayList<Table> tables = db.getAllTables();
-            for (Table table : tables) {
-                table.displayTableInfo();
-            }
-        } else {
-            System.out.println("No tables to display.");
+        }
+        for (Table table : tables) {
+            System.out.println(table.displayTableInfo());
         }
     }
 
@@ -89,9 +91,10 @@ public class StorageManager {
     public void displayTableInfo(String tableName) throws TableException {
         Table table = db.getTableByName(tableName);
         if (table == null) {
-            throw new TableException(1, tableName);
+            System.out.println("From storage manager");
+            throw new TableException(2, tableName);
         } else {
-            table.displayTableInfo();
+            System.out.println(table.displayTableInfo());
         }
     }
 
@@ -108,7 +111,7 @@ public class StorageManager {
 
     public String selectFromTable(String tableName, String[] columns) throws TableException{
         if (db.getTableByName(tableName) == null) {
-            throw new TableException(1, tableName);
+            throw new TableException(2, tableName);
         } else {
             return db.selectFromTable(tableName, columns);
         }
@@ -141,7 +144,7 @@ public class StorageManager {
     public void insertOneRecordIntoTable(String tableName, String[] record) throws TableException, InvalidDataTypeException, PrimaryKeyException{
         Table table = db.getTableByName(tableName);
         if (table == null) {
-            throw new TableException(1, tableName);
+            throw new TableException(2, tableName);
         }
         table.insertRecord(record);
         Page mostRecentPage = table.getMostRecentPage();

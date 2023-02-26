@@ -181,6 +181,7 @@ public class Parser {
                 System.out.println("Saving catalog...");
                 System.out.println("\nExiting the database...");
             }
+            case EMPTY -> throw new Exception();
         }
             System.out.println("SUCCESS");
         }
@@ -192,6 +193,9 @@ public class Parser {
         }
         catch (PrimaryKeyException e) {
             System.out.println(e.getMessage());
+        }
+        catch (Exception e) {
+            System.out.println("ERROR");
         }
     }
 
