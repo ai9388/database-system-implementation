@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.*;
 
 public class Parser {
@@ -134,8 +135,15 @@ public class Parser {
                         // Table table = new Table(table_name, attributes);
                         storageManager.createTable(table_name, attributes);
                         // storageManager.addTable(table);
-                        // File new_table = new File(dbLocation + table_name);
-                        // storageManager.addIntialInfoToTable(new_table, 0, 0, 0);
+                        String tablePath = dbLocation;
+                        if(dbLocation.contains("\\")){
+                            tablePath += "\\"+table_name;
+                        }
+                        else{
+                            tablePath += "/" + table_name;
+                        }
+                        File new_table = new File(tablePath);
+                        storageManager.addIntialInfoToTable(new_table, 0, 0, 0);
 
                         System.out.println("SUCCESS! You've created " + table_name);
                     }
