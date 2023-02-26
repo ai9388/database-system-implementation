@@ -89,7 +89,7 @@ public class StorageManager {
     public void displayTableInfo(String tableName) throws TableException {
         Table table = db.getTableByName(tableName);
         if (table == null) {
-            throw new TableException(1, tableName);
+            throw new TableException(2, tableName);
         } else {
             table.displayTableInfo();
         }
@@ -108,7 +108,7 @@ public class StorageManager {
 
     public String selectFromTable(String tableName, String[] columns) throws TableException{
         if (db.getTableByName(tableName) == null) {
-            throw new TableException(1, tableName);
+            throw new TableException(2, tableName);
         } else {
             return db.selectFromTable(tableName, columns);
         }
@@ -141,7 +141,7 @@ public class StorageManager {
     public void insertOneRecordIntoTable(String tableName, String[] record) throws TableException, InvalidDataTypeException, PrimaryKeyException{
         Table table = db.getTableByName(tableName);
         if (table == null) {
-            throw new TableException(1, tableName);
+            throw new TableException(2, tableName);
         }
         table.insertRecord(record);
         Page mostRecentPage = table.getMostRecentPage();
