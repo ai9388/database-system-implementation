@@ -31,7 +31,17 @@ public class Catalog {
     public void readCatalog()
     {
         try {
-            RandomAccessFile raFile = new RandomAccessFile(new File(this.path), READ);
+
+            String catalogPath = this.path;
+            if (path.contains("\\")) {
+                catalogPath += "\\Catalog";
+            } else {
+                catalogPath += "/Catalog";
+            }
+
+            File file = new File(catalogPath);
+
+            RandomAccessFile raFile = new RandomAccessFile(file, READ);
             raFile.seek(Integer.BYTES);
             int numOfTables = raFile.readInt();
 
@@ -56,10 +66,10 @@ public class Catalog {
             char[] tableNameChars = new char[tableNameLength];
 
             for (int i = 0; i < tableNameLength; i++) 
-            {
+            {   
                 tableNameChars[i] = f.readChar();
             }
-            String tableName = tableNameChars.toString();
+            String tableName = new String(tableNameChars);
 
             // getting the attributes from the bytes
             int numberOfAttributes = f.readInt();
@@ -77,7 +87,7 @@ public class Catalog {
                     attributeNameChars[j] = f.readChar();
                 }
 
-                String attributeName = attributeNameChars.toString();
+                String attributeName = new String(attributeNameChars);
 
                 int attributeTypeInt = f.readInt();
                 
@@ -125,9 +135,7 @@ public class Catalog {
                 attributes.add(attr);
             }
             return new Table(tableName, attributes);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException e) {e.printStackTrace();}
     
         return new Table(null, null);
     }

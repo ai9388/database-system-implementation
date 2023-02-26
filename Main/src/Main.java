@@ -33,7 +33,7 @@ public class Main {
                 System.out.println("catalog exists - maybe delete this line later");
             }
             else{
-                System.out.println("catalog file not exist - delete this lien later");
+                System.out.println("catalog file not exist - delete this line later");
             }
             // else creating new catalog
         }

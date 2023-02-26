@@ -190,7 +190,7 @@ public enum Type {
      * @return byte array
      */
     public static byte[] convertStringToByteArray(String st) {
-        byte[] bb = new byte[st.length()];
+        byte[] bb = new byte[0];
 
         char[] ch = st.toCharArray();
 
