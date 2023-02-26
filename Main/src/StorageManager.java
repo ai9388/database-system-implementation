@@ -8,15 +8,14 @@ public class StorageManager {
     public ArrayList<Page> pageBuffer = new ArrayList<>();
     public String dbPath;
     public int pageSize;
+    public Catalog catalog;
 
-    //create catalog 
-
-    //creating catalog, check if there is one 
-
-    //check of if the database exist, if not, create new one, else, get the dabase.
+    //call the get the most recent page from table for insert, update function
+    //then call the LRU(on the page)
 
     public StorageManager(String dbName, String dbPath, int bufferSize, int pageSize){
-        this.db = new Database(dbName, new HashMap<String, Table>(), null, dbPath, new HashMap<Integer, Table>());
+        this.catalog = new Catalog(dbPath);
+        this.db = new Database(dbName, new HashMap<String, Table>(), catalog, dbPath, new HashMap<Integer, Table>());
         this.bufferSize = bufferSize;
         this.dbPath = dbPath;
         this.pageSize = pageSize;
@@ -56,6 +55,7 @@ public class StorageManager {
             t = getTable(tableName);
             t.insertRecord(record);
         }
+
     }
 
     /***
@@ -76,7 +76,7 @@ public class StorageManager {
         System.out.println("Page Size: " + String.valueOf(pageSize));
         System.out.println("Buffer Size: " + String.valueOf(bufferSize));
         System.out.println("Tables: ");
-        
+
         ArrayList<Table> tables = db.getAllTables();
         for (Table table : tables) {
             table.displayTableInfo();
@@ -131,6 +131,7 @@ public class StorageManager {
     public void insertOneRecordIntoTable(String tableName, String[] record) throws TableException, InvalidDataTypeException, PrimaryKeyException{
         Table table = db.getTableByName(tableName);
         table.insertRecord(record);
+        
     }
 
     /***

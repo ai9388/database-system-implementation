@@ -1,7 +1,3 @@
-import java.beans.VetoableChangeSupport;
-import java.io.File;
-import java.io.RandomAccessFile;
-import java.security.cert.CertPath;
 import java.util.*;
 
 public class Parser {
@@ -148,7 +144,7 @@ public class Parser {
                         System.out.println(pke.getMessage());
                     }
                     // testing byte array stuff
-                    Catalog c = new Catalog(this.dbLocation, table_name, attributes, this.pageSize, this.bufferSize);
+                    Catalog c = new Catalog(this.dbLocation);
                     byte[] catalogAsBytes = c.createCatalog();
                     c.writeToFile(catalogAsBytes);
                 }
@@ -156,6 +152,7 @@ public class Parser {
             case DISPLAY_SCHEMA -> storageManager.displaySchema();
             case DISPLAY_INFO -> {
                 String table_name = user_input.replaceFirst("display info", "").strip();
+                storageManager.displayTableInfo(table_name);
                 storageManager.displayTableInfo(table_name);
             }
             case SELECT -> {
@@ -202,9 +199,6 @@ public class Parser {
             System.out.println(e.getMessage());
         }
         catch(InvalidDataTypeException e){
-            System.out.println(e.getMessage());
-        }
-        catch(PrimaryKeyException e){
             System.out.println(e.getMessage());
         }
     }
