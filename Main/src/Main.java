@@ -65,10 +65,6 @@ public class Main {
         System.out.println();
         System.out.print("11QL> ");
 
-        // starting the user input
-        Scanner userInput = new Scanner(System.in);
-        String strInput = userInput.nextLine().toLowerCase();
-
         // parser object for this session
         Parser parser = new Parser(directory.getName(), dbPath);
         // save the user provided arguments
