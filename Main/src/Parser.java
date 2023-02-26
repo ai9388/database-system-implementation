@@ -156,7 +156,7 @@ public class Parser {
             case DISPLAY_SCHEMA -> storageManager.displaySchema();
             case DISPLAY_INFO -> {
                 String table_name = user_input.replaceFirst("display info", "").strip();
-                storageManager.displayInfo(table_name);
+                storageManager.displayTableInfo(table_name);
             }
             case SELECT -> {
                 String input = user_input.replaceFirst("select", "").strip();
