@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Catalog {
 
@@ -25,28 +26,110 @@ public class Catalog {
     public Catalog(String path)
     {
         this.path = path;
-        System.out.println(this.path);
     }
 
     public void createTableObjects(byte[] bb)
     {
         try {
             RandomAccessFile raFile = new RandomAccessFile(new File(this.path), READ);
-            raFile.seek(4);
+            raFile.seek(Integer.BYTES);
+            int numOfTables = raFile.readInt();
 
-            int lengthOfTable = raFile.readInt();
+            for (int i = 0; i < numOfTables; i++) {
+                //int numberOfBytesInTable = raFile.readInt();
+                //raFile.seek(Integer.BYTES);
+                createTableFromBytes(raFile);
+            }
 
-            
-            
         } catch (IOException e) {
             System.out.println("File doesnt exist.");
             e.printStackTrace();
         }
     }
 
-    public void createTableFromBytes(byte[] bb)
+    public Table createTableFromBytes(RandomAccessFile f)
     {
-        
+        try {
+            // getting the 
+            int tableNameLength = f.readInt();
+
+            char[] tableNameChars = new char[tableNameLength];
+
+            for (int i = 0; i < tableNameLength; i++) 
+            {
+                tableNameChars[i] = f.readChar();
+            }
+            String tableName = tableNameChars.toString();
+
+            // getting the attributes from the bytes
+            int numberOfAttributes = f.readInt();
+
+            ArrayList<Attribute> attributes = new ArrayList<Attribute>();
+
+            for (int i = 0; i < numberOfAttributes; i++) 
+            {
+                int attributeNameLength = f.readInt();
+
+                char[] attributeNameChars = new char[attributeNameLength];
+
+                for (int j = 0; j < attributeNameLength; j++) 
+                {
+                    attributeNameChars[j] = f.readChar();
+                }
+
+                String attributeName = attributeNameChars.toString();
+
+                int attributeTypeInt = f.readInt();
+                
+                Type attributeType;
+
+                switch(attributeTypeInt)
+                {
+                    case Catalog.INTEGER ->
+                    {
+                        attributeType = Type.INTEGER;
+                        break;
+                    }
+                    case Catalog.DOUBLE ->
+                    {
+                        attributeType = Type.DOUBLE;
+                        break;
+                    }
+                    case Catalog.BOOLEAN ->
+                    {
+                        attributeType = Type.BOOLEAN;
+                        break;
+                    }
+                    case Catalog.CHAR ->
+                    {
+                        attributeType = Type.CHAR;
+                        break;
+                    }
+                    case Catalog.VARCHAR ->
+                    {
+                        attributeType = Type.VARCHAR;
+                        break;
+                    }
+                    default ->
+                    {
+                        attributeType = Type.INTEGER;
+                        break;
+                    }
+                }
+
+                int attributeN = f.readInt();
+                
+                boolean attributeIsPrimaryKey = f.readBoolean();
+
+                Attribute attr = new Attribute(attributeName, attributeType, attributeIsPrimaryKey, attributeN);
+                attributes.add(attr);
+            }
+            return new Table(tableName, attributes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    
+        return new Table(null, null);
     }
 
     /**
@@ -62,16 +145,14 @@ public class Catalog {
      * reading an existing catalog
      * @return
      */
-    public byte[] readCatalog()
+    public void readCatalog()
     {
-        byte[] bb = new byte[0];
         try {
-            bb = Files.readAllBytes(Paths.get(this.path));
-            System.out.println(bb);
+            byte[] bb = Files.readAllBytes(Paths.get(this.path));
+            createTableObjects(bb);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return bb;
     }
 
     /**

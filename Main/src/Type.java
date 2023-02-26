@@ -1,8 +1,6 @@
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-import javax.swing.text.html.HTMLDocument.RunElement;
-
 public enum Type {
     INTEGER ("int"),
     DOUBLE ("double"),
