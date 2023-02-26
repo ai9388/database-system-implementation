@@ -1,25 +1,20 @@
 import java.io.File;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 import java.util.*;
-
-import javax.swing.text.DefaultStyledDocument.ElementSpec;
-import javax.xml.crypto.Data;
-
-
-//TODO: need to implement a page buffer
-//not write into the file until the user said quit
-
-//creating new database in the main and pass it in the storage manager
-
 
 public class StorageManager {
     private Database db;
     private int bufferSize;
     public ArrayList<Page> pageBuffer = new ArrayList<>();
 
-    public StorageManager(Database database, int bufferSize){
-        this.db = database;
+    //create catalog 
+
+    //creating catalog, check if there is one 
+
+    //check of if the database exist, if not, create new one, else, get the dabase.
+
+    public StorageManager(String dbName, String dbPath, int bufferSize){
+        this.db = new Database(dbName, new HashMap<String, Table>(), null, dbPath, new HashMap<Integer, Table>());
         this.bufferSize = bufferSize;
     }
 
@@ -27,71 +22,97 @@ public class StorageManager {
         return db;
     }
 
-
+    /***
+     * get table using table name from database
+     * for parser be able to get the table with the given table name
+     * @param table_name
+     * @return
+     */
     public Table getTable(String table_name) {
-        // TODO: for parser be able to get the table with the given table name
         return db.getSingleTable(table_name);
     }
 
+    public ArrayList<Table> getAllTables(){
+        return db.getAllTables();
+    }
+
+    public void createTable(String tableName, ArrayList<Attribute> attributes) throws TableException{
+        db.createTable(tableName, attributes);
+    }
+
+    /***
+     * Insert records into given table from parser
+     * @param tableName
+     * @param records
+     * @throws PrimaryKeyException
+     */
     public void insertRecords(String tableName, ArrayList<Record> records) throws PrimaryKeyException {
-        // TODO: insert records into given table from parser
         Table t = null;
         for (Record record: records) {
             t = getTable(tableName);
             t.insertRecord(record);
         }
-        // TODO: write table out to storage?
     }
 
+    /***
+     * adding table into database
+     * @param table
+     */
     public void addTable(Table table) {
-        // This is used in Parser
         // TODO: write table to the database?
         db.addTable(table);
     }
 
-    public void displaySchema() {
-        ArrayList<Table> tables = db.getAllTables();
-        for (Table t : tables)
-        {
-            if (t != null) {
-                System.out.println("Table name: " + t.getName());
-                System.out.println("Table Schema: ");
-                for (Attribute a : t.getAttributes())
-                {
-                    System.out.println(a.toString());
-                }
-                //System.out.println("Pages: " + t.getNumberOfPages());
-                System.out.println("Records: " + t.getNumberOfRecords());
-            }
-        }   
+    /***
+     * displaying table schema
+     * @throws TableException
+     */
+    public void displaySchema(String tableName) throws TableException {
+        Table table = db.getTableByName(tableName);
+        table.displayTableSchema();
     }
 
-    public void displayInfo(String table_name) {
-        //displaySchema(table_name);
-        System.out.println("Number of pages: "); // Print # of pages
-        System.out.println("Number of records: "); // Print # of records
+    
+    public void displayInfo(String tableName) throws TableException {
+        Table table = db.getTableByName(tableName);
+        table.displayTableInfo();
     }
 
+    /***
+     * insert records into given table from parser
+     * @return true if there are tables
+     */
     public boolean hasTable() {
-        // TODO: check if there are any tables in the database for parser
-        return true;
+        int num = db.getAllTables().size();
+        return num > 0;
     }
+     
+    
 
     public String selectFromTable(String tableName, String[] columns) throws TableException{
         return db.selectFromTable(tableName, columns);
     }
 
-    public Record getRecordFromPrimaryKey(Table table, String key){
-        //get the record from the table
-        // return table.getRecordsPK(key);
-        return null;
+    /***
+     * Get record from the table using primary key
+     * @param table
+     * @param key
+     * @return record
+     * @throws PrimaryKeyException
+     */
+    public Record getRecordFromPrimaryKey(Table table, String key) throws PrimaryKeyException{
+        return table.getRecordByPK(key);
     }
     
-    public void getPageByTablePNumber(Table table, int pageNumber){
-        //TODO: change void back to Page
-        // return table.getPagebyPNum(pageNumber);
+    public Page getPageByTablePNumber(Table table, int pageNumber){
+        return table.getPageByPNum(pageNumber);
     }
 
+    /***
+     * get all records for a given table number
+     * @param tableNumber
+     * @return
+     */
     public ArrayList<Record> getAllRecords(int tableNumber){
         return null;
     }
@@ -101,21 +122,47 @@ public class StorageManager {
         table.insertRecord(record);
     }
 
+    /***
+     * insert a Record into a table
+     * @param table
+     * @param record
+     * @throws InvalidDataTypeException
+     * @throws PrimaryKeyException
+     */
+    public void insertARecord(Table table, String[] record) throws InvalidDataTypeException, PrimaryKeyException{
+        table.insertRecord(record);
+    }
+
+    /***
+     * delete record by primary key from a given table
+     * @param primaryKey
+     * @param table
+     * @throws InvalidDataTypeException
+     * @throws PrimaryKeyException
+     */
     public void deleteRecord(String primaryKey, Table table) throws PrimaryKeyException, InvalidDataTypeException{
         table.removeRecordByPK(primaryKey);
     }
 
+    /***
+     * update record by primary key from a given table
+     * @param primaryKey
+     * @param table
+     * @throws InvalidDataTypeException
+     * @throws PrimaryKeyException
+     * @throws TableException
+     */
     public void updateRecord(String primaryKey, Table table,  String column, String newEntry) throws TableException, PrimaryKeyException, InvalidDataTypeException{
         table.updateRecordByPK(primaryKey, column, newEntry);
     }
-
-    public String byteToString(){
-        return null;
-    }
     
+    /***
+     * Least recently used
+     * If the buffer is full, then remove the least used one(in the front) 
+     * and adding the new one(in the back)
+     * @param page
+     */
     public void LRU(Page page){
-        //old -> new
-        //adding into the linkedlist and if it full, pop the first one (the oldest one)
         if(pageBuffer.size() > bufferSize){
             pageBuffer.remove(0);
             pageBuffer.add(page);
@@ -123,10 +170,6 @@ public class StorageManager {
         else{
             pageBuffer.add(page);
         }
-    }
-
-    public void rewrite(){
-
     }
 
 
@@ -162,7 +205,4 @@ public class StorageManager {
             e.printStackTrace();
         }
     }
-
-
-
 }

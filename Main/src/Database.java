@@ -6,13 +6,15 @@ public class Database {
     private Map<String, Table> tables;
     private Catalog catalog;
     private String path;
+    private Map<Integer, Table> tablesID;
 
-    public Database(String name, Map<String, Table> tables, Catalog catalog, String path)
+    public Database(String name, Map<String, Table> tables, Catalog catalog, String path, Map<Integer, Table> tablesID)
     {
         this.name = name;
         this.tables = tables;
         this.catalog = catalog;
         this.path = path;
+        this.tablesID = tablesID;
     }
 
     /**
@@ -35,6 +37,7 @@ public class Database {
     public Map<String, Table> getTables() {
         return tables;
     }
+
 
     public Table getSingleTable(String name){
         return tables.get(name);
@@ -80,6 +83,14 @@ public class Database {
         return false;
     }
 
+    public void createTable(String tablename, ArrayList<Attribute> attributes) throws TableException{
+        if(this.getTableByName(tablename) == null){
+            Table newTable = new Table(tablename, attributes);
+            tables.put(tablename, newTable);
+            tablesID.put(newTable.getTableID(), newTable);
+        }
+    }
+
     public boolean dropTable(int tableID)
     {
         return false;
@@ -92,6 +103,10 @@ public class Database {
        } catch (NullPointerException e) {
         throw new TableException(2, name);
        }
+    }
+
+    public Table getTableByID(int id){
+        return this.tablesID.get(id);
     }
 
     public void updateCatalog()

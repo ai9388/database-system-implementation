@@ -52,11 +52,11 @@ public class ParserTest {
 
     @Before
     public void setupParser(){
-        this.parser = new Parser();
-        parser.saveArgs(new String[]{"/db", "200", "200"});
-        Database db = new Database("bunchapeople", null, null, null);
-        db.getTables().put("person", table);
-        parser.storageManager = new StorageManager(db, 200);
+        // this.parser = new Parser();
+        // parser.saveArgs(new String[]{"/db", "200", "200"});
+        // Database db = new Database("bunchapeople", null, null, null);
+        // db.getTables().put("person", table);
+        // parser.storageManager = new StorageManager(db, 200);
     }
 
     public void createAttributes(int pkidx, String[] c, Type[] t){
