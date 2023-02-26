@@ -55,27 +55,32 @@ public class Main {
 
         // starting the user input
         Scanner userInput = new Scanner(System.in);
-        System.out.print("JottQL> ");
-        String strInput = userInput.nextLine().toLowerCase();
+        // System.out.print("JottQL> ");
+        // String strInput = userInput.nextLine().toLowerCase();
         
         // parser object for this session
         Parser parser = new Parser(directory.getName(), dbPath);
         // save the user provided arguments
         parser.saveArgs(args);
         // looping until <quit> is taken in
-        while (!strInput.equals("quit")) {
+        
+        
+        boolean flag = true;
+        while (flag == true){
             // oh no the user needs help, have to display it   
             // keep asking user for input
-            parser.clasifyInput(strInput);
-            parser.parse();
             System.out.print("JottQL> ");
-            strInput = userInput.nextLine();
+            String strInput = userInput.nextLine();
+            parser.clasifyInput(strInput);
+            flag = parser.parse();
+            
         }
-        System.out.println("Shutting down 11QL...");
-        System.out.println("Shutting down the database...");
-        System.out.println("Purging the page buffer...");
-        System.out.println("Saving catalog...");
-        System.out.println("\nExiting the database...");
+
+        // System.out.println("Shutting down JottQL...");
+        // System.out.println("Shutting down the database...");
+        // System.out.println("Purging the page buffer...");
+        // System.out.println("Saving catalog...");
+        // System.out.println("\nExiting the database...");
         userInput.close();
 
     }

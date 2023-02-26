@@ -61,7 +61,7 @@ public class Parser {
     /**
      * Assume user passes in database
      */
-    public void parse() {
+    public boolean parse() {
         try{
             switch (command) {
             case CREATE_TABLE -> {
@@ -174,12 +174,15 @@ public class Parser {
             }
             case HELP -> displayHelp();
             case QUIT -> {
+                System.out.println("quit form parser");
                 storageManager.writeToCatalog();
                 System.out.println("Shutting down 11QL...");
                 System.out.println("Shutting down the database...");
                 System.out.println("Purging the page buffer...");
                 System.out.println("Saving catalog...");
                 System.out.println("\nExiting the database...");
+
+                return false;
             }
             case EMPTY -> throw new Exception();
         }
@@ -197,6 +200,8 @@ public class Parser {
         catch (Exception e) {
             System.out.println("ERROR");
         }
+
+        return true;
     }
 
     private void select(String attr, String tableName) throws TableException {
