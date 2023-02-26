@@ -518,6 +518,7 @@ public class Table {
         int attributeNameLength = attr.getName().length();
         String attributeName = attr.getName();
         int attributeType;
+        int attributeN = 0;
 
         switch (attr.getType()) {
             case BOOLEAN:
@@ -525,6 +526,7 @@ public class Table {
                 break;
             case CHAR:
                 attributeType = Catalog.CHAR;
+                attributeN = attr.getN();
                 break;
             case DOUBLE:
                 attributeType = Catalog.DOUBLE;
@@ -534,6 +536,7 @@ public class Table {
                 break;
             case VARCHAR:
                 attributeType = Catalog.VARCHAR;
+                attributeN = attr.getN();
                 break;
             default:
                 attributeType = 0;
@@ -545,6 +548,7 @@ public class Table {
         bb = Type.concat(bb, Type.convertIntToByteArray(attributeNameLength));
         bb = Type.concat(bb, Type.convertStringToByteArray(attributeName));
         bb = Type.concat(bb, Type.convertIntToByteArray(attributeType));
+        bb = Type.concat(bb, Type.convertIntToByteArray(attributeN));
         bb = Type.concat(bb, Type.convertBooleanToByteArray(isPrimaryKey));
 
         return bb;
