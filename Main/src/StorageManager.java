@@ -1,3 +1,5 @@
+import java.io.File;
+import java.io.RandomAccessFile;
 import java.util.*;
 
 public class StorageManager {
@@ -223,6 +225,30 @@ public class StorageManager {
         this.catalog.setTables(this.getAllTables());
         byte[] bb = this.catalog.createCatalog();
         this.catalog.writeToFile(bb);
+        
     }
+
+    /**
+      * adding the initial information to the file
+      * this includes the file id, number of pages, and number of records
+      */
+      public void addIntialInfoToTable(File new_table, int fileID, int numOfPages, int numOfRecords)
+      {
+          RandomAccessFile raf;
+          try {
+              raf = new RandomAccessFile(new_table, "rw");
+ 
+              byte[] bytes = new byte[0];
+
+              bytes= Type.concat(bytes, Type.convertIntToByteArray(fileID));
+              bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfPages));
+              bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfRecords));
+              
+              raf.write(bytes);
+              raf.close();
+          } catch (Exception e) {
+              e.printStackTrace();
+          }
+      }
 
 }
