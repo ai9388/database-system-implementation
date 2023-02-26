@@ -14,9 +14,10 @@ public class Parser {
     public StorageManager storageManager;
     public String dbName;
 
-    public Parser(String dbName){
+    public Parser(String dbName, String dbLocation){
         // TODO: hai-yen
         this.dbName = dbName;
+        this.dbLocation = dbLocation;
         storageManager = new StorageManager(dbName, dbLocation, bufferSize, pageSize);
     }
 
