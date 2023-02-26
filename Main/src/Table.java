@@ -42,6 +42,8 @@ public class Table {
      */
     private ArrayList<Page> pages;
 
+    private Page mostRecentPage;
+
     public Table(String name, ArrayList<Attribute> attributes) {
         this.name = name;
         this.tableID = GENERALTABLEID + 1;
@@ -83,6 +85,10 @@ public class Table {
      */
     public int getTableID() {
         return tableID;
+    }
+
+    public Page getMostRecentPage(){
+        return mostRecentPage;
     }
 
     /**
@@ -422,6 +428,9 @@ public class Table {
                 pages.add(i + 1, page.split());
                 inserted = true;
             }
+            if(inserted){
+                mostRecentPage = pages.get(i);
+            }
         }
     }
 
@@ -433,6 +442,7 @@ public class Table {
         for(Page page: this.pages){
             if(page.containsRecord(r)){
                 page.removeRecord(r);
+                mostRecentPage = page;
             }
         }
     }

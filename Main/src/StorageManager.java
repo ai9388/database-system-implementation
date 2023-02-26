@@ -1,5 +1,3 @@
-import java.io.File;
-import java.io.RandomAccessFile;
 import java.util.*;
 
 public class StorageManager {
@@ -54,8 +52,9 @@ public class StorageManager {
         for (Record record: records) {
             t = getTable(tableName);
             t.insertRecord(record);
+            Page page = t.getMostRecentPage();
+            LRU(page);
         }
-
     }
 
     /***
@@ -130,7 +129,8 @@ public class StorageManager {
     public void insertOneRecordIntoTable(String tableName, String[] record) throws TableException, InvalidDataTypeException, PrimaryKeyException{
         Table table = db.getTableByName(tableName);
         table.insertRecord(record);
-        
+        Page mostRecentPage = table.getMostRecentPage();
+        LRU(mostRecentPage);
     }
 
     /***
@@ -142,6 +142,8 @@ public class StorageManager {
      */
     public void insertARecord(Table table, String[] record) throws InvalidDataTypeException, PrimaryKeyException{
         table.insertRecord(record);
+        Page mostRecentPage = table.getMostRecentPage();
+        LRU(mostRecentPage);
     }
 
     /***
@@ -153,6 +155,8 @@ public class StorageManager {
      */
     public void deleteRecord(String primaryKey, Table table) throws PrimaryKeyException, InvalidDataTypeException{
         table.removeRecordByPK(primaryKey);
+        Page mostRecentPage = table.getMostRecentPage();
+        LRU(mostRecentPage);
     }
 
     /***
@@ -165,6 +169,8 @@ public class StorageManager {
      */
     public void updateRecord(String primaryKey, Table table,  String column, String newEntry) throws TableException, PrimaryKeyException, InvalidDataTypeException{
         table.updateRecordByPK(primaryKey, column, newEntry);
+        Page mostRecentPage = table.getMostRecentPage();
+        LRU(mostRecentPage);
     }
     
     /***
