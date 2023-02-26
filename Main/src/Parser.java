@@ -1,3 +1,4 @@
+import java.beans.VetoableChangeSupport;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.security.cert.CertPath;
@@ -5,7 +6,7 @@ import java.util.*;
 
 public class Parser {
      enum commands {
-        CREATE_TABLE, DISPLAY_SCHEMA, DISPLAY_INFO, SELECT, INSERT, HELP, QUIT
+        CREATE_TABLE, DISPLAY_SCHEMA, DISPLAY_INFO, SELECT, INSERT, HELP, QUIT, EMPTY
     }
 
     private String user_input;
@@ -25,7 +26,6 @@ public class Parser {
 
         this.user_input = str_input;
         database = new Database("db", new HashMap<String, Table>(), null, dbLocation);
-        storageManager = new StorageManager(database, bufferSize);
 
         this.user_input = str_input.toLowerCase();
         if (user_input.startsWith("create table")) {
@@ -43,7 +43,8 @@ public class Parser {
         } else if (user_input.startsWith("quit")) {
             command = commands.QUIT;
         } else {
-            System.out.println("Invalid Command.");
+            // System.out.println("Invalid Command.");
+            command = commands.EMPTY;
         }
     }
 
@@ -76,11 +77,7 @@ public class Parser {
                 ArrayList<Attribute> attributes = new ArrayList<>();
                 Attribute primaryAttribute = null;
                 int primaryIndex = 0;
-                Table t = storageManager.getTable(table_name);
-                if (t != null) {
-                    System.out.println("This table already exists.");
-                    break;
-                }
+    
                 boolean hasOnePK = false;
                 for (String attribute : attr) {
                     String[] components = attribute.strip().replaceAll("\\(", " ").split(" ");
@@ -126,7 +123,7 @@ public class Parser {
                         }
                         default -> {
                             System.out.println("ERROR!");
-                            System.out.println("one or more attributes have a poorly written type.");
+                            System.out.println("Invalid data type: " + components[1]);
                         }
                     }
                 }
@@ -152,10 +149,10 @@ public class Parser {
                     c.writeToFile(catalogAsBytes);
                 }
             }
-            case DISPLAY_SCHEMA -> displaySchema();
+            case DISPLAY_SCHEMA -> storageManager.displaySchema();
             case DISPLAY_INFO -> {
                 String table_name = user_input.replaceFirst("display info", "").strip();
-                displayInfo(table_name);
+                storageManager.displayInfo(table_name);
             }
             case SELECT -> {
                 String input = user_input.replaceFirst("select", "").strip();
@@ -193,58 +190,22 @@ public class Parser {
         }
         }
         catch(TableException e){
-            System.out.println(e.getLocalizedMessage());
+            System.out.println(e.getMessage());
         }
         catch(InvalidDataTypeException e){
             System.out.println(e.getMessage());
         }
+        catch(PrimaryKeyException e){
+            System.out.println(e.getMessage());
+        }
     }
-
-    private void displayInfo(String table_name) {
-        
-
-
-    }
-
-    private void displaySchema() {
-        System.out.println("DB Location: " + this.dbLocation);
-        System.out.println("Page Size: " + this.pageSize);
-        System.out.println("Buffer Size: " + this.bufferSize);
-
-        //StorageManager.displaySchema();
-
-        System.out.println("SUCCESS");
-    }
-
-    // this may not be needed????
-    // private void insert(String tableName, ArrayList<Record> vals) {
-    //     //StorageManager.insertRecords(tableName, vals);
-    // }
 
     private void select(String attr, String tableName) throws TableException {
         if (attr.equals("*")) {
-            // Table t = StorageManager.getTable(tableName);
-            // if (t == null) {
-            //     System.out.println("ERROR!");
-            // }
-            // else {
-            //     t.getRecords().forEach(System.out::println);
-            // }
             System.out.println(storageManager.selectFromTable(tableName, null));
         }
         else {
             String[] columns = attr.strip().split(",");
-            // Table t = StorageManager.getTable(tableName);
-            // if (t != null) {
-            //     ArrayList<Record> records = t.getRecords();
-            //     ArrayList<String> selected = new ArrayList<>();
-            //     for (int i = 0; i < records.size(); i++) {
-            //         for (String attribute : attributes) {
-            //             attribute = attribute.strip();
-            //             // TODO: this needs to be edited but rough idea...
-            //             selected.add(i, records.get(i).getValueAtColumn(attribute));
-            //         }
-            //     }
             System.out.println(storageManager.selectFromTable(tableName, columns));
             }
     }

@@ -246,6 +246,7 @@ public class TableTest {
          assertTrue(!res && msgExpected.equals(msgGot));
     }
 
+    
     public void createAttributes(int pkidx, String[] c, Type[] t, ArrayList<Attribute> attr) {
         for (int i = 0; i < c.length; i++) {
             Attribute a = new Attribute(c[i], t[i], i == pkidx ? true : false,
