@@ -477,10 +477,7 @@ public class Table {
 
         bb = Type.concat(bb, getTableHeaderInfoForCatalog());
         bb = Type.concat(bb, convertAllAttributestoBytes());
-
-        int len = bb.length;
         
-        bb = Type.concat(Type.convertIntToByteArray(len), bb);
         return bb;
     }
 

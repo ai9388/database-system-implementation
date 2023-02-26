@@ -31,7 +31,6 @@ public class Catalog {
     public void readCatalog()
     {
         try {
-
             String catalogPath = this.path;
             if (path.contains("\\")) {
                 catalogPath += "\\Catalog";
@@ -46,7 +45,8 @@ public class Catalog {
             int numOfTables = raFile.readInt();
 
             for (int i = 0; i < numOfTables; i++) {
-                createTableFromBytes(raFile);
+                Table t = createTableFromBytes(raFile);
+                //readTableFromBytes(t.getName());
             }
 
         } catch (IOException e) {
@@ -55,10 +55,35 @@ public class Catalog {
         }
     }
 
+    // public Table readTableFromBytes(String tableName)
+    // {
+    //     try {
+    //         String tablePath = this.path;
+    //         if (path.contains("\\")) {
+    //             tablePath += "\\" + tableName;
+    //         } else {
+    //             tablePath += "/" + tableName;
+    //         }
+
+    //         File file = new File(tablePath);
+
+    //         RandomAccessFile raFile = new RandomAccessFile(file, READ);
+    //         raFile.seek(0);
+    //         int numOfTables = raFile.readInt();
+
+    //         for (int i = 0; i < numOfTables; i++) {
+    //             createTableFromBytes(raFile);
+    //         }
+
+    //     } catch (IOException e) {
+    //         System.out.println("File doesnt exist.");
+    //         e.printStackTrace();
+    //     }
+    // }
+
     public Table createTableFromBytes(RandomAccessFile f)
     {        
         try {
-            f.seek(f.getFilePointer() + 4);
             // getting the table name
             int tableNameLength = f.readInt();
 
@@ -131,11 +156,6 @@ public class Catalog {
                 boolean attributeIsPrimaryKey = f.readBoolean();
 
                 Attribute attr = new Attribute(attributeName, attributeType, attributeIsPrimaryKey, attributeN);
-
-                System.out.println(attributeName);
-                System.out.println(attributeType);
-                System.out.println(attributeIsPrimaryKey);
-                System.out.println(attributeN);
 
                 attributes.add(attr);
             }
