@@ -155,6 +155,19 @@ public class Page {
         return -1;
     }
 
+    /**
+     * removes a record from the list of records
+     * @param r the record
+     */
+    public void removeRecord(Record r){
+        this.records.remove(r);
+        this.size -= r.getSize();
+    }
+
+    /**
+     * adds a record to the very end of the current page
+     * @param r the record to add
+     */
     public void addLast(Record r){
         this.records.add(r);
         this.size += r.getSize();
