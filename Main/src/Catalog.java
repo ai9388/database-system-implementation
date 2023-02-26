@@ -28,7 +28,7 @@ public class Catalog {
         this.path = path;
     }
 
-    public void createTableObjects(byte[] bb)
+    public void readCatalog()
     {
         try {
             RandomAccessFile raFile = new RandomAccessFile(new File(this.path), READ);
@@ -50,7 +50,7 @@ public class Catalog {
     public Table createTableFromBytes(RandomAccessFile f)
     {
         try {
-            // getting the 
+            // getting the table name
             int tableNameLength = f.readInt();
 
             char[] tableNameChars = new char[tableNameLength];
@@ -139,20 +139,6 @@ public class Catalog {
     public void setTables(ArrayList<Table> tables)
     {
         this.tables = tables;
-    }
-
-    /**
-     * reading an existing catalog
-     * @return
-     */
-    public void readCatalog()
-    {
-        try {
-            byte[] bb = Files.readAllBytes(Paths.get(this.path));
-            createTableObjects(bb);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
