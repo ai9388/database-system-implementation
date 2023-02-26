@@ -92,7 +92,7 @@ public class Page {
     }
  
     public Page split(){
-        int idx = Math.ceilDiv(records.size(), 2); // the index to split at
+        int idx = (int)Math.ceil(records.size()/ 2); // the index to split at
         Page otherPage = new Page(new ArrayList<>(this.records.subList(idx, records.size())));
         this.records = new ArrayList<>(this.records.subList(0, idx));
         this.setSize();
