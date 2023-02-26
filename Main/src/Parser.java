@@ -21,7 +21,7 @@ public class Parser {
     public Parser(String dbName){
         // TODO: hai-yen
         this.dbName = dbName;
-        storageManager = new StorageManager(dbName, dbLocation, bufferSize);
+        storageManager = new StorageManager(dbName, dbLocation, bufferSize, pageSize);
     }
 
     public void clasifyInput(String str_input) {
@@ -64,9 +64,8 @@ public class Parser {
 
     /**
      * Assume user passes in database
-     * @throws PrimaryKeyException
      */
-    public void parse() throws PrimaryKeyException {
+    public void parse() {
         try{
             switch (command) {
             case CREATE_TABLE -> {

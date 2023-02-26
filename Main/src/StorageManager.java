@@ -6,6 +6,8 @@ public class StorageManager {
     private Database db;
     private int bufferSize;
     public ArrayList<Page> pageBuffer = new ArrayList<>();
+    public String dbPath;
+    public int pageSize;
 
     //create catalog 
 
@@ -13,9 +15,11 @@ public class StorageManager {
 
     //check of if the database exist, if not, create new one, else, get the dabase.
 
-    public StorageManager(String dbName, String dbPath, int bufferSize){
+    public StorageManager(String dbName, String dbPath, int bufferSize, int pageSize){
         this.db = new Database(dbName, new HashMap<String, Table>(), null, dbPath, new HashMap<Integer, Table>());
         this.bufferSize = bufferSize;
+        this.dbPath = dbPath;
+        this.pageSize = pageSize;
     }
 
     public Database getDb() {
@@ -67,13 +71,20 @@ public class StorageManager {
      * displaying table schema
      * @throws TableException
      */
-    public void displaySchema(String tableName) throws TableException {
-        Table table = db.getTableByName(tableName);
-        table.displayTableSchema();
+    public void displaySchema() throws TableException {
+        System.out.println("DB location: " + dbPath);
+        System.out.println("Page Size: " + String.valueOf(pageSize));
+        System.out.println("Buffer Size: " + String.valueOf(bufferSize));
+        System.out.println("Tables: ");
+        
+        ArrayList<Table> tables = db.getAllTables();
+        for (Table table : tables) {
+            table.displayTableInfo();
+        }
     }
 
     
-    public void displayInfo(String tableName) throws TableException {
+    public void displayTableInfo(String tableName) throws TableException {
         Table table = db.getTableByName(tableName);
         table.displayTableInfo();
     }
