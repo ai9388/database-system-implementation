@@ -44,8 +44,9 @@ public class StorageManager {
      * Insert records into given table from parser
      * @param tableName
      * @param records
+     * @throws PrimaryKeyException
      */
-    public void insertRecords(String tableName, ArrayList<Record> records) {
+    public void insertRecords(String tableName, ArrayList<Record> records) throws PrimaryKeyException {
         Table t = null;
         for (Record record: records) {
             t = getTable(tableName);
