@@ -4,7 +4,7 @@ import java.security.cert.CertPath;
 import java.util.*;
 
 public class Parser {
-     enum commands {
+    enum commands {
         CREATE_TABLE, DISPLAY_SCHEMA, DISPLAY_INFO, SELECT, INSERT, HELP, QUIT
     }
 
@@ -89,7 +89,7 @@ public class Parser {
                     switch (components[1]) {
                         case "char" -> {
                             // originally had A XOR B, should be !(A XOR B)
-                            hasOnePK = ((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
+                            hasOnePK = !((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
                             Attribute a = new Attribute(attr_name, Type.CHAR, components.length > 3, Integer.parseInt(components[2].replace(')', ' ').strip()));
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
@@ -97,7 +97,7 @@ public class Parser {
                             //check component after char to know length
                         }
                         case "varchar" -> {
-                            hasOnePK = ((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
+                            hasOnePK = !((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
                             Attribute a = new Attribute(components[1], Type.VARCHAR, components.length > 3, Integer.parseInt(components[2].replace(')', ' ').strip()));
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
@@ -147,7 +147,7 @@ public class Parser {
                         System.out.println(pke.getMessage());
                     }
                     // testing byte array stuff
-                    Catalog c = new Catalog(this.dbLocation, attributes, this.pageSize, this.bufferSize);
+                    Catalog c = new Catalog(this.dbLocation, table_name, attributes, this.pageSize, this.bufferSize);
                     byte[] catalogAsBytes = c.createCatalog();
                     c.writeToFile(catalogAsBytes);
                 }
@@ -179,7 +179,12 @@ public class Parser {
                 // }
                 for (String value : vals) {
                     String[] values = value.replaceAll("[();]", "").strip().split(" ");
-                    storageManager.insertOneRecordIntoTable(table_name, values);
+                    try {
+                        storageManager.insertOneRecordIntoTable(table_name, values);
+                    } catch (PrimaryKeyException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                 }
             }
             case HELP -> displayHelp();
