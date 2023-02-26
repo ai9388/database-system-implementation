@@ -64,8 +64,9 @@ public class Parser {
 
     /**
      * Assume user passes in database
+     * @throws PrimaryKeyException
      */
-    public void parse() {
+    public void parse() throws PrimaryKeyException {
         try{
             switch (command) {
             case CREATE_TABLE -> {
