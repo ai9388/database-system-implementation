@@ -231,7 +231,7 @@ public class TableTest {
          // there is a record with this pk value
          boolean res = false;
          String[] d1 = new String[] { "1234", "madelina", "FINC" };
-         String msgExpected = new PrimaryKeyException(2, "1").getMessage();
+         String msgExpected = new PrimaryKeyException(2, "0").getMessage();
          String msgGot = "";
  
          try {
@@ -241,7 +241,7 @@ public class TableTest {
              msgGot = e.getMessage();
          } catch (PrimaryKeyException e) {
              // TODO Auto-generated catch block
-             e.printStackTrace();
+             msgGot = e.getLocalizedMessage();
          }
          assertTrue(!res && msgExpected.equals(msgGot));
     }
@@ -249,7 +249,7 @@ public class TableTest {
     public void createAttributes(int pkidx, String[] c, Type[] t, ArrayList<Attribute> attr) {
         for (int i = 0; i < c.length; i++) {
             Attribute a = new Attribute(c[i], t[i], i == pkidx ? true : false,
-                    types[i] == Type.VARCHAR || t[i] == Type.CHAR ? 20 : 0);
+                    t[i] == Type.VARCHAR || t[i] == Type.CHAR ? 20 : 0);
             attr.add(a);
         }
 
