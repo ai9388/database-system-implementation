@@ -40,7 +40,7 @@ public class Main {
         else{
             System.out.println("No existing db found");
             System.out.println("Creating new db at " + dbPath);
-            directory.mkdir();
+            directory.mkdirs();
             System.out.println("New db created successfully");
             System.out.println("Page size: " + pageSize);
             System.out.println("Buffer size: " + buffSize);
