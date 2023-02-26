@@ -83,7 +83,7 @@ public class StorageManager {
             System.out.println("Tables: ");
         }
         for (Table table : tables) {
-            table.displayTableInfo();
+            System.out.println(table.displayTableInfo());
         }
     }
 
@@ -91,9 +91,10 @@ public class StorageManager {
     public void displayTableInfo(String tableName) throws TableException {
         Table table = db.getTableByName(tableName);
         if (table == null) {
+            System.out.println("From storage manager");
             throw new TableException(2, tableName);
         } else {
-            table.displayTableInfo();
+            System.out.println(table.displayTableInfo());
         }
     }
 
