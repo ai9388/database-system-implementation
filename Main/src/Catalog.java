@@ -30,7 +30,7 @@ public class Catalog {
             readCatalog();
         } else 
         {
-            //this.writeToFile(this.createCatalog());
+            this.writeToFile(this.createCatalog());
         }
 
     }
