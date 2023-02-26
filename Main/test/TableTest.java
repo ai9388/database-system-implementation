@@ -246,7 +246,25 @@ public class TableTest {
          assertTrue(!res && msgExpected.equals(msgGot));
     }
 
-    
+    @Test
+    public void testUpdateTableByPK(){
+        System.out.println(table.selectAll());
+        try {
+            table.updateRecordByPK("carly", "age", "15");
+            assert(table.getRecordByPK("carly").getValueAtColumn(2).equals(15));
+        } catch (TableException e) {
+            // TODO Auto-generated catch block
+            System.out.println(e.getMessage());
+        } catch (PrimaryKeyException e) {
+            // TODO Auto-generated catch block
+            System.out.println(e.getMessage());
+        } catch (InvalidDataTypeException e) {
+            // TODO Auto-generated catch block
+            System.out.println(e.getMessage());
+        }
+        
+    }
+
     public void createAttributes(int pkidx, String[] c, Type[] t, ArrayList<Attribute> attr) {
         for (int i = 0; i < c.length; i++) {
             Attribute a = new Attribute(c[i], t[i], i == pkidx ? true : false,

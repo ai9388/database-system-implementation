@@ -238,12 +238,17 @@ public class Table {
             throws TableException, PrimaryKeyException, InvalidDataTypeException {
         if (Type.validateType(pkValue, primaryAttribute)) {
             if (isValidColumn(column)) {
-                Record r = getRecordByPK(pkValue);
                 Attribute a = attributesByCol.get(column);
+                Object pkObject = Type.getObjFromType(pkValue, primaryAttribute.getType());
                 // if both the column and the pk are valid, then validate data type
-                if (Type.validateType(pkValue, a)) {
-                    Object newEntryObject = Type.getObjFromType(pkValue, a.getType());
-                    r.updateAtColumn(getColumnIndex(column), newEntryObject);
+                if (Type.validateType(newEntry, a)) {
+                    Object newEntryObject = Type.getObjFromType(newEntry, a.getType());
+                    Record r = recordsByPK.remove(pkObject); // remove record from the map
+                    // this.records.remove(pkObject); // remove record from array
+                    removeRecordFromPage(r);// remove record from page
+                    r.updateAtColumn(getColumnIndex(column), newEntryObject); // update record
+                    recordsByPK.put(pkObject, r); // read the updated record
+                    addRecordToPage(r); // add record to page again
                 } else {
                     throw new InvalidDataTypeException(newEntry, a);
                 }
