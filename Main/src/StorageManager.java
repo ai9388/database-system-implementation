@@ -8,6 +8,7 @@ public class StorageManager {
     public ArrayList<Page> pageBuffer = new ArrayList<>();
     public String dbPath;
     public int pageSize;
+    public Catalog catalog;
 
     //create catalog 
 
@@ -17,6 +18,7 @@ public class StorageManager {
 
     public StorageManager(String dbName, String dbPath, int bufferSize, int pageSize){
         this.db = new Database(dbName, new HashMap<String, Table>(), null, dbPath, new HashMap<Integer, Table>());
+        this.catalog = new Catalog(dbPath, int pageSize, int bufferSize);
         this.bufferSize = bufferSize;
         this.dbPath = dbPath;
         this.pageSize = pageSize;
@@ -76,7 +78,7 @@ public class StorageManager {
         System.out.println("Page Size: " + String.valueOf(pageSize));
         System.out.println("Buffer Size: " + String.valueOf(bufferSize));
         System.out.println("Tables: ");
-        
+
         ArrayList<Table> tables = db.getAllTables();
         for (Table table : tables) {
             table.displayTableInfo();

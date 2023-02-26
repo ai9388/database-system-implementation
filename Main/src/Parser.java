@@ -148,7 +148,6 @@ public class Parser {
                         System.out.println(pke.getMessage());
                     }
                     // testing byte array stuff
-                    Catalog c = new Catalog(this.dbLocation, table_name, attributes, this.pageSize, this.bufferSize);
                     byte[] catalogAsBytes = c.createCatalog();
                     c.writeToFile(catalogAsBytes);
                 }
