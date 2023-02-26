@@ -140,7 +140,7 @@ public class StorageManager {
      * @throws InvalidDataTypeException
      * @throws PrimaryKeyException
      */
-    public void insertARecord(Table table, String[] record) throws InvalidDataTypeException, PrimaryKeyException{
+    public void insertARecord(Table table, String[] record) throws InvalidDataTypeException, PrimaryKeyException, TableException{
         table.insertRecord(record);
         Page mostRecentPage = table.getMostRecentPage();
         LRU(mostRecentPage);

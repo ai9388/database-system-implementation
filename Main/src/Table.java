@@ -158,7 +158,13 @@ public class Table {
      * @throws InvalidDataTypeException
      * @throws PrimaryKeyException
      */
-    public boolean insertRecord(String[] values) throws InvalidDataTypeException, PrimaryKeyException {
+    public boolean insertRecord(String[] values) throws InvalidDataTypeException, PrimaryKeyException, TableException {
+        if(values.length < attributes.size() || values.length > attributes.size()){
+            throw new TableException(4, "");
+        }
+        if(values.length > attributes.size()){
+            throw new TableException(3, "");
+        }
         if (Type.validateAll(values, attributes)) {
             Record record = new Record(new ArrayList<String>(Arrays.asList(values)), attributes);
             this.insertRecord(record);
