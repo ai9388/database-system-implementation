@@ -53,10 +53,10 @@ public class Parser {
         this.dbLocation = args[0];
         
         this.pageSize = Integer.parseInt(args[1]);
-        // set the page size
+        storageManager.setPageSize(this.pageSize);
         Page.setCapacity(pageSize);
         this.bufferSize = Integer.parseInt(args[2]);
-        // TODO: set the buffer size
+        storageManager.setBufferSize(this.bufferSize);
     }
 
     /**
@@ -84,7 +84,7 @@ public class Parser {
                     switch (components[1]) {
                         case "char" -> {
                             // originally had A XOR B, should be !(A XOR B)
-                            hasOnePK = !((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
+                            hasOnePK = ((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
                             Attribute a = new Attribute(attr_name, Type.CHAR, components.length > 3, Integer.parseInt(components[2].replace(')', ' ').strip()));
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
@@ -92,28 +92,28 @@ public class Parser {
                             //check component after char to know length
                         }
                         case "varchar" -> {
-                            hasOnePK = !((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
+                            hasOnePK = ((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
                             Attribute a = new Attribute(components[1], Type.VARCHAR, components.length > 3, Integer.parseInt(components[2].replace(')', ' ').strip()));
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
                         }
                         case "bool" -> {
-                            hasOnePK = !((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
+                            hasOnePK = ((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
                             Attribute a = new Attribute(attr_name, Type.BOOLEAN, primarykey, 0);
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
                         }
                         case "integer" -> {
-                            hasOnePK = !((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
+                            hasOnePK = ((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
                             Attribute a = new Attribute(attr_name, Type.INTEGER, primarykey, 0);
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
                         }
                         case "double" -> {
-                            hasOnePK = !((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
+                            hasOnePK = ((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
                             Attribute a = new Attribute(attr_name, Type.DOUBLE, primarykey, 0);
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
@@ -126,8 +126,7 @@ public class Parser {
                     }
                 }
                 if (!hasOnePK) {
-                    System.out.println("ERROR!");
-                    System.out.println("No primary key defined.");
+                    throw new PrimaryKeyException(1, " ");
                 } else {
                     System.out.println(attributes.toString());
                     try{
@@ -153,7 +152,6 @@ public class Parser {
             case DISPLAY_SCHEMA -> storageManager.displaySchema();
             case DISPLAY_INFO -> {
                 String table_name = user_input.replaceFirst("display info", "").strip();
-                storageManager.displayTableInfo(table_name);
                 storageManager.displayTableInfo(table_name);
             }
             case SELECT -> {
@@ -195,11 +193,15 @@ public class Parser {
                 System.out.println("\nExiting the database...");
             }
         }
+            System.out.println("SUCCESS");
         }
         catch(TableException e){
             System.out.println(e.getMessage());
         }
         catch(InvalidDataTypeException e){
+            System.out.println(e.getMessage());
+        }
+        catch (PrimaryKeyException e) {
             System.out.println(e.getMessage());
         }
     }

@@ -73,18 +73,26 @@ public class StorageManager {
         System.out.println("DB location: " + dbPath);
         System.out.println("Page Size: " + String.valueOf(pageSize));
         System.out.println("Buffer Size: " + String.valueOf(bufferSize));
-        System.out.println("Tables: ");
+        if (db.getAllTables().size() > 0) {
+            System.out.println("Tables: ");
 
-        ArrayList<Table> tables = db.getAllTables();
-        for (Table table : tables) {
-            table.displayTableInfo();
+            ArrayList<Table> tables = db.getAllTables();
+            for (Table table : tables) {
+                table.displayTableInfo();
+            }
+        } else {
+            System.out.println("No tables to display.");
         }
     }
 
     
     public void displayTableInfo(String tableName) throws TableException {
         Table table = db.getTableByName(tableName);
-        table.displayTableInfo();
+        if (table == null) {
+            throw new TableException(1, tableName);
+        } else {
+            table.displayTableInfo();
+        }
     }
 
     /***
@@ -99,7 +107,11 @@ public class StorageManager {
     
 
     public String selectFromTable(String tableName, String[] columns) throws TableException{
-        return db.selectFromTable(tableName, columns);
+        if (db.getTableByName(tableName) == null) {
+            throw new TableException(1, tableName);
+        } else {
+            return db.selectFromTable(tableName, columns);
+        }
     }
 
     /***
@@ -128,6 +140,9 @@ public class StorageManager {
 
     public void insertOneRecordIntoTable(String tableName, String[] record) throws TableException, InvalidDataTypeException, PrimaryKeyException{
         Table table = db.getTableByName(tableName);
+        if (table == null) {
+            throw new TableException(1, tableName);
+        }
         table.insertRecord(record);
         Page mostRecentPage = table.getMostRecentPage();
         LRU(mostRecentPage);
@@ -189,4 +204,11 @@ public class StorageManager {
         }
     }
 
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public void setBufferSize(int bufferSize) {
+        this.bufferSize = bufferSize;
+    }
 }

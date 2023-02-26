@@ -19,12 +19,12 @@ public class Main {
         Scanner userInput = new Scanner(System.in);
         String strInput = userInput.nextLine().toLowerCase();
 
-        String dbPath = args[1];
+        String dbPath = args[0];
         File directory = new File(dbPath);
         
         if(directory.exists()){
             if(directory.length() > 0){
-                System.out.println("catalog exists");
+                System.out.println("Directory exists");
             }
             // else creating new catalog
         }
