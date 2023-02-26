@@ -6,25 +6,31 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception {
-
-        System.out.println("Starting up 11QL...");
-        // Check for DB
-
-        // Basic nice-ities for starting up the DB
-        System.out.println("Enter <quit> to quit");
-        System.out.println("Enter <help> for help");
-        System.out.print(">");
-
-        // starting the user input
-        Scanner userInput = new Scanner(System.in);
-        String strInput = userInput.nextLine().toLowerCase();
-
-        String dbPath = args[1];
-        File directory = new File(dbPath);
         
+        String dbPath = args[0];
+        File directory = new File(dbPath);
+
+        System.out.println("Welcome to JottOL");
+        // Check for DB
+        System.out.println("Looking at " + dbPath + " for existing db....");
+
         if(directory.exists()){
-            if(directory.length() > 0){
-                System.out.println("catalog exists");
+            String catalogPath = dbPath;
+            if(dbPath.contains("\\")){
+                catalogPath += "\\Catalog";
+            }
+            else{
+                catalogPath += "/Catalog";
+            }
+
+            System.out.println(catalogPath);
+            
+            File catalogFile = new File(catalogPath);
+            if(catalogFile.exists() && !catalogFile.isDirectory()){
+                System.out.println("catalog exists - maybe delete this line later");
+            }
+            else{
+                System.out.println("catalog file not exist - delete this lien later");
             }
             // else creating new catalog
         }
@@ -36,7 +42,15 @@ public class Main {
             //need to add a catalog into the folder.
         }
 
-        
+        // Basic nice-ities for starting up the DB
+        System.out.println("Enter <quit> to quit");
+        System.out.println("Enter <help> for help");
+        System.out.print(">");
+
+        // starting the user input
+        Scanner userInput = new Scanner(System.in);
+        String strInput = userInput.nextLine().toLowerCase();
+
         // parser object for this session
         Parser parser = new Parser(directory.getName(), dbPath);
         // save the user provided arguments
