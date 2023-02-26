@@ -212,6 +212,7 @@ public class Table {
 
             // validate key value
             if (recordsByPK.containsKey(pkObject)) {
+
                 recordsByPK.remove(pkObject);
                 return true;
             } else {
@@ -422,10 +423,18 @@ public class Table {
                 inserted = true;
             }
         }
+    }
 
-        // if all the pages have been iterated and the value could not be added.
-        // that means it is greater than all values
-        //
+    /**
+     * remove a record from the page
+     * @param r
+     */
+    public void removeRecordFromPage(Record r){
+        for(Page page: this.pages){
+            if(page.containsRecord(r)){
+                page.removeRecord(r);
+            }
+        }
     }
 
     /*

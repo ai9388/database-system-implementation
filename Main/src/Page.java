@@ -1,4 +1,3 @@
-import java.lang.reflect.RecordComponent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -155,6 +154,27 @@ public class Page {
         return -1;
     }
 
+    /**
+     * removes a record from the list of records
+     * @param r the record
+     */
+    public void removeRecord(Record r){
+        this.records.remove(r);
+        this.size -= r.getSize();
+    }
+
+    /**
+     * checks if a specific record is contained here
+     * @param r
+     */
+    public boolean containsRecord(Record r){
+        return this.records.contains(r);
+    }
+
+    /**
+     * adds a record to the very end of the current page
+     * @param r the record to add
+     */
     public void addLast(Record r){
         this.records.add(r);
         this.size += r.getSize();
