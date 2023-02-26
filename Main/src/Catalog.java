@@ -1,6 +1,9 @@
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 
 public class Catalog {
 
@@ -14,19 +17,54 @@ public class Catalog {
     public static final String WRITE = "rw";
     
     private String path;
+    private ArrayList<Table> tables;
     public RandomAccessFile raf;
+    
 
     public Catalog(String path)
     {
         this.path = path;
+
+        if (new File(path).isFile())
+        {
+            readCatalog();
+        } else 
+        {
+            this.writeToFile(this.createCatalog());
+        }
+
     }
-        
+
+    
+    /**
+     * setting the tables for the catalog
+     * @param tables
+     */
+    public void setTables(ArrayList<Table> tables)
+    {
+        this.tables = tables;
+    }
+
+    /**
+     * reading an existing catalog
+     * @return
+     */
+    public byte[] readCatalog()
+    {
+        byte[] bb = new byte[0];
+        try {
+            bb = Files.readAllBytes(Paths.get(this.path));
+            System.out.println(bb);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bb;
+    }
 
     /**
      * Catalog is formatted as
      * 4 Bytes - number of tables
      * 4 Bytes - number of pages that the catalog has
-     * 4 Bytes - page number of most recently used page
      * 
      * @return
      */
@@ -34,10 +72,14 @@ public class Catalog {
     {   
         // adding in the header for the file
         byte[] bytes = new byte[0];
-        //byte[] pageSize = Type.convertIntToByteArray(this.pageSize);
-        byte[] numOfPages = Type.convertIntToByteArray(1);
-        byte[] lup = Type.convertIntToByteArray(1);
+        byte[] numOfTables = Type.convertIntToByteArray(this.tables.size());
 
+        bytes = Type.concat(bytes, numOfTables);
+
+        for (Table t : this.tables)
+        {
+            bytes = Type.concat(bytes, t.convertTableObjectToBytes());
+        }
 
         return bytes;
     }
@@ -45,24 +87,14 @@ public class Catalog {
     /**
      * updating the number of pages in the catalog
      */
-    public void updateNumberOfPages(int newNumOfPages)
+    public void updateNumberOfTables(int newNumOfTables)
     {
         try {
-            raf.seek(4);
-            raf.writeInt(newNumOfPages);
+            raf.seek(0);
+            raf.writeInt(newNumOfTables);
             raf.close();
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void updateLastUsedPageNumber(int lupn) 
-    {
-        try {
-            raf.seek(8);
-            raf.writeInt(lupn);
-            raf.close();
-        } catch (IOException e) {
+            System.out.println("Cannot update number of tables.");
             e.printStackTrace();
         }
     }

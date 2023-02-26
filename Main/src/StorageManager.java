@@ -22,7 +22,7 @@ public class StorageManager {
     }
 
     public Database getDb() {
-        return db;
+        return this.db;
     }
 
     /***
@@ -63,7 +63,6 @@ public class StorageManager {
      * @param table
      */
     public void addTable(Table table) {
-        // TODO: write table to the database?
         db.addTable(table);
     }
 
@@ -184,37 +183,4 @@ public class StorageManager {
         }
     }
 
-
-    /**
-     * adding the initial information to the file
-     * this includes the file id, number of pages, and number of records
-     */
-    public void addIntialInfoToTable(File new_table, int fileID, int numOfPages, int numOfRecords)
-    {
-        RandomAccessFile raf;
-        try {
-            raf = new RandomAccessFile(new_table, "rw");
-
-            byte[] bytes = new byte[3 * Integer.BYTES];
-            // writing the file id
-            for (int i = 0; i < Integer.BYTES; i++) {
-                Type.concat(bytes, Type.convertIntToByteArray(fileID));
-            }
-
-            // writing the number of pages
-            for (int i = Integer.BYTES; i < 2 * Integer.BYTES; i++) {
-                Type.concat(bytes, Type.convertIntToByteArray(numOfPages));
-            }
-
-            // writing the number of records
-            for (int i = 2 * Integer.BYTES; i < 3 * Integer.BYTES; i++) {
-                Type.concat(bytes, Type.convertIntToByteArray(numOfRecords));
-            }
-
-            raf.write(bytes);
-            raf.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }
