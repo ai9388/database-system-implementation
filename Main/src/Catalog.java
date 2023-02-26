@@ -25,7 +25,7 @@ public class Catalog {
     public Catalog(String path)
     {
         this.path = path;
-        System.out.println(this.path);
+        // System.out.println(this.path);
     }
 
     public void createTableObjects(byte[] bb)

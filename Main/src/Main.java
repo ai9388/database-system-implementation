@@ -19,6 +19,7 @@ public class Main {
         System.out.println("Looking at " + dbPath + " for existing db....");
 
         if(directory.exists()){
+            System.out.println("The db exist");
             String catalogPath = dbPath;
             if(dbPath.contains("\\")){
                 catalogPath += "\\Catalog";
@@ -26,8 +27,6 @@ public class Main {
             else{
                 catalogPath += "/Catalog";
             }
-
-            System.out.println(catalogPath);
 
             File catalogFile = new File(catalogPath);
             if(catalogFile.exists() && !catalogFile.isDirectory()){
