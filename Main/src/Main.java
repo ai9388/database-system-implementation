@@ -38,7 +38,7 @@ public class Main {
 
         
         // parser object for this session
-        Parser parser = new Parser(directory.getName());
+        Parser parser = new Parser(directory.getName(), dbPath);
         // save the user provided arguments
         parser.saveArgs(args);
         // looping until <quit> is taken in
