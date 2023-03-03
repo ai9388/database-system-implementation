@@ -24,3 +24,8 @@ Writeups found in writeups/
 Project Requirements:
 
 https://docs.google.com/document/d/11nryC8fkJ2tnQ10sDe3ddnFzvIVu_6O3c1RNKVE0YGk/edit?usp=share_link
+
+How to run:
+
+javac *.java
+java Main <db loc> <page size> <buffer size>

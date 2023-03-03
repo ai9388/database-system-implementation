@@ -87,7 +87,6 @@ public class Page {
         {
             Type.concat(bb, record.recordToBytes());
         }
-
         return bb;
     }
  
