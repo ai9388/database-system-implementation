@@ -136,7 +136,7 @@ public class Table {
     /*
      * returns a re
      */
-    public Record getRecordByPK(String pkValue) throws PrimaryKeyException {
+    public Record getRecordByPK(String pkValue) throws PrimaryKeyException, InvalidDataTypeException {
         if (Type.validateType(pkValue, primaryAttribute)) {
             if (recordsByPK.containsKey(pkValue)) {
                 return recordsByPK.get(pkValue);
@@ -198,6 +198,7 @@ public class Table {
             String rowOccupied = String.valueOf(getRecordIndex(record));
             throw new PrimaryKeyException(2, rowOccupied);
         }
+
         this.records.add(record);
         this.recordsByPK.put(record.getValueAtColumn(primaryIndex), record);
         // if there are no pages create one
@@ -555,7 +556,6 @@ public class Table {
     /**
      * Gets the length of the table name, the table name, and the number of attributes
      * associated with the table
-     * @param tableName - name of associated table
      * @return
      */
     public byte[] getTableHeaderInfoForCatalog() 
