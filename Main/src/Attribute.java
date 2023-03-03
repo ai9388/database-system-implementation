@@ -82,7 +82,7 @@ public class Attribute
     }
 
     /**
-     * @param isPrimaryKey the isPrimaryKey to set
+     * @param primaryKey the isPrimaryKey to set
      */
     public void setIsPrimaryKey(boolean primaryKey) {
         this.primaryKey = primaryKey;
@@ -99,5 +99,9 @@ public class Attribute
      */
     public boolean getNotNull() {
         return this.notNull;
+    }
+
+    public boolean getUnique() {
+        return this.unique;
     }
 }
