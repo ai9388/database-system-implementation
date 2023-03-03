@@ -3,7 +3,7 @@ import java.util.*;
 
 public class Parser {
     enum commands {
-        CREATE_TABLE, DISPLAY_SCHEMA, DISPLAY_INFO, SELECT, INSERT, HELP, QUIT, EMPTY
+        CREATE_TABLE, DISPLAY_SCHEMA, DISPLAY_INFO, SELECT, INSERT, HELP, QUIT, DROP, ALTER, DELETE, UPDATE, EMPTY
     }
 
     private String user_input;
@@ -39,6 +39,14 @@ public class Parser {
             command = commands.HELP;
         } else if (user_input.startsWith("quit")) {
             command = commands.QUIT;
+        } else if (user_input.startsWith("drop table")) {
+            command = commands.DROP;
+        } else if (user_input.startsWith("alter table")) {
+            command = commands.ALTER;
+        } else if (user_input.startsWith("update")) {
+            command = commands.UPDATE;
+        } else if (user_input.startsWith("delete from")) {
+            command = commands.DELETE;
         } else {
             // System.out.println("Invalid Command.");
             command = commands.EMPTY;
@@ -190,6 +198,18 @@ public class Parser {
                 System.out.println("\nExiting the database...");
 
                 return false;
+            }
+            case DROP -> {
+                //
+            }
+            case ALTER -> {
+                //
+            }
+            case DELETE -> {
+                //
+            }
+            case UPDATE -> {
+                //
             }
             case EMPTY -> throw new Exception();
         }
