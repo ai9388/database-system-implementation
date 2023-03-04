@@ -117,6 +117,8 @@ public class TableTest {
             r = table.getRecordByPK(pkvalue);
         } catch (PrimaryKeyException e) {
             System.out.println(e.getMessage());
+        } catch (InvalidDataTypeException e) {
+            e.printStackTrace();
         }
 
         assertNotNull(r);
@@ -133,6 +135,8 @@ public class TableTest {
             r = table2.getRecordByPK(str);
         } catch (PrimaryKeyException e) {
             msgGot = e.getMessage();
+        } catch (InvalidDataTypeException e) {
+            e.printStackTrace();
         }
 
         assertTrue(r == null && msgGot.equals(msgExpected));
@@ -148,6 +152,8 @@ public class TableTest {
             r = table.getRecordByPK(str);
         } catch (PrimaryKeyException e) {
             msgGot = e.getMessage();
+        } catch (InvalidDataTypeException e) {
+            e.printStackTrace();
         }
 
         assertTrue(r == null && msgGot.equals(msgExpected));
@@ -202,6 +208,8 @@ public class TableTest {
         } catch (PrimaryKeyException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        } catch (TableException e) {
+            e.printStackTrace();
         }
     }
 
@@ -220,6 +228,8 @@ public class TableTest {
             msgGot = e.getMessage();
         } catch (PrimaryKeyException e) {
             // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (TableException e) {
             e.printStackTrace();
         }
 
@@ -242,8 +252,10 @@ public class TableTest {
          } catch (PrimaryKeyException e) {
              // TODO Auto-generated catch block
              msgGot = e.getLocalizedMessage();
+         } catch (TableException e) {
+             e.printStackTrace();
          }
-         assertTrue(!res && msgExpected.equals(msgGot));
+        assertTrue(!res && msgExpected.equals(msgGot));
     }
 
     @Test
@@ -267,7 +279,7 @@ public class TableTest {
 
     public void createAttributes(int pkidx, String[] c, Type[] t, ArrayList<Attribute> attr) {
         for (int i = 0; i < c.length; i++) {
-            Attribute a = new Attribute(c[i], t[i], i == pkidx ? true : false,
+            Attribute a = new Attribute(c[i], t[i], i == pkidx ? true : false, false, false,
                     t[i] == Type.VARCHAR || t[i] == Type.CHAR ? 20 : 0);
             attr.add(a);
         }

@@ -1,6 +1,5 @@
 import java.util.*;
 import java.io.File;
-import java.nio.file.Path;
 
 public class Main {
 
@@ -71,7 +70,7 @@ public class Main {
             // keep asking user for input
             System.out.print("JottQL> ");
             String strInput = userInput.nextLine();
-            parser.clasifyInput(strInput);
+            parser.classifyInput(strInput);
             flag = parser.parse();
             
         }
