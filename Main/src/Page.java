@@ -8,6 +8,8 @@ public class Page {
 
     /**
      * page capacity
+     * TODO: set capacity from storage manager
+     * call: Page.setCapacity()
      */
     private static int capacity;
     /**
@@ -21,19 +23,22 @@ public class Page {
      */
     private int id;
 
-    StorageManager sm;
-
     ArrayList<Record> records;
 
-    int pkIdx;
+    int pageNumber;
     
-    public Page(int pkIdx){
+    public Page(int id){
         this.size = 0;
-        this.pkIdx = pkIdx;
         this.records = new ArrayList<>();
+        this.id = id;
     }
 
-    public Page(ArrayList<Record> records){
+    /**
+     * creates a new table from memory
+     * @param id the table ID
+     * @param records
+     */
+    public Page(int id, ArrayList<Record> records){
         this.records = records;
         this.size = 0;
         setSize();
@@ -79,6 +84,10 @@ public class Page {
         return Type.concat(Type.convertIntToByteArray(this.id), Type.convertIntToByteArray(this.size));
     }
 
+    public int getPageNumber() {
+        return pageNumber;
+    }
+
     public byte[] recordsAsBytes()
     {
         byte[] bb = new byte[0];
@@ -90,9 +99,9 @@ public class Page {
         return bb;
     }
  
-    public Page split(){
+    public Page split(int newID){
         int idx = (int)Math.ceil(records.size()/ 2); // the index to split at
-        Page otherPage = new Page(new ArrayList<>(this.records.subList(idx, records.size())));
+        Page otherPage = new Page(newID, new ArrayList<>(this.records.subList(idx, records.size())));
         this.records = new ArrayList<>(this.records.subList(0, idx));
         this.setSize();
 
@@ -102,55 +111,10 @@ public class Page {
     public byte[] getPageAsBytes(){
         return Type.concat(getHeader(), recordsAsBytes());
     }
-    
-
-    public void setRecordsOrder() {
-        Collections.sort(records, new Comparator<Record>() {
-            @Override
-            public int compare(Record r1, Record r2) {
-                Object pkValue1 = r1.getValueAtColumn(pkIdx);
-                Object pkValue2 = r2.getValueAtColumn(pkIdx);
-
-                // INT
-                if (pkValue1 instanceof Integer) {
-                    return Integer.compare((int) pkValue1, (int) pkValue2);
-                }
-
-                // DOUBLE
-                else if (pkValue1 instanceof Double) {
-                    return Double.compare((double) pkValue1, (double) pkValue2);
-                }
-
-                // BOOLEAN
-                else if (pkValue1 instanceof Boolean) {
-                    return Boolean.compare((boolean) pkValue1, (boolean) pkValue2);
-                }
-
-                // String
-                else {
-                    return String.valueOf(pkValue1).compareTo(String.valueOf(pkValue2));
-                }
-
-            }
-        });
-    }
 
     public void insertRecordAt(Record record, int index){
         this.records.add(index, record);
         this.size += record.getSize();
-    }
-
-    public int addRecordInOrder(Record record){
-        if(records.size() == 0){
-            return 0;
-        }
-        for (int i = 0; i < records.size(); i++) {
-            if(record.compareTo(records.get(i)) < 0){
-                return i;
-            }
-        }
-
-        return -1;
     }
 
     /**
@@ -179,6 +143,14 @@ public class Page {
         this.size += r.getSize();
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public ArrayList<Record> getRecords() {
+        return records;
+    }
+
     @Override
     public String toString() {
         String str0 = "--------------------------------------------------------------------\n";
@@ -188,11 +160,6 @@ public class Page {
             str2 += r + "\n";
         }
         return str0 + str + str2 + str0;
-    }
-
-    public Page readPageFromBytes(byte[] bb)
-    {
-        return new Page(0);
     }
 
 }
