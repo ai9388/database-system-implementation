@@ -1,5 +1,3 @@
-import java.io.File;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -64,7 +62,7 @@ public class ParserTest {
 
     public void createAttributes(int pkidx, String[] c, Type[] t){
         for(int i = 0; i < columns.length; i++){
-            Attribute a = new Attribute(c[i], t[i], i == pkidx ? true : false, types[i] == Type.VARCHAR || types[i] == Type.CHAR ? 20 : 0);
+            Attribute a = new Attribute(c[i], t[i], i == pkidx, false, false, types[i] == Type.VARCHAR || types[i] == Type.CHAR ? 20 : 0);
             attributes.add(a); 
         }
 
@@ -78,7 +76,7 @@ public class ParserTest {
     @Test
     public void testSelect(){
         String command = "Select * from person";
-        parser.clasifyInput(command);
+        parser.classifyInput(command);
         parser.parse();
     }
 

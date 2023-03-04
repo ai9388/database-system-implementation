@@ -237,8 +237,10 @@ public class Catalog {
                 int attributeN = f.readInt();
                 
                 boolean attributeIsPrimaryKey = f.readBoolean();
+                boolean attributeNotNull = f.readBoolean();
+                boolean attributeUnique = f.readBoolean();
 
-                Attribute attr = new Attribute(attributeName, attributeType, attributeIsPrimaryKey, attributeN);
+                Attribute attr = new Attribute(attributeName, attributeType, attributeIsPrimaryKey, attributeNotNull, attributeUnique, attributeN);
 
                 attributes.add(attr);
             }

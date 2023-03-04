@@ -16,18 +16,6 @@ public class Attribute
      */
     private int N;
 
-    public Attribute(String name, Type type, boolean primarykey, int N)
-    {
-        this.name = name;
-        this.type = type;
-        this.primaryKey = primarykey;
-        if (primarykey) {
-            this.notNull = true;
-            this.unique = true;
-        }
-        this.N = N;
-    }
-
     public Attribute(String name, Type type, boolean primaryKey, boolean notNull, boolean unique, int N) {
         this.name = name;
         this.type = type;
@@ -90,7 +78,7 @@ public class Attribute
 
     @Override
     public String toString() {
-        return String.format(this.name + ": " + this.type.toString() + " " + (isIsPrimaryKey() ? "primary key" : ""), N == 0 ? "" : this.N);
+        return String.format(this.name + ": " + this.type.toString() + " " + (isIsPrimaryKey() ? "primary key" : "") + " " + (notNull ? "not null" : "") + " " + (unique ? "unique" : ""), N == 0 ? "" : this.N);
     }
 
     /**
