@@ -14,7 +14,7 @@ public class StorageManager {
     //then call the LRU(on the page)
 
     public StorageManager(String dbName, String dbPath, int bufferSize, int pageSize){
-        this.catalog = new Catalog(dbPath);
+        this.catalog = new Catalog(dbPath, pageSize);
         this.db = new Database(dbName, new HashMap<String, Table>(), catalog, dbPath, new HashMap<Integer, Table>());
         this.bufferSize = bufferSize;
         this.dbPath = dbPath;
