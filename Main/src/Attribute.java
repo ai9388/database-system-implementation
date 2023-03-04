@@ -8,20 +8,22 @@ public class Attribute
     private String name;
     private Type type;
     private boolean primaryKey;
+    private boolean notNull;
+    private boolean unique;
     /*
      * lenght of the value
      * only applicable for char/varchar
      */
     private int N;
 
-    public Attribute(String name, Type type, boolean primarykey, int N)
-    {
+    public Attribute(String name, Type type, boolean primaryKey, boolean notNull, boolean unique, int N) {
         this.name = name;
         this.type = type;
-        this.primaryKey = primarykey;
+        this.primaryKey = primaryKey;
+        this.notNull = notNull;
+        this.unique = unique;
         this.N = N;
     }
-
 
     /**
      * @return String return the name
@@ -68,7 +70,7 @@ public class Attribute
     }
 
     /**
-     * @param isPrimaryKey the isPrimaryKey to set
+     * @param primaryKey the isPrimaryKey to set
      */
     public void setIsPrimaryKey(boolean primaryKey) {
         this.primaryKey = primaryKey;
@@ -79,4 +81,15 @@ public class Attribute
         return String.format(this.name + ": " + this.type.toString() + " " + (isIsPrimaryKey() ? "primary key" : ""), N == 0 ? "" : this.N);
     }
 
+    /**
+     *
+     * @return notNull
+     */
+    public boolean getNotNull() {
+        return this.notNull;
+    }
+
+    public boolean getUnique() {
+        return this.unique;
+    }
 }

@@ -136,7 +136,7 @@ public class Table {
     /*
      * returns a re
      */
-    public Record getRecordByPK(String pkValue) throws PrimaryKeyException {
+    public Record getRecordByPK(String pkValue) throws PrimaryKeyException, InvalidDataTypeException {
         if (Type.validateType(pkValue, primaryAttribute)) {
             if (recordsByPK.containsKey(pkValue)) {
                 return recordsByPK.get(pkValue);
@@ -166,6 +166,10 @@ public class Table {
             throw new TableException(3, "");
         }
         if (Type.validateAll(values, attributes)) {
+            ArrayList<Integer> uniqueAttributes = this.uniqueAttribute(attributes);
+            if (uniqueAttributes.size() > 0) {
+                this.checkUniqueness(values, uniqueAttributes, attributes);
+            }
             Record record = new Record(new ArrayList<String>(Arrays.asList(values)), attributes);
             this.insertRecord(record);
             return true;
@@ -173,6 +177,39 @@ public class Table {
             // creation of record failed
             throw new InvalidDataTypeException(values, attributes);
         }
+    }
+
+    private void checkUniqueness(String[] values, ArrayList<Integer> uniqueAttributes, ArrayList<Attribute> attributes) throws TableException {
+        for (Integer unique: uniqueAttributes) {
+            for (Record record: records) {
+                // TODO: Check if the values are equal
+                // ? would it just be equals function?
+                // I'll come back to this (Alex S)
+                Object valueAtUnique = record.getValueAtColumn(unique);
+                Attribute a = attributes.get(unique);
+                switch (a.getType()) {
+                    case CHAR -> {
+                        String s = String.valueOf(valueAtUnique);
+                        if (values[unique].equals(s)) {
+                            throw new TableException(4, "");
+                        }
+                    }
+                    case VARCHAR -> {
+
+                    }
+                }
+            }
+        }
+    }
+
+    private ArrayList<Integer> uniqueAttribute(ArrayList<Attribute> attributes) {
+        ArrayList<Integer> uniqueAttributes = new ArrayList<>();
+        for (int i = 0; i < attributes.size(); i++) {
+            if (attributes.get(i).getUnique() && !attributes.get(i).isIsPrimaryKey()) {
+                uniqueAttributes.add(i);
+            }
+        }
+        return uniqueAttributes;
     }
 
     /**
@@ -198,6 +235,7 @@ public class Table {
             String rowOccupied = String.valueOf(getRecordIndex(record));
             throw new PrimaryKeyException(2, rowOccupied);
         }
+
         this.records.add(record);
         this.recordsByPK.put(record.getValueAtColumn(primaryIndex), record);
         // if there are no pages create one
@@ -555,7 +593,6 @@ public class Table {
     /**
      * Gets the length of the table name, the table name, and the number of attributes
      * associated with the table
-     * @param tableName - name of associated table
      * @return
      */
     public byte[] getTableHeaderInfoForCatalog() 

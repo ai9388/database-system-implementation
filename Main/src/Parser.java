@@ -3,7 +3,7 @@ import java.util.*;
 
 public class Parser {
     enum commands {
-        CREATE_TABLE, DISPLAY_SCHEMA, DISPLAY_INFO, SELECT, INSERT, HELP, QUIT, EMPTY
+        CREATE_TABLE, DISPLAY_SCHEMA, DISPLAY_INFO, SELECT, INSERT, HELP, QUIT, DROP, ALTER, DELETE, UPDATE, EMPTY
     }
 
     private String user_input;
@@ -22,7 +22,7 @@ public class Parser {
         storageManager = new StorageManager(dbName, dbLocation, bufferSize, pageSize);
     }
 
-    public void clasifyInput(String str_input) {
+    public void classifyInput(String str_input) {
 
         this.user_input = str_input.toLowerCase();
         if (user_input.startsWith("create table")) {
@@ -39,6 +39,14 @@ public class Parser {
             command = commands.HELP;
         } else if (user_input.startsWith("quit")) {
             command = commands.QUIT;
+        } else if (user_input.startsWith("drop table")) {
+            command = commands.DROP;
+        } else if (user_input.startsWith("alter table")) {
+            command = commands.ALTER;
+        } else if (user_input.startsWith("update")) {
+            command = commands.UPDATE;
+        } else if (user_input.startsWith("delete from")) {
+            command = commands.DELETE;
         } else {
             // System.out.println("Invalid Command.");
             command = commands.EMPTY;
@@ -81,40 +89,76 @@ public class Parser {
                     String[] components = attribute.strip().replaceAll("\\(", " ").split(" ");
                     String attr_name = components[0];
                     boolean primarykey = components.length > 2 && components[2].equals("primarykey");
+                    boolean notNull = false;
+                    boolean unique = false;
                     switch (components[1]) {
                         case "char" -> {
-                            // originally had A XOR B, should be !(A XOR B)
-                            hasOnePK = ((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
-                            Attribute a = new Attribute(attr_name, Type.CHAR, components.length > 3, Integer.parseInt(components[2].replace(')', ' ').strip()));
+                            for (int i = 3; i < components.length; i++) {
+                                switch (components[i]) {
+                                    case "primarykey" -> primarykey = true;
+                                    case "notnull" -> notNull = true;
+                                    case "unique" -> unique = true;
+                                }
+                            }
+                            hasOnePK = ((primarykey && !hasOnePK) || (components.length <= 3 && hasOnePK));
+                            Attribute a = new Attribute(attr_name, Type.CHAR, primarykey, notNull, unique, Integer.parseInt(components[2].replace(')', ' ').strip()));
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
                             //check component after char to know length
                         }
                         case "varchar" -> {
+                            for (int i = 3; i < components.length; i++) {
+                                switch (components[i]) {
+                                    case "primarykey" -> primarykey = true;
+                                    case "notnull" -> notNull = true;
+                                    case "unique" -> unique = true;
+                                }
+                            }
                             hasOnePK = ((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
-                            Attribute a = new Attribute(attr_name, Type.VARCHAR, components.length > 3, Integer.parseInt(components[2].replace(')', ' ').strip()));
+                            Attribute a = new Attribute(attr_name, Type.VARCHAR, primarykey, notNull, unique, Integer.parseInt(components[2].replace(')', ' ').strip()));
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
                         }
                         case "bool" -> {
+                            for (int i = 2; i < components.length; i++) {
+                                switch (components[i]) {
+                                    case "primarykey" -> primarykey = true;
+                                    case "notnull" -> notNull = true;
+                                    case "unique" -> unique = true;
+                                }
+                            }
                             hasOnePK = ((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
-                            Attribute a = new Attribute(attr_name, Type.BOOLEAN, primarykey, 0);
+                            Attribute a = new Attribute(attr_name, Type.BOOLEAN, primarykey, notNull, unique, 0);
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
                         }
                         case "integer" -> {
+                            for (int i = 2; i < components.length; i++) {
+                                switch (components[i]) {
+                                    case "primarykey" -> primarykey = true;
+                                    case "notnull" -> notNull = true;
+                                    case "unique" -> unique = true;
+                                }
+                            }
                             hasOnePK = ((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
-                            Attribute a = new Attribute(attr_name, Type.INTEGER, primarykey, 0);
+                            Attribute a = new Attribute(attr_name, Type.INTEGER, primarykey, notNull, unique, 0);
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
                         }
                         case "double" -> {
+                            for (int i = 2; i < components.length; i++) {
+                                switch (components[i]) {
+                                    case "primarykey" -> primarykey = true;
+                                    case "notnull" -> notNull = true;
+                                    case "unique" -> unique = true;
+                                }
+                            }
                             hasOnePK = ((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
-                            Attribute a = new Attribute(attr_name, Type.DOUBLE, primarykey, 0);
+                            Attribute a = new Attribute(attr_name, Type.DOUBLE, primarykey, notNull, unique, 0);
                             primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                             primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                             attributes.add(a);
@@ -170,14 +214,13 @@ public class Parser {
                 int start_index = input.indexOf("(");
                 input = input.substring(start_index - 1);
                 String[] vals = input.split(",");
-                for (String value : vals) {
-                    String[] values = value.replaceAll("[();]", "").strip().split(" ");
-                    try {
+                try {
+                    for (String value : vals) {
+                        String[] values = value.replaceAll("[();]", "").strip().split(" ");
                         storageManager.insertOneRecordIntoTable(table_name, values);
-                    } catch (PrimaryKeyException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
                     }
+                } catch (PrimaryKeyException e) {
+                    System.out.println(e.getMessage());
                 }
             }
             case HELP -> displayHelp();
@@ -190,6 +233,37 @@ public class Parser {
                 System.out.println("\nExiting the database...");
 
                 return false;
+            }
+            case DROP -> {
+                String input = user_input.replaceFirst("drop table", "").strip();
+                String table_name = input.split(" ")[0];
+                // TODO: add functionality to storage manager to drop table
+                storageManager.dropTable(table_name);
+            }
+            case ALTER -> {
+                String input = user_input.replaceFirst("alter table", "").strip();
+                String table_name = input.split(" ")[0];
+                boolean drop = input.split(" ")[1].strip().equals("drop");
+                String attribute_name = input.split(" ")[2];
+                if (drop) {
+                    // TODO: add functionality to storage manager to alter the table and drop the attribute
+                    storageManager.dropAttributeFromTable(attribute_name, table_name);
+                } else {
+                    String attribute_type = input.split(" ")[3];
+                    if (input.split(" ").length > 5) {
+                        String value = input.split(" ")[5];
+                        // TODO: add functionality to storage manager to add attribute to table
+                        storageManager.addAttributeToTable(attribute_name, attribute_type, value, table_name);
+                    } else {
+                        storageManager.addAttributeToTable(attribute_name, attribute_type, "", table_name);
+                    }
+                }
+            }
+            case DELETE -> {
+                //
+            }
+            case UPDATE -> {
+                //
             }
             case EMPTY -> throw new Exception();
         }

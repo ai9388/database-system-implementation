@@ -126,7 +126,7 @@ public class StorageManager {
      * @return record
      * @throws PrimaryKeyException
      */
-    public Record getRecordFromPrimaryKey(Table table, String key) throws PrimaryKeyException{
+    public Record getRecordFromPrimaryKey(Table table, String key) throws PrimaryKeyException, InvalidDataTypeException {
         return table.getRecordByPK(key);
     }
     
@@ -251,4 +251,27 @@ public class StorageManager {
           }
       }
 
+    /**
+     * drops the table with given name
+     * @param table_name
+     */
+    public void dropTable(String table_name) {
+
+    }
+
+    /**
+     * Drop the given attribute from given table
+     * @param attribute_name
+     * @param table_name
+     */
+    public void dropAttributeFromTable(String attribute_name, String table_name) {
+    }
+
+    public void addAttributeToTable(String attribute_name, String attribute_type, String value, String table_name) {
+        if (value.equalsIgnoreCase("")) {
+            // set values to null
+        } else {
+            // set values to value
+        }
+    }
 }

@@ -32,8 +32,10 @@ public enum Type {
     public static boolean validateType(String value, Attribute attribute){
         // verify if null regardless of data type
         // null values are always allowed
-        if(value.equalsIgnoreCase("null")){
+        if (value.equalsIgnoreCase("null") && !attribute.getNotNull()) {
             return true;
+        } else if (value.equalsIgnoreCase("null")) {
+            return false;
         }
         try{
             switch(attribute.getType()){
@@ -78,7 +80,6 @@ public enum Type {
         for (int i = 0; i < values.length; i++) {
             Attribute attribute = attributes.get(i);
             String value = values[i];
-
             if(!Type.validateType(value, attribute)){
                 return false;
             }

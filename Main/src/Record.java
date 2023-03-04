@@ -48,7 +48,7 @@ public class Record implements Comparable<Record>{
 
     /**
      * returns the value of this record at a specific column
-     * @param attribute attribute containing the name of the column
+     * @param idx attribute containing the name of the column
      */
     public Object getValueAtColumn(int idx){
         return this.entries.get(idx);
