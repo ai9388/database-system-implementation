@@ -14,7 +14,7 @@ public class StorageManager {
     //then call the LRU(on the page)
 
     public StorageManager(String dbName, String dbPath, int bufferSize, int pageSize){
-        this.catalog = new Catalog(dbPath);
+        this.catalog = new Catalog(dbPath, pageSize);
         this.db = new Database(dbName, new HashMap<String, Table>(), catalog, dbPath, new HashMap<Integer, Table>());
         this.bufferSize = bufferSize;
         this.dbPath = dbPath;
@@ -73,8 +73,8 @@ public class StorageManager {
      */
     public void displaySchema() throws TableException {
         System.out.println("DB location: " + dbPath);
-        System.out.println("Page Size: " + String.valueOf(pageSize));
-        System.out.println("Buffer Size: " + String.valueOf(bufferSize));
+        System.out.println("Page Size: " + pageSize);
+        System.out.println("Buffer Size: " + bufferSize);
         System.out.println();
         
         ArrayList<Table> tables = db.getAllTables();

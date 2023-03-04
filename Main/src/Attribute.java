@@ -78,7 +78,7 @@ public class Attribute
 
     @Override
     public String toString() {
-        return String.format(this.name + ": " + this.type.toString() + " " + (isIsPrimaryKey() ? "primary key" : ""), N == 0 ? "" : this.N);
+        return String.format(this.name + ": " + this.type.toString() + " " + (isIsPrimaryKey() ? "primary key" : "") + " " + (notNull ? "not null" : "") + " " + (unique ? "unique" : ""), N == 0 ? "" : this.N);
     }
 
     /**

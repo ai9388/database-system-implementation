@@ -20,12 +20,14 @@ public class Catalog {
     public static final String WRITE = "rw";
     
     private String path;
+    private int pageSize;
     private ArrayList<Table> tables;
     public RandomAccessFile raf;
 
-    public Catalog(String path)
+    public Catalog(String path, int pageSize)
     {
         this.path = path;
+        this.pageSize = pageSize;
     }
 
     public void readCatalog()
@@ -80,6 +82,87 @@ public class Catalog {
     //         e.printStackTrace();
     //     }
     // }
+
+    public ArrayList<Page> readPagesFromTableFile(RandomAccessFile raFile, ArrayList<Attribute> attributes)
+    {
+        ArrayList<Page> pages = new ArrayList<>();
+
+        // first getting the number of pages from table file
+        try {
+            int numOfPages = raFile.readInt();
+
+            // iterating over all the pages in the file
+            for (int i = 0; i < numOfPages; i++) 
+            {
+                int traversedBytes = 8;
+                int pageID = raFile.readInt();
+                int numberOfRecords = raFile.readInt();
+                ArrayList<Record> records = new ArrayList<>();
+
+                // iterating over the individual records
+                for (int j = 0; j < numberOfRecords; j++) 
+                {
+                    ArrayList<Object> recordData = new ArrayList<>();
+                    
+                    for (int k = 0; k < attributes.size(); k++) 
+                    {
+                        switch(attributes.get(k).getType())
+                        {
+                            case BOOLEAN:
+                                boolean b = raFile.readBoolean();
+                                traversedBytes += 1;
+                                recordData.add(b);
+                                break;
+                            case CHAR:
+                                int n = attributes.get(k).getN();
+                                char[] ch = new char[n];
+
+                                for (int l = 0; l < n; l++) {
+                                    char c = raFile.readChar();
+                                    ch[l] = c;
+                                }
+                                traversedBytes += (Character.BYTES * n);
+                                recordData.add(ch.toString());
+                                break;
+                            case DOUBLE:
+                                double d = raFile.readDouble();
+                                traversedBytes += Double.BYTES;
+                                recordData.add(d);
+                                break;
+                            case INTEGER:
+                                int in = raFile.readInt();
+                                traversedBytes += Integer.BYTES;
+                                recordData.add(in);
+                                break;
+                            case VARCHAR:
+                                int vn = attributes.get(k).getN();
+                                char[] vch = new char[vn];
+
+                                for (int l = 0; l < vn; l++) {
+                                    char c = raFile.readChar();
+                                    vch[l] = c;
+                                }
+                                traversedBytes += (Character.BYTES * vn);
+                                recordData.add(vch.toString());    
+                            break;
+                            default:
+                            // program kills itself
+                                break;
+                        }
+                    }
+                    records.add(new Record(recordData));
+                }
+                Page page = new Page(pageID, records);
+                pages.add(page);
+
+                raFile.seek(pageSize - traversedBytes);
+            }
+        } catch (IOException e) {
+            System.out.println();
+            e.printStackTrace();
+        }
+        return pages;
+    }
 
     public Table createTableFromBytes(RandomAccessFile f)
     {        
