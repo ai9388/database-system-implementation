@@ -2,16 +2,15 @@
 /// Used in the catalog to store the name of the 
 ///
 
-public class Attribute
-{
-    
+public class Attribute {
+
     private String name;
     private Type type;
     private boolean primaryKey;
-    private boolean notNull;
-    private boolean unique;
+    private final boolean notNull;
+    private final boolean unique;
     /*
-     * lenght of the value
+     * length of the value
      * only applicable for char/varchar
      */
     private int N;
@@ -39,7 +38,7 @@ public class Attribute
         this.name = name;
     }
 
-    public void setN(int N){
+    public void setN(int N) {
         this.N = N;
     }
 
@@ -82,7 +81,6 @@ public class Attribute
     }
 
     /**
-     *
      * @return notNull
      */
     public boolean getNotNull() {
