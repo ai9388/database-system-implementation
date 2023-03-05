@@ -609,4 +609,13 @@ public class Table {
         return bb;
     }
 
+    public boolean removeAttribute(String attribute_name) {
+        // TODO: actually... i forgot about changing records so i need to do that
+        return attributes.removeIf(a -> a.getName().equalsIgnoreCase(attribute_name));
+    }
+
+    public boolean addAttribute(Attribute attribute, String value) {
+        // TODO: add attribute to record
+        return attributes.add(attribute);
+    }
 }

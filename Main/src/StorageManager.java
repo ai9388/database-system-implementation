@@ -255,8 +255,10 @@ public class StorageManager {
      * drops the table with given name
      * @param table_name
      */
-    public void dropTable(String table_name) {
-
+    public void dropTable(String table_name) throws TableException {
+        if (!db.dropTable(table_name)) {
+            throw new TableException(2, table_name);
+        }
     }
 
     /**
@@ -264,14 +266,11 @@ public class StorageManager {
      * @param attribute_name
      * @param table_name
      */
-    public void dropAttributeFromTable(String attribute_name, String table_name) {
+    public void dropAttributeFromTable(String attribute_name, String table_name) throws TableException {
+        db.dropAttribute(attribute_name, table_name);
     }
 
-    public void addAttributeToTable(String attribute_name, String attribute_type, String value, String table_name) {
-        if (value.equalsIgnoreCase("")) {
-            // set values to null
-        } else {
-            // set values to value
-        }
+    public void addAttributeToTable(Attribute attribute, String value, String table_name) throws TableException {
+        db.addAttribute(attribute, value, table_name);
     }
 }

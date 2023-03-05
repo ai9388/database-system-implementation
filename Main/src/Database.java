@@ -91,9 +91,9 @@ public class Database {
         }
     }
 
-    public boolean dropTable(int tableID)
+    public boolean dropTable(String tablename)
     {
-        return false;
+        return tables.remove(tablename) != null;
     }
 
     public Table getTableByName(String name) throws TableException
@@ -142,5 +142,23 @@ public class Database {
             return table.selectAll();
         }
         return table.select(columns);
+    }
+
+    public void dropAttribute(String attribute_name, String table_name) throws TableException {
+        Table table = this.getTableByName(table_name);
+        if (!table.removeAttribute(attribute_name)) {
+            throw new TableException(1, attribute_name);
+        }
+        this.tables.remove(table_name);
+        this.tablesID.remove(table.getTableID());
+        this.tables.put(table_name, table);
+        this.tablesID.put(table.getTableID(), table);
+    }
+
+    public void addAttribute(Attribute attribute, String value, String table_name) throws TableException {
+        Table table = this.getTableByName(table_name);
+        if (!table.addAttribute(attribute, value)) {
+            throw new TableException(1, attribute.getName());
+        }
     }
 }
