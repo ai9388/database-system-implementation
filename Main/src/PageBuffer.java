@@ -181,8 +181,7 @@ public class PageBuffer {
      * iterates over all the pages remaining
      * in the buffer and writes them to hardware
      */
-    public void purge(){
-        // TODO: serialize @ hai-yen
-        // iterate pages
+    public ArrayList<Page> getPages(){
+        return new ArrayList<>(this.activePages);
     }
 }
