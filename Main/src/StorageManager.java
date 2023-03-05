@@ -5,7 +5,7 @@ import java.util.*;
 public class StorageManager {
     public Database db;
     private int bufferSize;
-    public ArrayList<Page> pageBuffer = new ArrayList<>();
+    public PageBuffer pageBuffer;
     public String dbPath;
     public int pageSize;
     public Catalog catalog;
@@ -55,7 +55,6 @@ public class StorageManager {
             t = getTable(tableName);
             t.insertRecord(record);
             Page page = t.getMostRecentPage();
-            LRU(page);
         }
     }
 
@@ -150,7 +149,6 @@ public class StorageManager {
         }
         table.insertRecord(record);
         Page mostRecentPage = table.getMostRecentPage();
-        LRU(mostRecentPage);
     }
 
     /***
@@ -163,7 +161,6 @@ public class StorageManager {
     public void insertARecord(Table table, String[] record) throws InvalidDataTypeException, PrimaryKeyException, TableException{
         table.insertRecord(record);
         Page mostRecentPage = table.getMostRecentPage();
-        LRU(mostRecentPage);
     }
 
     /***
@@ -176,7 +173,6 @@ public class StorageManager {
     public void deleteRecord(String primaryKey, Table table) throws PrimaryKeyException, InvalidDataTypeException{
         table.removeRecordByPK(primaryKey);
         Page mostRecentPage = table.getMostRecentPage();
-        LRU(mostRecentPage);
     }
 
     /***
@@ -190,23 +186,6 @@ public class StorageManager {
     public void updateRecord(String primaryKey, Table table,  String column, String newEntry) throws TableException, PrimaryKeyException, InvalidDataTypeException{
         table.updateRecordByPK(primaryKey, column, newEntry);
         Page mostRecentPage = table.getMostRecentPage();
-        LRU(mostRecentPage);
-    }
-    
-    /***
-     * Least recently used
-     * If the buffer is full, then remove the least used one(in the front) 
-     * and adding the new one(in the back)
-     * @param page
-     */
-    public void LRU(Page page){
-        if(pageBuffer.size() > bufferSize){
-            pageBuffer.remove(0);
-            pageBuffer.add(page);
-        }
-        else{
-            pageBuffer.add(page);
-        }
     }
 
     public void setPageSize(int pageSize) {
