@@ -3,14 +3,13 @@ import java.io.File;
 
 public class Main {
 
-
     public static void main(String[] args) throws Exception {
 
         String dbPath = args[0];
         String pageSize = args[1];
         String buffSize = args[2];
 
-        System.out.println("Welcome to JottQL....");
+        System.out.println("Welcome to 11QL....");
 
         File directory = new File(dbPath);
 
@@ -46,16 +45,12 @@ public class Main {
         }
 
         // Basic nice-ities for starting up the DB
-        // System.out.println("Enter <quit> to quit");
-        // System.out.println("Enter <help> for help");
         System.out.println();
         System.out.println("Please enter commands, enter <quit> to shutdown the db");
         System.out.println();
 
         // starting the user input
         Scanner userInput = new Scanner(System.in);
-        // System.out.print("JottQL> ");
-        // String strInput = userInput.nextLine().toLowerCase();
         
         // parser object for this session
         Parser parser = new Parser(directory.getName(), dbPath);
@@ -68,18 +63,12 @@ public class Main {
         while (flag == true){
             // oh no the user needs help, have to display it   
             // keep asking user for input
-            System.out.print("JottQL> ");
+            System.out.print("11QL> ");
             String strInput = userInput.nextLine();
             parser.classifyInput(strInput);
             flag = parser.parse();
             
         }
-
-        // System.out.println("Shutting down JottQL...");
-        // System.out.println("Shutting down the database...");
-        // System.out.println("Purging the page buffer...");
-        // System.out.println("Saving catalog...");
-        // System.out.println("\nExiting the database...");
         userInput.close();
 
     }
