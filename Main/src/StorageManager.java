@@ -203,7 +203,7 @@ public class StorageManager {
     {
         this.catalog.setTables(this.getAllTables());
         byte[] bb = this.catalog.createCatalog();
-        this.catalog.writeToFile(bb);
+        this.catalog.writeToCatalogFile(bb);
         this.catalog.readCatalog();
     }
 

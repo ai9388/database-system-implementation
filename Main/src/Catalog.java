@@ -1,12 +1,7 @@
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Catalog {
 
@@ -284,22 +279,7 @@ public class Catalog {
         return bytes;
     }
 
-    /**
-     * updating the number of pages in the catalog
-     */
-    public void updateNumberOfTables(int newNumOfTables)
-    {
-        try {
-            raf.seek(0);
-            raf.writeInt(newNumOfTables);
-            raf.close();
-        } catch (IOException e) {
-            System.out.println("Cannot update number of tables.");
-            e.printStackTrace();
-        }
-    }
-
-    public void writeToFile(byte[] bytes)
+    public void writeToCatalogFile(byte[] bytes)
     {  
         try {
             String catalogPath = path;
