@@ -1,3 +1,5 @@
+import java.io.File;
+import java.io.RandomAccessFile;
 import java.util.*;
 
 public class PageBuffer {
@@ -8,6 +10,7 @@ public class PageBuffer {
 
     private int totalPages;
 
+    private String dbPath;
 
     /**
      * id used as reference when assigning pageID
@@ -15,7 +18,8 @@ public class PageBuffer {
      */
     private static int LASTPAGEID;
     private HashSet<TableSchema> tables;
-    public PageBuffer(int bufferSize, int pageSize, int totalPages){
+    public PageBuffer(String dbPath, int bufferSize, int pageSize, int totalPages){
+        this.dbPath = dbPath;
         this.bufferSize = PageBuffer.bufferSize;
         Page.setCapacity(pageSize);
         this.totalPages = totalPages;
@@ -73,7 +77,7 @@ public class PageBuffer {
             // remove the top from the queue if full
             Page oldPage = activePages.poll();
             // write the old page to storage
-            writePage(oldPage);
+            writePage(dbPath, oldPage);
         }
 
         // add the new page to active pages
@@ -161,9 +165,24 @@ public class PageBuffer {
      * @param page the page to write to mem
      * @return bool, true if successful
      */
-    public boolean writePage(Page page){
+    public boolean writePage(String dbPath, Page page){
         String tableName = getTableName(page.getId());
         // TODO: serialize @ hai-yen
+        //get the table path, then call the page to byte from Pages
+        File tableFile = new File(dbPath + "/" + tableName);
+        RandomAccessFile raf;
+        try {
+            raf = new RandomAccessFile(tableFile, "rw");
+
+            byte[] bytes = new byte[0];
+
+            bytes =Type.concat(bytes, page.getPageAsBytes());
+          
+            raf.write(bytes);
+            raf.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
