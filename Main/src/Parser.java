@@ -60,10 +60,10 @@ public class Parser {
         this.dbLocation = args[0];
 
         this.pageSize = Integer.parseInt(args[1]);
-        storageManager.setPageSize(this.pageSize);
+        //storageManager.setPageSize(this.pageSize); value passed in constructor
         Page.setCapacity(pageSize);
         this.bufferSize = Integer.parseInt(args[2]);
-        storageManager.setBufferSize(this.bufferSize);
+        //storageManager.setBufferSize(this.bufferSize); value passed in constructor
     }
 
     /**
@@ -210,7 +210,7 @@ public class Parser {
                     try {
                         for (String value : vals) {
                             String[] values = value.replaceAll("[();]", "").strip().split(" ");
-                            storageManager.insertOneRecordIntoTable(table_name, values);
+                            storageManager.insertRecord(table_name, values);
                         }
                     } catch (PrimaryKeyException e) {
                         System.out.println(e.getMessage());

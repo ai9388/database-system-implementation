@@ -16,7 +16,7 @@ public class Catalog {
 
     private final String path;
     private final int pageSize;
-    private ArrayList<Table> tables;
+    private ArrayList<TableSchema> tables;
     public RandomAccessFile raf;
 
     public Catalog(String path, int pageSize) {
@@ -40,7 +40,7 @@ public class Catalog {
             int numOfTables = raFile.readInt();
 
             for (int i = 0; i < numOfTables; i++) {
-                Table t = createTableFromBytes(raFile);
+                TableSchema t = createTableFromBytes(raFile);
                 //readTableFromBytes(t.getName());
             }
 
@@ -152,7 +152,7 @@ public class Catalog {
         return pages;
     }
 
-    public Table createTableFromBytes(RandomAccessFile f) {
+    public TableSchema createTableFromBytes(RandomAccessFile f) {
         try {
             // getting the table name
             int tableNameLength = f.readInt();
@@ -203,12 +203,12 @@ public class Catalog {
 
                 attributes.add(attr);
             }
-            return new Table(tableName, attributes);
+            return new TableSchema(tableName, attributes);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return new Table(null, null);
+        return new TableSchema(null, null);
     }
 
     /**
@@ -216,7 +216,7 @@ public class Catalog {
      *
      * @param tables list of tables
      */
-    public void setTables(ArrayList<Table> tables) {
+    public void setTables(ArrayList<TableSchema> tables) {
         this.tables = tables;
     }
 
@@ -233,7 +233,7 @@ public class Catalog {
 
         bytes = Type.concat(bytes, numOfTables);
 
-        for (Table t : this.tables) {
+        for (TableSchema t : this.tables) {
             bytes = Type.concat(bytes, t.convertTableObjectToBytes());
         }
 

@@ -6,7 +6,7 @@ public class PageBuffer {
 
     Queue<Page> activePages = new LinkedList<>();
 
-    private static int bufferSize;
+    private int bufferSize;
 
     private int totalPages;
 
@@ -18,11 +18,10 @@ public class PageBuffer {
      */
     private static int LASTPAGEID;
     private HashSet<TableSchema> tables;
-    public PageBuffer(String dbPath, int bufferSize, int pageSize, int totalPages){
+    public PageBuffer(String dbPath, int bufferSize, int pageSize){
         this.dbPath = dbPath;
-        this.bufferSize = PageBuffer.bufferSize;
+        this.bufferSize = bufferSize;
         Page.setCapacity(pageSize);
-        this.totalPages = totalPages;
     }
 
     public int getNextPageID(){
@@ -81,7 +80,13 @@ public class PageBuffer {
         }
 
         // add the new page to active pages
-        activePages.add(page);
+        // if the page is already in the buffer, remove and read
+        if(activePages.remove(page)){
+            activePages.add(page);
+        }
+        else{
+            activePages.add(page);
+        }
     }
 
     /**
@@ -95,13 +100,15 @@ public class PageBuffer {
     public void insertRecord(TableSchema tableSchema, Record record){
         boolean inserted = false;
         int tableNumOfPages = tableSchema.getNumberOfPages();
+        boolean split = false;
 
         if(tableNumOfPages == 0) { // if there are no pages for this table
             // TODO: make a new file for the table
-            Page page = new Page(getNextPageID());
+            Page page = new Page(getNextPageID(), tableSchema.getTableID());
             page.insertRecordAt(record, 0); // add this entry to a new page
             // TODO: insert the page into the table file
             updateBuffer(page); // add page to buffer
+            tableSchema.addPageID(page.getId());
             return;
         }
         // read table page in order from table file
@@ -113,35 +120,41 @@ public class PageBuffer {
             Page page = getPage(tableSchema.getName(), id);
 
             // initially not inserted into page
-            if(inserted){
+            if(inserted && !split){
                 break;
             }
 
-            // iterate the records in the page
-            for (int x = 0; x < page.numOfRecords; x++) {
-                Record currentRecord = page.getRecords().get(i);
-                // if record belongs before the current record
-                if(record.compareTo(currentRecord) < 0){
-                    // insert record before it
-                    page.insertRecordAt(record, x);
-                    updateBuffer(page);
+            if(!inserted) {
+                int pageNumOfRecords = page.getNumOfRecords();
+                // iterate the records in the page if the record has not been inserted
+                for (int x = 0; x < pageNumOfRecords; x++) {
+                    Record currentRecord = page.getRecords().get(x);
+                    // if record belongs before the current record
+                    if (record.compareTo(currentRecord) < 0) {
+                        // insert record before it
+                        page.insertRecordAt(record, x);
+                        updateBuffer(page);
+                        inserted = true;
+                    }
+                }
+                // if last page visited and record still not inserted
+                if(i == tableNumOfPages - 1 && !inserted ){
+                    // insert it to the last page of the table file
+                    page.addLast(record);
                     inserted = true;
                 }
             }
-            // if the record does not get inserted
-            // if this is the last page visited and record not inserted
-            if(i == tableNumOfPages - 1 && !inserted ){
-                // insert it to the last page of the table file
-                page.addLast(record);
-                inserted = true;
-            }
 
             // if table becomes overfull, split the page; end
-            if (page.overflow()) {
-                // TODO: add the next page id here
+            if(page.overflow()) {
                 Page newPage = page.split(getNextPageID());
+                tableSchema.addPageID(newPage.getId());
                 updateBuffer(newPage); // update the buffer with new Page
                 inserted = true;
+                split = true;
+            }
+            else{
+                split = false;
             }
         }
     }
@@ -177,7 +190,7 @@ public class PageBuffer {
             byte[] bytes = new byte[0];
 
             bytes =Type.concat(bytes, page.getPageAsBytes());
-          
+
             raf.write(bytes);
             raf.close();
         } catch (Exception e) {
@@ -202,5 +215,14 @@ public class PageBuffer {
      */
     public ArrayList<Page> getPages(){
         return new ArrayList<>(this.activePages);
+    }
+
+    public String displayPages(){
+        String str = "";
+        for(Page page: activePages){
+            str += page.toString();
+        }
+
+        return str;
     }
 }

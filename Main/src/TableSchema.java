@@ -39,16 +39,27 @@ public class TableSchema {
     private int primaryIndex;
 
     /**
+     * indicates if the table has been updated
+     * notable updates are:
+     *      number of pages changed
+     *      new pageId
+     *      new page added to hardware list
+     */
+    private boolean updated;
+
+    /**
      * constructor used to create a table that has no pages yet
      * For example, when a table is created for the first time
      * @param name table name
      * @param attributes the attributes that make up this table
      */
 
-    public TableSchema(int id, String name, ArrayList<Attribute> attributes){
-        this.tableID = id;
+    public TableSchema(String name, ArrayList<Attribute> attributes){
+        LASTTABLEID++;
+        this.tableID = LASTTABLEID;
         this.name = name;
         this.attributes = attributes;
+        this.pageIds = new ArrayList<>();
         setPrimaryIndex();
     }
 
@@ -73,6 +84,10 @@ public class TableSchema {
      */
     public int getNumberOfPages(){
         return this.pageIds.size();
+    }
+
+    public int getTableID() {
+        return tableID;
     }
 
     public String getName(){
@@ -100,6 +115,11 @@ public class TableSchema {
         }
     }
 
+
+    public void addPageID(int ID){
+        this.pageIds.add(ID);
+    }
+
     /**
      * returns the primary index of this table
      * @return
@@ -113,6 +133,169 @@ public class TableSchema {
      * @return
      */
     public ArrayList<Integer> getPageIds() {
-        return getPageIds();
+        return pageIds;
+    }
+
+    /**
+     * removes an attribute from the current table schema
+     * @param attributeName the name of the attribute to remove
+     */
+    public void removeAttribute(String attributeName) throws TableException{
+        Attribute a = getAttribute(attributeName);
+
+        if(a == null){
+            throw new TableException(1, attributeName);
+        }
+
+        // remove the attribute
+        attributes.remove(a);
+    }
+
+    /**
+     * adds a new attribute to the table
+     * @param a
+     * @throws TableException
+     */
+    public void addAttribute(Attribute a) throws TableException{
+        // attribute with same name should not exist
+        Attribute otherAttribute = getAttribute(a.getName());
+         if(otherAttribute != null){
+             throw new TableException(6, a.getName());
+         }
+         else{
+             this.attributes.add(a);
+         }
+    }
+
+    /**
+     * returns an attribute based on the name
+     * @param name the name of the attribute
+     * @return the attribute if exists; null otherwise
+     */
+    public Attribute getAttribute(String name){
+        for(Attribute a: attributes){
+            if(a.getName().equals(name)){
+                return a;
+            }
+        }
+
+        return null;
+    }
+
+    public ArrayList<Attribute> getAttributes() {
+        return attributes;
+    }
+
+    /**
+     * builds the table schema as a string
+     * * @return schema as a string
+     */
+    public String displayTableSchema(){
+        String str = "Table Name: " + this.name + "\n" + "Table Schema: \n";
+        for (Attribute a : attributes) {
+            str += "\t" + a + "\n";
+        }
+        return str;
+    }
+
+
+    //////// CATALOG SERIALIZATION CODE ////////////
+    /**
+     * converts the entire table into Bytes for the catalog to use
+     *
+     * @return byte[]
+     */
+    public byte[] convertTableObjectToBytes()
+    {
+        byte[] bb = new byte[0];
+
+        bb = Type.concat(bb, getTableHeaderInfoForCatalog());
+        bb = Type.concat(bb, convertAllAttributestoBytes());
+
+        return bb;
+    }
+
+    /**
+     * Turns all of the table's attributes into a byte array
+     * @return byte[]
+     */
+    public byte[] convertAllAttributestoBytes()
+    {
+        byte[] bb = new byte[0];
+
+        for (Attribute attr : this.attributes)
+        {
+            bb = Type.concat(bb, convertAttributeToBytes(attr));
+        }
+
+        return bb;
+    }
+
+    /**
+     * Turns a single attribute into bytes
+     *
+     * @param attr - the attribute we are converting
+     * @return byte[]
+     */
+    public byte[] convertAttributeToBytes(Attribute attr)
+    {
+        byte[] bb = new byte[0];
+
+        int attributeNameLength = attr.getName().length();
+        String attributeName = attr.getName();
+        int attributeType;
+        int attributeN = 0;
+
+        switch (attr.getType()) {
+            case BOOLEAN:
+                attributeType = Catalog.BOOLEAN;
+                break;
+            case CHAR:
+                attributeType = Catalog.CHAR;
+                attributeN = attr.getN();
+                break;
+            case DOUBLE:
+                attributeType = Catalog.DOUBLE;
+                break;
+            case INTEGER:
+                attributeType = Catalog.INTEGER;
+                break;
+            case VARCHAR:
+                attributeType = Catalog.VARCHAR;
+                attributeN = attr.getN();
+                break;
+            default:
+                attributeType = 0;
+                break;
+        }
+
+        boolean isPrimaryKey = attr.isIsPrimaryKey();
+
+        bb = Type.concat(bb, Type.convertIntToByteArray(attributeNameLength));
+        bb = Type.concat(bb, Type.convertStringToByteArray(attributeName));
+        bb = Type.concat(bb, Type.convertIntToByteArray(attributeType));
+        bb = Type.concat(bb, Type.convertIntToByteArray(attributeN));
+        bb = Type.concat(bb, Type.convertBooleanToByteArray(isPrimaryKey));
+
+        return bb;
+    }
+
+    /**
+     * Gets the length of the table name, the table name, and the number of attributes
+     * associated with the table
+     * @return
+     */
+    public byte[] getTableHeaderInfoForCatalog()
+    {
+        byte[] bb = new byte[0];
+
+        int tableNameLength = this.name.length();
+        int numOfAttributes = this.attributes.size();
+
+        bb = Type.concat(bb, Type.convertIntToByteArray(tableNameLength));
+        bb = Type.concat(bb, Type.convertStringToByteArray(this.name));
+        bb = Type.concat(bb, Type.convertIntToByteArray(numOfAttributes));
+
+        return bb;
     }
 }

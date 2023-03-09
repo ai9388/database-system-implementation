@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 public class Page {
     
-    int numOfRecords;
+    private int numOfRecords;
 
     /**
      * page capacity
@@ -25,12 +25,13 @@ public class Page {
 
     ArrayList<Record> records;
 
-    int pageNumber;
+    int tableId;
     
-    public Page(int id){
+    public Page(int id, int tableId){
         this.size = 0;
         this.records = new ArrayList<>();
         this.id = id;
+        this.tableId = tableId;
     }
 
     /**
@@ -39,6 +40,7 @@ public class Page {
      * @param records
      */
     public Page(int id, ArrayList<Record> records){
+        this.id = id;
         this.records = records;
         this.size = 0;
         setSize();
@@ -50,6 +52,14 @@ public class Page {
         for(Record r: this.records){
             this.size += r.getSize();
         }
+    }
+
+    public void setTableId(int tableId) {
+        this.tableId = tableId;
+    }
+
+    public int getNumOfRecords() {
+        return this.records.size();
     }
 
     /**
@@ -82,10 +92,6 @@ public class Page {
 
     public byte[] getHeader(){
         return Type.concat(Type.convertIntToByteArray(this.id), Type.convertIntToByteArray(this.size));
-    }
-
-    public int getPageNumber() {
-        return pageNumber;
     }
 
     public byte[] recordsAsBytes()
