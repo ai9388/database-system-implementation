@@ -92,6 +92,12 @@ public class Database {
      * @param name the name of the table
      * @return TableSchema Object matching
      */
+    public TableSchema getTable(String name) throws TableException{
+        try {
+            return tables.get(name);
+        } catch (NullPointerException e) {
+            throw new TableException(2, name);
+        }
     }
 
     /**
