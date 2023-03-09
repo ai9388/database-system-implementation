@@ -142,7 +142,7 @@ public class StorageManager {
         return null;
     }
 
-    public void insertOneRecordIntoTable(String tableName, String[] record) throws TableException, InvalidDataTypeException, PrimaryKeyException{
+    public void insertOneRecordIntoTable(String tableName, String[] record) throws TableException, InvalidDataTypeException, PrimaryKeyException, UniqueException {
         Table table = db.getTableByName(tableName);
         if (table == null) {
             throw new TableException(2, tableName);
@@ -158,7 +158,7 @@ public class StorageManager {
      * @throws InvalidDataTypeException
      * @throws PrimaryKeyException
      */
-    public void insertARecord(Table table, String[] record) throws InvalidDataTypeException, PrimaryKeyException, TableException{
+    public void insertARecord(Table table, String[] record) throws InvalidDataTypeException, PrimaryKeyException, TableException, UniqueException {
         table.insertRecord(record);
         Page mostRecentPage = table.getMostRecentPage();
     }
