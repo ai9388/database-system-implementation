@@ -34,7 +34,7 @@ public class PageTest {
         Attribute pka = attributes.get(0);
         pb = new PageBuffer("./db/", 5, 100);
         ts = new TableSchema("person", attributes);
-        TableSchema.setLASTTABLEID(0);
+        TableSchema.setLASTTABLEID(1);
         ArrayList<String> d1 = new ArrayList<>(Arrays.asList(new String[]{"carly", "maggiolo", "21"}));
         ArrayList<String> d2 = new ArrayList<>(Arrays.asList(new String[]{"mark", "smith", "24"}));
         ArrayList<String> d3= new ArrayList<>(Arrays.asList(new String[]{"LongName", "ReallyLongLastName", "50"}));
@@ -82,14 +82,14 @@ public class PageTest {
          * </tableFile>
 
          */
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
-
-        String tableFilename = ts.getName() + "_" + ts.getTableID();
+//        System.out.println("Working Directory = " + System.getProperty("user.dir"));
+//
+        String tableFilename = ts.getName();
         String path = "Main/db/" + tableFilename;
         File file = new File(path);
         RandomAccessFile rand = new RandomAccessFile(file, "rw");
 
-        // write the number of pages
+//         write the number of pages
         rand.writeInt(ts.getNumberOfPages());
 
 //        // write every page in sequential order
@@ -103,26 +103,24 @@ public class PageTest {
             rand.write(bytePage);
         }
 
-
         // close the writer
         rand.close();
     }
 
     public ArrayList<Page> readTest() throws IOException {
-        String tableFilename = ts.getName() + "_" + ts.getTableID();
+        String tableFilename = ts.getName();
         String path = "Main/db/" + tableFilename;
-        File file = new File(path);
-        RandomAccessFile rand = new RandomAccessFile(file, "rw");
+        RandomAccessFile rand = new RandomAccessFile(path, "rw");
 
-        // get the table name and number
-        String[] fileinfo= file.getName().split("_");
-        String tablename = fileinfo[0];
-        int tableid = Integer.parseInt(fileinfo[1]);
-        // read the number of pages
-        System.out.println(String.format("Table %s(%d):", tablename, tableid));
+//        // get the table name and number
+//        String[] fileinfo= file.getName().split("_");
+//        String tablename = fileinfo[0];
+//        int tableid = Integer.parseInt(fileinfo[1]);
+//        // read the number of pages
+//        System.out.println(String.format("Table %s(%d):", tablename, tableid));
 
         // read the number of pages
-        int numPages = rand.readInt();
+//        int numPages = rand.readInt();
 //        System.out.println(numPages + " pages");
 
 //        // iterate to get the page order
@@ -139,10 +137,10 @@ public class PageTest {
 //
 //        // first getting the number of pages from table file
 //        try {
-//            int numOfPages = rand.readInt();
+            int numOfPages = rand.readInt();
 
             // iterating over all the pages in the file
-        for (int i = 0; i < numPages; i++) {
+        for (int i = 0; i < numOfPages; i++) {
                 int traversedBytes = 8;
                 int pageID = rand.readInt();
                 int numberOfRecords = rand.readInt();
@@ -183,13 +181,14 @@ public class PageTest {
                             case VARCHAR:
                                 int len = rand.readInt();
                                 char[] vch = new char[len];
-
+                                String s = "";
                                 for (int l = 0; l < len; l++) {
                                     char c = rand.readChar();
                                     vch[l] = c;
+                                    s += c;
                                 }
                                 traversedBytes += (Character.BYTES * len) + Integer.BYTES;
-                                recordData.add(vch.toString());
+                                recordData.add(new String(vch));
                                 break;
                             default:
                                 // program kills itself
@@ -209,6 +208,7 @@ public class PageTest {
     }
 
 
+
     @Test
     public void readandwrite() throws IOException {
         writeTest();
@@ -220,8 +220,12 @@ public class PageTest {
 
     }
 
-    
-
+    @Test
+    public void testWritePage(){
+        String path = "Main/db/";
+        pb.writePage(path, pb.getPages().get(0));
+        pb.writePage(path, pb.getPages().get(1));
+    }
 
 
     public void createAttributes(int pkidx, String[] c, Type[] t){

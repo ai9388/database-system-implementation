@@ -115,14 +115,14 @@ public class Page {
         return otherPage;
     }
 
-    public byte[] getPageAsBytes(){
-        return Type.concat(getHeader(), recordsAsBytes());
-    }
-
-    public void insertRecordAt(Record record, int index){
-        this.records.add(index, record);
-        this.size += record.getSize();
-    }
+//    public byte[] getPageAsBytes(){
+//        return Type.concat(getHeader(), recordsAsBytes());
+//    }
+//
+//    public void insertRecordAt(Record record, int index){
+//        this.records.add(index, record);
+//        this.size += record.getSize();
+//    }
 
     /**
      * removes a record from the list of records
@@ -169,14 +169,14 @@ public class Page {
         return str0 + str + str2 + str0;
     }
 
-    public ByteBuffer getPageAsBytess(){
+    public ByteBuffer getPageAsBytes(){
 
         // number of records + page id + total bytes for all records
         int bufferContent = Integer.BYTES + this.size;
         bufferContent += Integer.BYTES;
 
         // allocate space based on the page size
-        ByteBuffer bb = ByteBuffer.allocate(bufferContent);
+        ByteBuffer bb = ByteBuffer.allocate(capacity + 8);
 
         // put the size
         bb.putInt(this.id);
@@ -185,7 +185,9 @@ public class Page {
 
         // put all the record
         for(Record r : records){
-            bb.put(r.getRecordAsBytes());
+            ByteBuffer bbf = r.getRecordAsBytes();
+            bbf.position(0);
+            bb.put(bbf);
         }
         System.out.println(bb.array().length);
 

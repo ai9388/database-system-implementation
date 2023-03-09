@@ -23,6 +23,7 @@ public class PageBuffer {
         this.dbPath = dbPath;
         this.bufferSize = bufferSize;
         Page.setCapacity(pageSize);
+        this.tables = new HashSet<>();
     }
 
     public int getNextPageID(){
@@ -122,6 +123,7 @@ public class PageBuffer {
 
             // initially not inserted into page
             if(inserted && !split){
+                tables.add(tableSchema);
                 break;
             }
 
@@ -193,7 +195,7 @@ public class PageBuffer {
             raf = new RandomAccessFile(tableFile, "rw");
 
             byte[] bytes = new byte[0];
-            bytes =Type.concat(bytes, page.getPageAsBytes());
+            bytes = page.getPageAsBytes().array();
             
             raf.seek(raf.length());
             raf.write(bytes);
