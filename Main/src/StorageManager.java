@@ -19,7 +19,7 @@ public class StorageManager {
         this.bufferSize = bufferSize;
         this.dbPath = dbPath;
         this.pageSize = pageSize;
-        this.pageBuffer = new PageBuffer(bufferSize, pageSize);
+        this.pageBuffer = new PageBuffer(dbPath, bufferSize, pageSize);
     }
 
     /**

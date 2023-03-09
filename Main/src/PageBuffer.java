@@ -18,7 +18,7 @@ public class PageBuffer {
      */
     private static int LASTPAGEID;
     private HashSet<TableSchema> tables;
-    public PageBuffer(String dbPath, int bufferSize, int pageSize, int totalPages){
+    public PageBuffer(String dbPath, int bufferSize, int pageSize){
         this.dbPath = dbPath;
         this.bufferSize = bufferSize;
         Page.setCapacity(pageSize);
