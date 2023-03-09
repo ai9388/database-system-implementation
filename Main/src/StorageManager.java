@@ -65,7 +65,7 @@ public class StorageManager {
      * @param recordsInfo the information about all the records to be inserted
      * @throws PrimaryKeyException
      */
-    public void insertRecords(String tableName, ArrayList<String[]> recordsInfo) throws TableException, PrimaryKeyException, InvalidDataTypeException {
+    public void insertRecords(String tableName, ArrayList<String[]> recordsInfo) throws TableException, PrimaryKeyException, InvalidDataTypeException, UniqueException {
         for(String[] recordInfo: recordsInfo){
             insertRecord(tableName, recordInfo);
         }
