@@ -65,7 +65,7 @@ public class StorageManager {
      * @param recordsInfo the information about all the records to be inserted
      * @throws PrimaryKeyException
      */
-    public void insertRecords(String tableName, ArrayList<String[]> recordsInfo) throws TableException, PrimaryKeyException, InvalidDataTypeException {
+    public void insertRecords(String tableName, ArrayList<String[]> recordsInfo) throws TableException, PrimaryKeyException, InvalidDataTypeException, UniqueException {
         for(String[] recordInfo: recordsInfo){
             insertRecord(tableName, recordInfo);
         }
@@ -142,7 +142,7 @@ public class StorageManager {
      * @throws InvalidDataTypeException if the types provided in the record info are invalid
      * @throws PrimaryKeyException if the primary key isn't valid or if repeated
      */
-    public void insertRecord(String tableName, String[] recordInfo) throws TableException, InvalidDataTypeException, PrimaryKeyException{
+    public void insertRecord(String tableName, String[] recordInfo) throws TableException, InvalidDataTypeException, PrimaryKeyException, UniqueException{
         TableSchema table = db.getTable(tableName);
         Record record = null;
         if (table == null) {
@@ -162,7 +162,7 @@ public class StorageManager {
      * @param tablename the table to delete record from
      * @throws PrimaryKeyException if the primary key is invalid in some way
      */
-    public void deleteRecord(String primaryKey, String tablename){
+    public void deleteRecord(String primaryKey, String tablename) throws PrimaryKeyException, InvalidDataTypeException{
         // not due until phase 3
     }
 
@@ -220,7 +220,7 @@ public class StorageManager {
      */
     public void dropTable(String table_name) throws TableException {
         db.dropTable(table_name);
-        // TODO: remove related pages from buffer and memory :((
+            //throw new TableException(2, table_name)
     }
 
     /**

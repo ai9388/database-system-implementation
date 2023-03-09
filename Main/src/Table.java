@@ -158,7 +158,7 @@ public class Table {
      * @throws InvalidDataTypeException
      * @throws PrimaryKeyException
      */
-    public boolean insertRecord(String[] values) throws InvalidDataTypeException, PrimaryKeyException, TableException {
+    public boolean insertRecord(String[] values) throws InvalidDataTypeException, PrimaryKeyException, TableException, UniqueException {
         if(values.length < attributes.size() || values.length > attributes.size()){
             throw new TableException(4, "");
         }
@@ -179,23 +179,13 @@ public class Table {
         }
     }
 
-    private void checkUniqueness(String[] values, ArrayList<Integer> uniqueAttributes, ArrayList<Attribute> attributes) throws TableException {
+    private void checkUniqueness(String[] values, ArrayList<Integer> uniqueAttributes, ArrayList<Attribute> attributes) throws TableException, UniqueException {
         for (Integer unique: uniqueAttributes) {
             for (Record record: records) {
-                // TODO: Check if the values are equal
-                // ? would it just be equals function?
-                // I'll come back to this (Alex S)
                 Object valueAtUnique = record.getValueAtColumn(unique);
-                Attribute a = attributes.get(unique);
-                switch (a.getType()) {
-                    case CHAR -> {
-                        String s = String.valueOf(valueAtUnique);
-                        if (values[unique].equals(s)) {
-                            throw new TableException(4, "");
-                        }
-                    }
-                    case VARCHAR -> {
-
+                for (String value: values) {
+                    if (valueAtUnique.equals(value)) {
+                        throw new UniqueException(1,"");
                     }
                 }
             }

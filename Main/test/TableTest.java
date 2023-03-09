@@ -210,6 +210,8 @@ public class TableTest {
             e.printStackTrace();
         } catch (TableException e) {
             e.printStackTrace();
+        } catch (UniqueException e) {
+            e.printStackTrace();
         }
     }
 
@@ -230,6 +232,8 @@ public class TableTest {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (TableException e) {
+            e.printStackTrace();
+        } catch (UniqueException e) {
             e.printStackTrace();
         }
 
@@ -253,6 +257,8 @@ public class TableTest {
              // TODO Auto-generated catch block
              msgGot = e.getLocalizedMessage();
          } catch (TableException e) {
+             e.printStackTrace();
+         } catch (UniqueException e) {
              e.printStackTrace();
          }
         assertTrue(!res && msgExpected.equals(msgGot));

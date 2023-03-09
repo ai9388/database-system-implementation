@@ -12,6 +12,7 @@ public class PageBuffer {
 
     private String dbPath;
 
+
     /**
      * id used as reference when assigning pageID
      * TODO: maybe set from catalog
@@ -182,15 +183,19 @@ public class PageBuffer {
         String tableName = getTableName(page.getId());
         // TODO: serialize @ hai-yen
         //get the table path, then call the page to byte from Pages
+        //get the order of the pages from the table
+        //add new page: get# of pages to skip there #pages X page size
+        //update: have the order of pages in tableschema and then update
+        //randomaccessfile can't add on, only overwrite
         File tableFile = new File(dbPath + "/" + tableName);
         RandomAccessFile raf;
         try {
             raf = new RandomAccessFile(tableFile, "rw");
 
             byte[] bytes = new byte[0];
-
             bytes =Type.concat(bytes, page.getPageAsBytes());
-
+            
+            raf.seek(raf.length());
             raf.write(bytes);
             raf.close();
         } catch (Exception e) {
@@ -225,4 +230,27 @@ public class PageBuffer {
 
         return str;
     }
+
+    //TODO: Hai-Yen: writing pages to table fully
+    // public void writeToTableFile(File new_table, int fileID, int numOfPages, int numOfRecords)
+    // {
+    //     RandomAccessFile raf;
+    //     try {
+    //         raf = new RandomAccessFile(new_table, "rw");
+
+    //         byte[] bytes = new byte[0];
+
+    //     //   bytes= Type.concat(bytes, Type.convertIntToByteArray(fileID));
+    //         bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfPages));
+    //     //   bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfRecords));
+        
+
+            
+    //         raf.write(bytes);
+    //         raf.close();
+    //     } catch (Exception e) {
+    //         e.printStackTrace();
+    //     }
+    // }
+
 }
