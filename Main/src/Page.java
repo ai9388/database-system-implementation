@@ -1,3 +1,4 @@
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -166,5 +167,28 @@ public class Page {
             str2 += r + "\n";
         }
         return str0 + str + str2 + str0;
+    }
+
+    public ByteBuffer getPageAsBytess(){
+
+        // number of records + page id + total bytes for all records
+        int bufferContent = Integer.BYTES + this.size;
+        bufferContent += Integer.BYTES;
+
+        // allocate space based on the page size
+        ByteBuffer bb = ByteBuffer.allocate(bufferContent);
+
+        // put the size
+        bb.putInt(this.id);
+        // put the number of records
+        bb.putInt(getNumOfRecords());
+
+        // put all the record
+        for(Record r : records){
+            bb.put(r.getRecordAsBytes());
+        }
+        System.out.println(bb.array().length);
+
+        return bb;
     }
 }
