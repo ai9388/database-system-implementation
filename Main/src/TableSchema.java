@@ -59,6 +59,7 @@ public class TableSchema {
         this.tableID = LASTTABLEID;
         this.name = name;
         this.attributes = attributes;
+        this.pageIds = new ArrayList<>();
         setPrimaryIndex();
     }
 
@@ -114,6 +115,11 @@ public class TableSchema {
         }
     }
 
+
+    public void addPageID(int ID){
+        this.pageIds.add(ID);
+    }
+
     /**
      * returns the primary index of this table
      * @return
@@ -127,7 +133,7 @@ public class TableSchema {
      * @return
      */
     public ArrayList<Integer> getPageIds() {
-        return getPageIds();
+        return pageIds;
     }
 
     /**

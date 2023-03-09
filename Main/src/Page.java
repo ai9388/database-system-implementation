@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 public class Page {
     
-    int numOfRecords;
+    private int numOfRecords;
 
     /**
      * page capacity
@@ -56,6 +56,10 @@ public class Page {
 
     public void setTableId(int tableId) {
         this.tableId = tableId;
+    }
+
+    public int getNumOfRecords() {
+        return this.records.size();
     }
 
     /**
