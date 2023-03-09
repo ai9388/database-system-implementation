@@ -4,10 +4,7 @@ public class PageBuffer {
 
     Queue<Page> activePages = new LinkedList<>();
 
-    private static int bufferSize;
-
-    private int totalPages;
-
+    private int bufferSize;
 
     /**
      * id used as reference when assigning pageID
@@ -15,10 +12,10 @@ public class PageBuffer {
      */
     private static int LASTPAGEID;
     private HashSet<TableSchema> tables;
-    public PageBuffer(int bufferSize, int pageSize, int totalPages){
-        this.bufferSize = PageBuffer.bufferSize;
+
+    public PageBuffer(int bufferSize, int pageSize){
+        this.bufferSize = bufferSize;
         Page.setCapacity(pageSize);
-        this.totalPages = totalPages;
     }
 
     public int getNextPageID(){
@@ -94,7 +91,7 @@ public class PageBuffer {
 
         if(tableNumOfPages == 0) { // if there are no pages for this table
             // TODO: make a new file for the table
-            Page page = new Page(getNextPageID());
+            Page page = new Page(getNextPageID(), tableSchema.getTableID());
             page.insertRecordAt(record, 0); // add this entry to a new page
             // TODO: insert the page into the table file
             updateBuffer(page); // add page to buffer
