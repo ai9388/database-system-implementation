@@ -3,18 +3,33 @@ import java.util.*;
 public class Database {
     
     private String name;
-    private Map<String, Table> tables;
-    private Catalog catalog;
-    private String path;
-    private Map<Integer, Table> tablesID;
 
-    public Database(String name, Map<String, Table> tables, Catalog catalog, String path, Map<Integer, Table> tablesID)
+    private String path;
+    private Map<String, TableSchema> tables;
+
+    private Map<Integer, TableSchema> tablesID;
+
+    /**
+     * used when loading a database from hardware
+     * @param name the name of the database
+     * @param path the path
+     * @param tables the tables in hardware
+     */
+    public Database(String name, String path, ArrayList<TableSchema> tables)
     {
         this.name = name;
-        this.tables = tables;
-        this.catalog = catalog;
         this.path = path;
-        this.tablesID = tablesID;
+        setTables(tables);
+    }
+
+    /**
+     * constructor when creating a database without tables yet
+     * @param name the name of the database
+     * @param path the path
+     */
+    public Database(String name, String path){
+        this.name = name;
+        this.path = path;
     }
 
     /**
@@ -25,43 +40,10 @@ public class Database {
     }
 
     /**
-     * @param name the name to set
+     * @param path the path to set
      */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * @return Map<String, Table> return the tables
-     */
-    public Map<String, Table> getTables() {
-        return tables;
-    }
-
-
-    public Table getSingleTable(String name){
-        return tables.get(name);
-    }
-
-    /**
-     * @param tables the tables to set
-     */
-    public void setTables(Map<String, Table> tables) {
-        this.tables = tables;
-    }
-
-    /**
-     * @return Map<String, Attribute> return the catalog
-     */
-    public Catalog getCatalog() {
-        return catalog;
-    }
-
-    /**
-     * @param catalog the catalog to set
-     */
-    public void setCatalog(Catalog catalog) {
-        this.catalog = catalog;
+    public void setPath(String path) {
+        this.path = path;
     }
 
     /**
@@ -72,93 +54,146 @@ public class Database {
     }
 
     /**
-     * @param path the path to set
+     * adds an already existing table from hardware
+     * @param table the table schema to insert
      */
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public boolean addTable(Table table)
+    public void addTable(TableSchema table)
     {
-        return false;
-    }
-
-    public void createTable(String tablename, ArrayList<Attribute> attributes) throws TableException{
-        if(this.getTableByName(tablename) == null){
-            Table newTable = new Table(tablename, attributes);
-            tables.put(tablename, newTable);
-            tablesID.put(newTable.getTableID(), newTable);
-        }
-    }
-
-    public boolean dropTable(String tablename)
-    {
-        return tables.remove(tablename) != null;
-    }
-
-    public Table getTableByName(String name) throws TableException
-    {
-       try {
-        return tables.get(name);
-       } catch (NullPointerException e) {
-        throw new TableException(2, name);
-       }
-    }
-
-    public Table getTableByID(int id){
-        return this.tablesID.get(id);
-    }
-
-    public void updateCatalog()
-    {
-        System.out.println("updating!");
-    }
-
-    public void getPageByTable()
-    {
-        System.out.println("getting page by table");
-    }
-
-    public void getPageByNum() 
-    {
-        
-        System.out.println("getting page by number");
-    } 
-
-    public ArrayList<Record> getRecordsFromTable(Table table) 
-    {
-        return table.getRecords();
-    }
-
-    public ArrayList<Table> getAllTables()
-    {
-        return new ArrayList<Table>(this.tables.values());
-    }
-    
-    public String selectFromTable(String tableName, String[] columns) throws TableException{
-        Table table = this.getTableByName(tableName); 
-
-        if(columns == null){
-            return table.selectAll();
-        }
-        return table.select(columns);
-    }
-
-    public void dropAttribute(String attribute_name, String table_name) throws TableException {
-        Table table = this.getTableByName(table_name);
-        if (!table.removeAttribute(attribute_name)) {
-            throw new TableException(1, attribute_name);
-        }
-        this.tables.remove(table_name);
-        this.tablesID.remove(table.getTableID());
-        this.tables.put(table_name, table);
+        this.tables.put(table.getName(), table);
         this.tablesID.put(table.getTableID(), table);
     }
 
-    public void addAttribute(Attribute attribute, String value, String table_name) throws TableException {
-        Table table = this.getTableByName(table_name);
-        if (!table.addAttribute(attribute, value)) {
-            throw new TableException(1, attribute.getName());
+    /**
+     * creates a new table and makes sure its name is unique
+     * @param tablename the name of the table
+     * @param attributes the attributes that make up the schema
+     * @throws TableException if the table name already exists
+     */
+    public void createTable(String tablename, ArrayList<Attribute> attributes) throws TableException {
+        if (!this.tables.containsKey(tablename)) {
+            TableSchema table = new TableSchema(tablename, attributes);
+            tables.put(tablename, table);
+            tablesID.put(table.getTableID(), table);
+        }
+        else{
+            throw new TableException(5, tablename);
         }
     }
+
+    /**
+     * @return a collection of all the tables
+     */
+    public ArrayList<TableSchema> getTables() {
+        return new ArrayList<>(tables.values());
+    }
+
+    /**
+     * returns a single table based on the name
+     * @param name the name of the table
+     * @return TableSchema Object matching
+     */
+    }
+
+    /**
+     * iterates the table collection and populates the
+     * tables by name and tables by ID Map
+     * @param tables the tables to set
+     */
+    public void setTables(ArrayList<TableSchema> tables) {
+        this.tables = new HashMap<>();
+        this.tablesID = new HashMap<>();
+        for(TableSchema table: tables){
+            this.tables.put(table.getName(),table);
+            this.tablesID.put(table.getTableID(), table);
+        }
+    }
+
+    /**
+     * drops a table from the database
+     * @param tablename the name of the table to delete from database
+     * @throws TableException if table referenced does not exist
+     */
+    public void dropTable(String tablename) throws TableException
+    {
+        if(tables.containsKey(tablename)){
+            this.tablesID.remove(tables.get(tablename).getTableID());
+            this.tables.remove(tablename);
+        }
+        else{
+            throw new TableException(2, tablename);
+        }
+    }
+
+    /**
+     * returns a table based on its ID
+     * @param id the table id
+     * @return the table object (most likely exists)
+     *  no need to validate name
+     */
+    public TableSchema getTableByID(int id){
+        return this.tablesID.get(id);
+    }
+
+    /**
+     * validates the record by verifying that all value types are correct
+     * @param tableName the name of the table
+     * @param values the values being inserted
+     * @return true if all the types are valid
+     * @throws TableException if the table name/object does not exist
+     * @throws InvalidDataTypeException if the object type is not valid
+     */
+    public Record validateRecord(TableSchema table, String[] values) throws TableException, InvalidDataTypeException {
+        // get all the attributes
+        ArrayList<Attribute> attributes = table.getAttributes();
+
+        if(values.length < attributes.size()){
+            throw new TableException(4, "");
+        }
+        if(values.length > attributes.size()){
+            throw new TableException(3, "");
+        }
+        if (Type.validateAll(values, attributes)) {
+            return new Record(new ArrayList<>(Arrays.asList(values, attributes)));
+        } else {
+            // creation of record failed
+            throw new InvalidDataTypeException(values, attributes);
+        }
+    }
+
+    public String selectFromTable(String tableName, String[] columns) throws TableException{
+        //TODO : how to do this?
+
+        return "";
+    }
+
+    /**
+     * drops an attribute from the table
+     * @param attribute_name the name of the attribute
+     * @param table_name the name of the table
+     * @throws TableException
+     *         code 2: if the table name provided does not match a table
+     *         code 1: if the attribute name does not match a column
+     */
+    public void dropAttribute(String attribute_name, String table_name) throws TableException {
+        TableSchema table = this.getTable(table_name); // throws except. if table name invalid
+        table.removeAttribute(attribute_name); // throws exception if column name invalid
+//        this.tables.remove(table_name);
+//        this.tablesID.remove(table.getTableID());
+//        this.tables.put(table_name, table);
+//        this.tablesID.put(table.getTableID(), table);
+    }
+
+
+    /**
+     * adds an attribute to a table
+      * @param attribute the name of the attribute
+     * @param value the value
+     * @param table_name
+     * @throws TableException
+     */
+    public void addAttribute(Attribute attribute, String value, String table_name) throws TableException {
+        TableSchema table = this.getTable(table_name);
+        table.addAttribute(attribute);
+    }
+
 }
