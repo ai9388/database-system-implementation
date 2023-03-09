@@ -193,24 +193,26 @@ public class StorageManager {
       * adding the initial information to the file
       * this includes the file id, number of pages, and number of records
       */
-      public void addIntialInfoToTable(File new_table, int fileID, int numOfPages, int numOfRecords)
-      {
-          RandomAccessFile raf;
-          try {
-              raf = new RandomAccessFile(new_table, "rw");
- 
-              byte[] bytes = new byte[0];
+    public void addIntialInfoToTable(File new_table, int fileID, int numOfPages, int numOfRecords)
+    {
+        RandomAccessFile raf;
+        try {
+            raf = new RandomAccessFile(new_table, "rw");
 
-              bytes= Type.concat(bytes, Type.convertIntToByteArray(fileID));
-              bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfPages));
-              bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfRecords));
-              
-              raf.write(bytes);
-              raf.close();
-          } catch (Exception e) {
-              e.printStackTrace();
-          }
-      }
+            byte[] bytes = new byte[0];
+
+        //   bytes= Type.concat(bytes, Type.convertIntToByteArray(fileID));
+            bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfPages));
+        //   bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfRecords));
+        
+
+            
+            raf.write(bytes);
+            raf.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * drops the table with given name

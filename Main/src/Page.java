@@ -163,5 +163,4 @@ public class Page {
         }
         return str0 + str + str2 + str0;
     }
-
 }
