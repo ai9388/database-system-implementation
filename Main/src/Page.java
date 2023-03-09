@@ -118,11 +118,11 @@ public class Page {
 //    public byte[] getPageAsBytes(){
 //        return Type.concat(getHeader(), recordsAsBytes());
 //    }
-//
-//    public void insertRecordAt(Record record, int index){
-//        this.records.add(index, record);
-//        this.size += record.getSize();
-//    }
+
+    public void insertRecordAt(Record record, int index){
+        this.records.add(index, record);
+        this.size += record.getSize();
+    }
 
     /**
      * removes a record from the list of records
