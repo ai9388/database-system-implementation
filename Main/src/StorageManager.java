@@ -219,9 +219,8 @@ public class StorageManager {
      * @param table_name
      */
     public void dropTable(String table_name) throws TableException {
-        if (!db.dropTable(table_name)) {
-            throw new TableException(2, table_name);
-        }
+        db.dropTable(table_name);
+            //throw new TableException(2, table_name)
     }
 
     /**
