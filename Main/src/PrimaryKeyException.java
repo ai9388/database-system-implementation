@@ -1,11 +1,11 @@
 public class PrimaryKeyException extends Exception {
     
     private String[] errorMessages = new String[]{
-        "No primary key defined",
-        "Duplicate primary key for row: ",
-        "More than one primary key",
-        "Invalid primary key value: ",
-        "Invalid primary key type: "
+        "No primary key defined", // 1
+        "Duplicate primary key for row: ", // 2
+        "More than one primary key", // 3
+        "Invalid primary key value: ", // 4
+        "Invalid primary key type: " // 5
     };
     private String message = "";
 
