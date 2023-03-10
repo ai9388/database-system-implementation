@@ -33,15 +33,7 @@ public class ParserTest {
     @Test
     public void createTest(){
         String[] commands = new String[]{
-                "create table foo (num integer primarykey, name char(10));",
-                "display schema;"
-        };
-        runCommands(commands);
-    }
-
-    @Test
-    public void insertTest(){
-        String[] commands = new String[]{
+                "create table foo (num integer primarykey, name varchar(10));",
                 "insert into foo values (45, \"          carly     \");",
                 "display info foo;"
         };
@@ -50,9 +42,9 @@ public class ParserTest {
 
     @Test
     public void insertTest2(){
-        System.out.println("adding record");
         String[] commands = new String[]{
-                "insert into foo values (45, carly);",
+                "create table foo (num integer primarykey, name varchar(10));",
+                "insert into foo values (45, \"carly\");",
                 "display info foo;"
         };
         runCommands(commands);
@@ -67,9 +59,15 @@ public class ParserTest {
     }
 
     @Test
-    public void createAndInsert(){
-        createTest();
-        insertTest2();
+    public void test2(){
+        String[] commands = new String[]{
+                "create table foo (num integer primarykey, name varchar(10));",
+                "insert into foo values (45, \"carly\"), (54, \"hai-yen\");",
+                "display info foo;"
+        };
+
+        runCommands(commands);
     }
+
 
 }
