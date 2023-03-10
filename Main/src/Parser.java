@@ -160,7 +160,7 @@ public class Parser {
                     } else {
                         System.out.println(attributes.toString());
                         try {
-                            storageManager.createTable(table_name, attributes);
+                            storageManager.createTable(table_name.strip(), attributes);
                             System.out.println("SUCCESS! You've created " + table_name);
                         } catch (Exception pke) {
                             System.out.println(pke.getMessage());
@@ -181,7 +181,7 @@ public class Parser {
                 }
                 case INSERT -> {
                     String input = user_input.replaceFirst("insert into", "").strip();
-                    String table_name = input.split(" ")[0];
+                    String table_name = input.split(" ")[0].strip();
                     int start_index = input.indexOf("(");
                     input = input.substring(start_index - 1);
                     String[] vals = input.split(",");

@@ -85,7 +85,7 @@ public class Database {
      * @return a collection of all the tables
      */
     public ArrayList<TableSchema> getTables() {
-        return new ArrayList<>(tables.values());
+        return new ArrayList<>(this.tables.values());
     }
 
     /**
@@ -95,7 +95,7 @@ public class Database {
      */
     public TableSchema getTable(String name) throws TableException{
         try {
-            return tables.get(name);
+            return this.tables.get(name);
         } catch (NullPointerException e) {
             throw new TableException(2, name);
         }

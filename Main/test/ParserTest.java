@@ -32,9 +32,44 @@ public class ParserTest {
 
     @Test
     public void createTest(){
-        parser.classifyInput("create table foo (num integer primarykey, name char(20));");
-        parser.parse();
+        String[] commands = new String[]{
+                "create table foo (num integer primarykey, name char(10));",
+                "display schema;"
+        };
+        runCommands(commands);
     }
 
+    @Test
+    public void insertTest(){
+        String[] commands = new String[]{
+                "insert into foo values (45, \"          carly     \");",
+                "display info foo;"
+        };
+        runCommands(commands);
+    }
+
+    @Test
+    public void insertTest2(){
+        System.out.println("adding record");
+        String[] commands = new String[]{
+                "insert into foo values (45, carly);",
+                "display info foo;"
+        };
+        runCommands(commands);
+    }
+
+    public void runCommands(String[] commands){
+        for(int i = 0; i < commands.length; i++){
+            String command = commands[i];
+            parser.classifyInput(command);
+            parser.parse();
+        }
+    }
+
+    @Test
+    public void createAndInsert(){
+        createTest();
+        insertTest2();
+    }
 
 }
