@@ -232,7 +232,7 @@ public class PageBuffer {
             //skip to certain pointer for the page
             int numPages = table.getNumberOfPages();
             raf.write(Type.convertIntToByteArray(numPages));
-            int skip = page.getId() * Page.getCapacity();
+            int skip = (page.getId()-1) * Page.getCapacity();
             raf.seek(skip);
             raf.write(bytes);
 

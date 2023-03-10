@@ -59,18 +59,13 @@ public class ParserTest {
     }
 
     public void parseValueRecords(String queries){
-        int idx = 0;
-        char c = queries.charAt(0);
+        int idx = 1;
+        char c = queries.charAt(idx);
         String single = "";
         while(true){
             if(c == ')'){
                 System.out.println("single: " + single);
                 break;
-            }
-            // idx++;
-            // c = queries.charAt(idx);
-            if (c == '('){ // multiple tuples
-                System.out.println("multiple");
             }
             else{ //only one
                 if(c == '\"'){
@@ -87,9 +82,22 @@ public class ParserTest {
         }
     }
 
+    public void recursiveParse(String queries){
+        //TODO: character at 0 shoudl be "("
+        int idx = 1;
+        char c = queries.charAt(idx);
+        while(true){
+            if(c == '('){
+                String substring = queries.substring(idx);
+                parseValueRecords(substring);
+            }
+        }
+    }
+
     @Test
     public void parseTest(){
         parseValueRecords("(45, \"haiyen\")");
+        //test
     }
 
     @Test
