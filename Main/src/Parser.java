@@ -260,12 +260,12 @@ public class Parser {
     }
 
     private void select(String attr, String tableName) throws TableException {
-        if (attr.equals("*")) {
-            System.out.println(storageManager.selectFromTable(tableName, null));
-        } else {
-            String[] columns = attr.strip().split(",");
-            System.out.println(storageManager.selectFromTable(tableName, columns));
-        }
+//        if (attr.equals("*")) {
+//            System.out.println(storageManager.selectFromTable(tableName, null));
+//        } else {
+//            String[] columns = attr.strip().split(",");
+//            System.out.println(storageManager.selectFromTable(tableName, columns));
+//        }
     }
 
     public void displayHelp() {
