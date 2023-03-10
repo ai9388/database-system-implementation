@@ -78,7 +78,7 @@ public class PageBuffer {
             // remove the top from the queue if full
             Page oldPage = activePages.poll();
             // write the old page to storage
-            writePage(dbPath, oldPage);
+            writePage(oldPage);
         }
 
         // add the new page to active pages
@@ -167,13 +167,13 @@ public class PageBuffer {
      * @param id the page id
      * @return the name of the table
      */
-    public String getTableName(int id){
+    public TableSchema getTableName(int id){
         for(TableSchema table: tables){
             if(table.getPageIds().contains(id)){
-                return table.getName();
+                return table;
             }
         }
-        return "";
+        return null;
     }
 
     /**
@@ -196,6 +196,7 @@ public class PageBuffer {
             byte[] bytes = new byte[Page.getCapacity()];
             bytes = page.getPageAsBytes().array();
             
+            
             raf.seek(raf.length());
             raf.write(bytes);
 
@@ -208,10 +209,11 @@ public class PageBuffer {
     }
 
     public boolean updatePage(Page page){
-        String tableName = getTableName(page.getId());
+        TableSchema table = getTableName(page.getId());
+        String tableName = table.getName();
         // TODO: serialize @ hai-yen
         //update: have the order of pages in tableschema and then update
-        //Future hai-yen: in the future, the page order will be diffrent bc we will delete page
+        //Future hai-yen: in the future, the page order will be diffrent bc we will delete
         File tableFile = new File(dbPath + "/" + tableName);
         RandomAccessFile raf;
         try {
@@ -220,6 +222,9 @@ public class PageBuffer {
             byte[] bytes = new byte[Page.getCapacity()];
             bytes = page.getPageAsBytes().array();
             
+            //skip to certain pointer for the page
+            int numPages = table.getNumberOfPages();
+            raf.write(Type.convertIntToByteArray(numPages));
             int skip = page.getId() * Page.getCapacity();
             raf.seek(skip);
             raf.write(bytes);
@@ -260,25 +265,11 @@ public class PageBuffer {
     }
 
     //TODO: Hai-Yen: writing pages to table fully
-    // public void writeToTableFile(File new_table, int fileID, int numOfPages, int numOfRecords)
-    // {
-    //     RandomAccessFile raf;
-    //     try {
-    //         raf = new RandomAccessFile(new_table, "rw");
-
-    //         byte[] bytes = new byte[0];
-
-    //     //   bytes= Type.concat(bytes, Type.convertIntToByteArray(fileID));
-    //         bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfPages));
-    //     //   bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfRecords));
-        
-
-            
-    //         raf.write(bytes);
-    //         raf.close();
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //     }
-    // }
+    public void purge()
+    {
+        for(Page page: activePages){
+            updatePage(page);
+        }
+    }
 
 }
