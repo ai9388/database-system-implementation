@@ -182,7 +182,8 @@ public class PageBuffer {
      * @return bool, true if successful
      */
     public boolean writePage(Page page){
-        String tableName = getTableName(page.getId());
+        TableSchema table = getTableName(page.getId());
+        String tableName = table.getName();
         // TODO: serialize @ hai-yen
         //get the table path, then call the page to byte from Pages
         //get the order of the pages from the table
