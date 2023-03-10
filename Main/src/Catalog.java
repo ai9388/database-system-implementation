@@ -16,8 +16,8 @@ public class Catalog {
 
     private final String path;
     private final int pageSize;
-    private ArrayList<TableSchema> tables;
-    private HashMap<String, TableSchema> tableNameToTableSchema;
+    private ArrayList<TableSchema> tables = new ArrayList<>();
+    private HashMap<String, TableSchema> tableNameToTableSchema = new HashMap<String, TableSchema>();
     public RandomAccessFile raf;
 
     public Catalog(String path, int pageSize) {
@@ -57,7 +57,25 @@ public class Catalog {
             e.printStackTrace();
         }
     }
-    
+
+    /**
+     * returns the hashmap of table names to table schemas
+     * @return
+     */
+    public HashMap<String, TableSchema> getTableNameToTableSchema()
+    {
+        return this.tableNameToTableSchema;   
+    }
+
+    /**
+     * returns the tables
+     * @return
+     */
+    public ArrayList<TableSchema> getTables()
+    {
+        return this.tables;
+    }
+
     /**
      * Goes through the physical table file and seeks through memory to get an
      * individual page
