@@ -1,5 +1,4 @@
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.*;
@@ -26,6 +25,9 @@ public class Catalog {
         this.pageSize = pageSize;
     }
 
+    /**
+     * Reads a catalog from the physical file 
+     */
     public void readCatalog() {
         try {
             String catalogPath = this.path;
@@ -42,7 +44,7 @@ public class Catalog {
             int numOfTables = raFile.readInt();
 
             for (int i = 0; i < numOfTables; i++) {
-                TableSchema t = createTableFromBytes(raFile);
+                TableSchema t = createTableSchemaObjectFromBytes(raFile);
                 
                 tableNameToTableSchema.put(t.getName(), t);
             }
@@ -53,6 +55,12 @@ public class Catalog {
         }
     }
 
+    /**
+     * Goes through the physical table file and seeks through memory to get an individual page
+     * @param tableName
+     * @param pageID
+     * @return
+     */
     public Page readIndividualPageFromMemory(String tableName, int pageID)
     {
         try {
@@ -132,6 +140,12 @@ public class Catalog {
         return null; 
     }
 
+    /**
+     * reading all the pages from a given table file and returning the pages from each of them
+     * @param raFile
+     * @param attributes
+     * @return
+     */
     public ArrayList<Page> readPagesFromTableFile(RandomAccessFile raFile, ArrayList<Attribute> attributes) {
         ArrayList<Page> pages = new ArrayList<>();
 
@@ -208,7 +222,12 @@ public class Catalog {
         return pages;
     }
 
-    public TableSchema createTableFromBytes(RandomAccessFile f) {
+    /**
+     * Reads from binary data to create a TableSchema object
+     * @param f the table file we are reading from
+     * @return
+     */
+    public TableSchema createTableSchemaObjectFromBytes(RandomAccessFile f) {
         try {
             // getting the table name
             int tableNameLength = f.readInt();
@@ -287,7 +306,7 @@ public class Catalog {
      *
      * @return a byte array
      */
-    public byte[] createCatalog() {
+    public byte[] createBytesForCatalog() {
         // adding in the header for the file
         byte[] bytes = new byte[0];
         byte[] numOfTables = Type.convertIntToByteArray(this.tables == null ? 0 : tables.size());
@@ -305,7 +324,7 @@ public class Catalog {
      * Writes byte array to the Catalog file
      * @param bytes
      */
-    public void writeToCatalogFile(byte[] bytes) {
+    public void writeBytesToCatalogFile(byte[] bytes) {
         try {
             String catalogPath = path;
             if (path.contains("\\")) {
@@ -326,8 +345,18 @@ public class Catalog {
         }
     }
 
+    /**
+     * creates an actual table file in the database that we write to later
+     * @param tableName
+     */
     public void createTableFile(String tableName)
     {
-        //TODO: create physical file into 
+        String tablePath = path;
+        if (path.contains("\\")) {
+            tablePath += "\\" + tableName;
+        } else {
+            tablePath += "/" + tableName;
+        }
+        File file = new File(tablePath);
     }
 }
