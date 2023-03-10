@@ -351,12 +351,13 @@ public class Catalog {
      */
     public void createTableFile(String tableName)
     {
-        String tablePath = path;
-        if (path.contains("\\")) {
-            tablePath += "\\" + tableName;
-        } else {
-            tablePath += "/" + tableName;
+        File dir = new File(path);
+        File file = new File(path + "/" + tableName);
+        dir.mkdirs();
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        File file = new File(tablePath);
     }
 }

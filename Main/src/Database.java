@@ -30,6 +30,7 @@ public class Database {
     public Database(String name, String path){
         this.name = name;
         this.path = path;
+        setTables(null);
     }
 
     /**
@@ -108,6 +109,10 @@ public class Database {
     public void setTables(ArrayList<TableSchema> tables) {
         this.tables = new HashMap<>();
         this.tablesID = new HashMap<>();
+
+        if(tables == null){
+            return;
+        }
         for(TableSchema table: tables){
             this.tables.put(table.getName(),table);
             this.tablesID.put(table.getTableID(), table);

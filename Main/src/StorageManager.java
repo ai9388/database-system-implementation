@@ -57,6 +57,7 @@ public class StorageManager {
      */
     public void createTable(String tableName, ArrayList<Attribute> attributes) throws TableException{
         db.createTable(tableName, attributes);
+        catalog.createTableFile(tableName);
     }
 
     /***
@@ -76,8 +77,8 @@ public class StorageManager {
      */
     public void displaySchema(){
         System.out.println("DB location: " + dbPath);
-        System.out.println("Page Size: " + pageSize);
-        System.out.println("Buffer Size: " + bufferSize);
+        System.out.println("Page Size: " + this.pageSize);
+        System.out.println("Buffer Size: " + this.bufferSize);
         System.out.println();
         
         ArrayList<TableSchema> tables = db.getTables();
@@ -187,6 +188,31 @@ public class StorageManager {
         byte[] bb = this.catalog.createBytesForCatalog();
         this.catalog.writeBytesToCatalogFile(bb);
         this.catalog.readCatalog();
+    }
+
+    /**
+      * adding the initial information to the file
+      * this includes the file id, number of pages, and number of records
+      */
+    public void addIntialInfoToTable(File new_table, int fileID, int numOfPages, int numOfRecords)
+    {
+        RandomAccessFile raf;
+        try {
+            raf = new RandomAccessFile(new_table, "rw");
+
+            byte[] bytes = new byte[0];
+
+        //   bytes= Type.concat(bytes, Type.convertIntToByteArray(fileID));
+            bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfPages));
+        //   bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfRecords));
+        
+
+            
+            raf.write(bytes);
+            raf.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

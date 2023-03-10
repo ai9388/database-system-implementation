@@ -15,7 +15,7 @@ public class Parser {
     public StorageManager storageManager;
     public String dbName;
 
-    public Parser(String dbName, String dbLocation) {
+    public Parser(String dbName, String dbLocation, int pageSize, int bufferSize) {
         // TODO: hai-yen
         this.dbName = dbName;
         this.dbLocation = dbLocation;
@@ -51,19 +51,6 @@ public class Parser {
             // System.out.println("Invalid Command.");
             command = commands.EMPTY;
         }
-    }
-
-    /**
-     * Args need to be saved to pass into catalog
-     */
-    public void saveArgs(String[] args) {
-        this.dbLocation = args[0];
-
-        this.pageSize = Integer.parseInt(args[1]);
-        //storageManager.setPageSize(this.pageSize); value passed in constructor
-        Page.setCapacity(pageSize);
-        this.bufferSize = Integer.parseInt(args[2]);
-        //storageManager.setBufferSize(this.bufferSize); value passed in constructor
     }
 
     /**
@@ -174,15 +161,6 @@ public class Parser {
                         System.out.println(attributes.toString());
                         try {
                             storageManager.createTable(table_name, attributes);
-                            String tablePath = dbLocation;
-                            if (dbLocation.contains("\\")) {
-                                tablePath += "\\" + table_name;
-                            } else {
-                                tablePath += "/" + table_name;
-                            }
-                            File new_table = new File(tablePath);
-                            storageManager.addIntialInfoToTable(new_table, 0, 0, 0);
-
                             System.out.println("SUCCESS! You've created " + table_name);
                         } catch (Exception pke) {
                             System.out.println(pke.getMessage());
