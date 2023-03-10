@@ -42,6 +42,7 @@ public class Catalog {
             RandomAccessFile raFile = new RandomAccessFile(file, READ);
             raFile.seek(0);
             int numOfTables = raFile.readInt();
+            TableSchema.setLASTTABLEID(numOfTables);
 
             for (int i = 0; i < numOfTables; i++) {
                 TableSchema t = createTableSchemaObjectFromBytes(raFile);
@@ -61,10 +62,10 @@ public class Catalog {
      * @param pageID
      * @return
      */
-    public Page readIndividualPageFromMemory(String tableName, int pageID)
+    public static Page readIndividualPageFromMemory(String path, String tableName, int pageID, int pageSize, ArrayList<Attribute> attributes)
     {
         try {
-            String tablePath = this.path;
+            String tablePath = path;
             if (path.contains("\\")) {
                 tablePath += "\\" + tableName;
             } else {
@@ -78,12 +79,11 @@ public class Catalog {
 
             // seeking to the page number
             // i.e trying to find page 4 means we have to seek pageSize * 4
-            raFile.seek(pageID * this.pageSize);
+            raFile.seek(pageID * pageSize);
             raFile.seek(4);
 
             int numberOfRecords = raFile.readInt();
             ArrayList<Record> records = new ArrayList<>();
-            ArrayList<Attribute> attributes = this.tableNameToTableSchema.get(tableName).getAttributes();
 
             // iterating over the individual records
             for (int j = 0; j < numberOfRecords; j++) {
@@ -152,6 +152,7 @@ public class Catalog {
         // first getting the number of pages from table file
         try {
             int numOfPages = raFile.readInt();
+            PageBuffer.setLASTTABLEID(numOfPages);
 
             // iterating over all the pages in the file
             for (int i = 0; i < numOfPages; i++) {
