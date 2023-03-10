@@ -185,8 +185,8 @@ public class StorageManager {
     public void writeToCatalog()
     {
         this.catalog.setTables(db.getTables());
-        byte[] bb = this.catalog.createCatalog();
-        this.catalog.writeToCatalogFile(bb);
+        byte[] bb = this.catalog.createBytesForCatalog();
+        this.catalog.writeBytesToCatalogFile(bb);
         this.catalog.readCatalog();
     }
 
