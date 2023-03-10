@@ -18,12 +18,18 @@ public class PageBuffer {
      * TODO: maybe set from catalog
      */
     private static int LASTPAGEID;
+
     private HashSet<TableSchema> tables;
     public PageBuffer(String dbPath, int bufferSize, int pageSize){
         PageBuffer.dbPath = dbPath;
         this.bufferSize = bufferSize;
         Page.setCapacity(pageSize);
         this.tables = new HashSet<>();
+    }
+
+    public static void setLASTTABLEID(int id)
+    {
+        PageBuffer.LASTPAGEID = id;
     }
 
     public int getNextPageID(){
