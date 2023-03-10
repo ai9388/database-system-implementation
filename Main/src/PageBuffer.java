@@ -10,7 +10,7 @@ public class PageBuffer {
 
     private int totalPages;
 
-    private String dbPath;
+    private static String dbPath;
 
 
     /**
@@ -20,7 +20,7 @@ public class PageBuffer {
     private static int LASTPAGEID;
     private HashSet<TableSchema> tables;
     public PageBuffer(String dbPath, int bufferSize, int pageSize){
-        this.dbPath = dbPath;
+        PageBuffer.dbPath = dbPath;
         this.bufferSize = bufferSize;
         Page.setCapacity(pageSize);
         this.tables = new HashSet<>();
@@ -181,24 +181,50 @@ public class PageBuffer {
      * @param page the page to write to mem
      * @return bool, true if successful
      */
-    public boolean writePage(String dbPath, Page page){
+    public boolean writePage(Page page){
         String tableName = getTableName(page.getId());
         // TODO: serialize @ hai-yen
         //get the table path, then call the page to byte from Pages
         //get the order of the pages from the table
         //add new page: get# of pages to skip there #pages X page size
         //update: have the order of pages in tableschema and then update
-        //randomaccessfile can't add on, only overwrite
         File tableFile = new File(dbPath + "/" + tableName);
         RandomAccessFile raf;
         try {
             raf = new RandomAccessFile(tableFile, "rw");
 
-            byte[] bytes = new byte[0];
+            byte[] bytes = new byte[Page.getCapacity()];
             bytes = page.getPageAsBytes().array();
             
             raf.seek(raf.length());
             raf.write(bytes);
+
+            //need up to figure out the update
+            raf.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updatePage(Page page){
+        String tableName = getTableName(page.getId());
+        // TODO: serialize @ hai-yen
+        //update: have the order of pages in tableschema and then update
+        //Future hai-yen: in the future, the page order will be diffrent bc we will delete page
+        File tableFile = new File(dbPath + "/" + tableName);
+        RandomAccessFile raf;
+        try {
+            raf = new RandomAccessFile(tableFile, "rw");
+
+            byte[] bytes = new byte[Page.getCapacity()];
+            bytes = page.getPageAsBytes().array();
+            
+            int skip = page.getId() * Page.getCapacity();
+            raf.seek(skip);
+            raf.write(bytes);
+
+            //need up to figure out the update
             raf.close();
         } catch (Exception e) {
             e.printStackTrace();
