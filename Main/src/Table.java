@@ -205,7 +205,7 @@ public class Table {
         this.recordsByPK.put(record.getValueAtColumn(primaryIndex), record);
         // if there are no pages create one
         if (this.pages.size() == 0) {
-            Page page = new Page(this.primaryIndex);
+            Page page = new Page(this.primaryIndex, 1);
             this.pages.add(page);
         }
         addRecordToPage(record);
@@ -424,7 +424,7 @@ public class Table {
                 break;
             }
             // does the record belong in this page?
-            int index = page.addRecordInOrder(r);
+            int index = 0;
             if (index > -1) {
                 page.insertRecordAt(r, index);
                 inserted = true;
@@ -439,7 +439,7 @@ public class Table {
             }
             // if the addition overflows the page split
             if (page.overflow()) {
-                pages.add(i + 1, page.split());
+                pages.add(i + 1, page.split(0));
                 inserted = true;
             }
             if(inserted){

@@ -1,13 +1,21 @@
 import java.util.*;
 import java.io.File;
 
+import static java.lang.System.exit;
+
 public class Main {
 
     public static void main(String[] args) throws Exception {
+        args = new String[]{"Main/db/", "100", "15"};
+
+        if(args.length != 3){
+            System.out.println("Usage: Filename, Page Size, Buffer Size");
+            exit(0);
+        }
 
         String dbPath = args[0];
-        String pageSize = args[1];
-        String buffSize = args[2];
+        int pageSize = Integer.parseInt(args[1]);
+        int buffSize = Integer.parseInt(args[2]);
 
         System.out.println("Welcome to 11QL....");
 
@@ -53,9 +61,7 @@ public class Main {
         Scanner userInput = new Scanner(System.in);
         
         // parser object for this session
-        Parser parser = new Parser(directory.getName(), dbPath);
-        // save the user provided arguments
-        parser.saveArgs(args);
+        Parser parser = new Parser(directory.getName(), dbPath, pageSize, buffSize);
         // looping until <quit> is taken in
         
         

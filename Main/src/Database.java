@@ -30,6 +30,7 @@ public class Database {
     public Database(String name, String path){
         this.name = name;
         this.path = path;
+        setTables(null);
     }
 
     /**
@@ -84,7 +85,7 @@ public class Database {
      * @return a collection of all the tables
      */
     public ArrayList<TableSchema> getTables() {
-        return new ArrayList<>(tables.values());
+        return new ArrayList<>(this.tables.values());
     }
 
     /**
@@ -94,7 +95,7 @@ public class Database {
      */
     public TableSchema getTable(String name) throws TableException{
         try {
-            return tables.get(name);
+            return this.tables.get(name);
         } catch (NullPointerException e) {
             throw new TableException(2, name);
         }
@@ -108,6 +109,10 @@ public class Database {
     public void setTables(ArrayList<TableSchema> tables) {
         this.tables = new HashMap<>();
         this.tablesID = new HashMap<>();
+
+        if(tables == null){
+            return;
+        }
         for(TableSchema table: tables){
             this.tables.put(table.getName(),table);
             this.tablesID.put(table.getTableID(), table);

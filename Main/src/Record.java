@@ -1,3 +1,4 @@
+import java.nio.ByteBuffer;
 import java.util.*;
 
 public class Record implements Comparable<Record>{
@@ -7,6 +8,8 @@ public class Record implements Comparable<Record>{
     private ArrayList<Object> entries;
     private int pkid;
     private int size;
+
+    ArrayList<Attribute> attr;
 
     public Record(ArrayList<String> values, ArrayList<Attribute> attr) {
         this.entries = new ArrayList<>();
@@ -32,6 +35,7 @@ public class Record implements Comparable<Record>{
                     break;
                 case VARCHAR:
                     entries.add(value);
+                    size += Integer.BYTES;
                     size += (Character.BYTES * value.length());
                     break;
                 case CHAR:
@@ -40,6 +44,8 @@ public class Record implements Comparable<Record>{
                     break;
             }
         }
+
+        this.attr = attr;
     }
 
     public Record(ArrayList<Object> entries){
@@ -96,7 +102,7 @@ public class Record implements Comparable<Record>{
         String str = "";
         for (Object entry : this.entries) 
         {
-            str += String.valueOf(entry) + ", ";
+            str += entry + ", ";
         }
         return "("  + str + "): " + this.size + " bytes";
     }
@@ -124,6 +130,43 @@ public class Record implements Comparable<Record>{
                 Type.concat(bb, Type.convertStringToByteArray( (String) entry));
             }
         }
+        return bb;
+    }
+
+    public ByteBuffer getRecordAsBytes()
+    {
+        ByteBuffer bb = ByteBuffer.allocate(this.size);
+        for (int i = 0; i < entries.size(); i++)
+        {
+            Object entry = entries.get(i);
+            if (entry instanceof Integer)
+            {
+                bb.putInt((int)entry);
+            }
+            else if (entry instanceof Double)
+            {
+                bb.putDouble((double)entry);
+            }
+            else if (entry instanceof Boolean)
+            {
+                boolean temp = (boolean)entry;
+                bb.put((byte)(temp? 1 : 0));
+            }
+            else if (entry instanceof String word)
+            {
+                if(attr.get(i).getType() == Type.VARCHAR) {
+                    // add the length of the string plus its
+                    bb.putInt(word.length());
+                }
+
+                // for char it does not matter
+                for(int x = 0; x < word.length(); x++){
+                    char c = word.charAt(x);
+                    bb.putChar(c);
+                }
+            }
+        }
+
         return bb;
     }
 
@@ -156,8 +199,7 @@ public class Record implements Comparable<Record>{
     @Override
     public boolean equals(Object obj) {
         boolean res = false;
-        if(obj instanceof Record){
-            Record r = (Record)obj;
+        if(obj instanceof Record r){
             res = this.compareTo(r) == 0;
         }
         return res;

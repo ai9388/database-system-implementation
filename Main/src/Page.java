@@ -1,3 +1,4 @@
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -114,9 +115,9 @@ public class Page {
         return otherPage;
     }
 
-    public byte[] getPageAsBytes(){
-        return Type.concat(getHeader(), recordsAsBytes());
-    }
+//    public byte[] getPageAsBytes(){
+//        return Type.concat(getHeader(), recordsAsBytes());
+//    }
 
     public void insertRecordAt(Record record, int index){
         this.records.add(index, record);
@@ -166,5 +167,30 @@ public class Page {
             str2 += r + "\n";
         }
         return str0 + str + str2 + str0;
+    }
+
+    public ByteBuffer getPageAsBytes(){
+
+        // number of records + page id + total bytes for all records
+        int bufferContent = Integer.BYTES + this.size;
+        bufferContent += Integer.BYTES;
+
+        // allocate space based on the page size
+        ByteBuffer bb = ByteBuffer.allocate(capacity + 8);
+
+        // put the size
+        bb.putInt(this.id);
+        // put the number of records
+        bb.putInt(getNumOfRecords());
+
+        // put all the record
+        for(Record r : records){
+            ByteBuffer bbf = r.getRecordAsBytes();
+            bbf.position(0);
+            bb.put(bbf);
+        }
+        System.out.println(bb.array().length);
+
+        return bb;
     }
 }

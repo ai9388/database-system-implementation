@@ -57,6 +57,7 @@ public class StorageManager {
      */
     public void createTable(String tableName, ArrayList<Attribute> attributes) throws TableException{
         db.createTable(tableName, attributes);
+        catalog.createTableFile(tableName);
     }
 
     /***
@@ -76,8 +77,8 @@ public class StorageManager {
      */
     public void displaySchema(){
         System.out.println("DB location: " + dbPath);
-        System.out.println("Page Size: " + pageSize);
-        System.out.println("Buffer Size: " + bufferSize);
+        System.out.println("Page Size: " + this.pageSize);
+        System.out.println("Buffer Size: " + this.bufferSize);
         System.out.println();
         
         ArrayList<TableSchema> tables = db.getTables();
@@ -102,14 +103,6 @@ public class StorageManager {
         System.out.println(table.displayTableSchema());
     }
 
-    public String selectFromTable(String tableName, String[] columns) throws TableException{
-        if (db.getTable(tableName) == null) {
-            throw new TableException(2, tableName);
-        } else {
-            return db.selectFromTable(tableName, columns);
-        }
-    }
-
     /***
      * Get record from the table using primary key
      * @param table the table we're getting the record from
@@ -125,13 +118,17 @@ public class StorageManager {
     }
 
     /***
-     * TODO this is Kind of like select. could be renamed
      * get all records for a given table number
-     * @param tableNumber the table name
+     * @param tableName the table name
      * @return an arraylist of records
      */
-    public ArrayList<Record> getAllRecords(int tableNumber){
-        return null;
+    private ArrayList<Record> loadRecords(TableSchema table){
+
+        ArrayList<Record> records = null;
+
+        records = pageBuffer.getRecords(table);
+
+        return records;
     }
 
     /**
@@ -186,8 +183,8 @@ public class StorageManager {
     public void writeToCatalog()
     {
         this.catalog.setTables(db.getTables());
-        byte[] bb = this.catalog.createCatalog();
-        this.catalog.writeToCatalogFile(bb);
+        byte[] bb = this.catalog.createBytesForCatalog();
+        this.catalog.writeBytesToCatalogFile(bb);
         this.catalog.readCatalog();
     }
 

@@ -12,16 +12,24 @@ public class PageBuffer {
 
     private String dbPath;
 
+
     /**
      * id used as reference when assigning pageID
      * TODO: maybe set from catalog
      */
     private static int LASTPAGEID;
+
     private HashSet<TableSchema> tables;
     public PageBuffer(String dbPath, int bufferSize, int pageSize){
         this.dbPath = dbPath;
         this.bufferSize = bufferSize;
         Page.setCapacity(pageSize);
+        this.tables = new HashSet<>();
+    }
+
+    public static void setLASTTABLEID(int id)
+    {
+        PageBuffer.LASTPAGEID = id;
     }
 
     public int getNextPageID(){
@@ -76,7 +84,7 @@ public class PageBuffer {
             // remove the top from the queue if full
             Page oldPage = activePages.poll();
             // write the old page to storage
-            writePage(dbPath, oldPage);
+            writePage(oldPage);
         }
 
         // add the new page to active pages
@@ -121,6 +129,7 @@ public class PageBuffer {
 
             // initially not inserted into page
             if(inserted && !split){
+                tables.add(tableSchema);
                 break;
             }
 
@@ -164,13 +173,13 @@ public class PageBuffer {
      * @param id the page id
      * @return the name of the table
      */
-    public String getTableName(int id){
+    public TableSchema getTableName(int id){
         for(TableSchema table: tables){
             if(table.getPageIds().contains(id)){
-                return table.getName();
+                return table;
             }
         }
-        return "";
+        return null;
     }
 
     /**
@@ -178,20 +187,56 @@ public class PageBuffer {
      * @param page the page to write to mem
      * @return bool, true if successful
      */
-    public boolean writePage(String dbPath, Page page){
-        String tableName = getTableName(page.getId());
+    public boolean writePage(Page page){
+        TableSchema table = getTableName(page.getId());
+        String tableName = table.getName();
         // TODO: serialize @ hai-yen
         //get the table path, then call the page to byte from Pages
+        //get the order of the pages from the table
+        //add new page: get# of pages to skip there #pages X page size
+        //update: have the order of pages in tableschema and then update
         File tableFile = new File(dbPath + "/" + tableName);
         RandomAccessFile raf;
         try {
             raf = new RandomAccessFile(tableFile, "rw");
 
-            byte[] bytes = new byte[0];
-
-            bytes =Type.concat(bytes, page.getPageAsBytes());
-
+            byte[] bytes = new byte[Page.getCapacity()];
+            bytes = page.getPageAsBytes().array();
+            
+            
+            raf.seek(raf.length());
             raf.write(bytes);
+
+            //need up to figure out the update
+            raf.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updatePage(Page page){
+        TableSchema table = getTableName(page.getId());
+        String tableName = table.getName();
+        // TODO: serialize @ hai-yen
+        //update: have the order of pages in tableschema and then update
+        //Future hai-yen: in the future, the page order will be diffrent bc we will delete
+        File tableFile = new File(dbPath + "/" + tableName);
+        RandomAccessFile raf;
+        try {
+            raf = new RandomAccessFile(tableFile, "rw");
+
+            byte[] bytes = new byte[Page.getCapacity()];
+            bytes = page.getPageAsBytes().array();
+            
+            //skip to certain pointer for the page
+            int numPages = table.getNumberOfPages();
+            raf.writeInt(numPages);
+            int skip = (page.getId()-1) * Page.getCapacity();
+            raf.seek(skip);
+            raf.write(bytes);
+
+            //need up to figure out the update
             raf.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -217,6 +262,23 @@ public class PageBuffer {
         return new ArrayList<>(this.activePages);
     }
 
+    /**
+     * Gets all the pages of a specific table from memory
+     * @param table the table object where pages are read from
+     * @return an arraylist of records
+     */
+    public ArrayList<Record> getRecords(TableSchema table){
+        ArrayList<Record> records = new ArrayList<>();
+
+        // iterate all the page ID's to get the pages
+        for(Integer pageID : table.getPageIds()){
+            Page page = Catalog.readIndividualPageFromMemory(dbPath, table.getName(), pageID, Page.getCapacity(), table.getAttributes());
+            records.addAll(page.getRecords());
+        }
+
+        return records;
+    }
+
     public String displayPages(){
         String str = "";
         for(Page page: activePages){
@@ -225,4 +287,13 @@ public class PageBuffer {
 
         return str;
     }
+
+    //TODO: Hai-Yen: writing pages to table fully
+    public void purge()
+    {
+        for(Page page: activePages){
+            updatePage(page);
+        }
+    }
+
 }
