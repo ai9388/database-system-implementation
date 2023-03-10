@@ -223,8 +223,8 @@ public class PageTest {
     @Test
     public void testWritePage(){
         String path = "Main/db/";
-        pb.writePage(path, pb.getPages().get(0));
-        pb.writePage(path, pb.getPages().get(1));
+        pb.writePage(pb.getPages().get(0));
+        pb.writePage(pb.getPages().get(1));
     }
 
 

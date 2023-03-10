@@ -78,7 +78,7 @@ public class PageBuffer {
             // remove the top from the queue if full
             Page oldPage = activePages.poll();
             // write the old page to storage
-            writePage(dbPath, oldPage);
+            writePage(oldPage);
         }
 
         // add the new page to active pages

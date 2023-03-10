@@ -57,6 +57,7 @@ public class StorageManager {
      */
     public void createTable(String tableName, ArrayList<Attribute> attributes) throws TableException{
         db.createTable(tableName, attributes);
+        catalog.createTableFile(tableName);
     }
 
     /***

@@ -22,7 +22,7 @@ public class ParserTest {
     @Before
     public void setupParser(){
         String dbname = "school";
-        String path = "./Main/db/school";
+        String path = "./Main/" + dbname;
         int pageSize = 100;
         int bufferSize = 15;
         this.parser = new Parser(dbname, path, pageSize, bufferSize);

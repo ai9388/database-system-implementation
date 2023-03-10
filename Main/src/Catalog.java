@@ -328,6 +328,13 @@ public class Catalog {
 
     public void createTableFile(String tableName)
     {
-        //TODO: create physical file into 
+        File dir = new File(path);
+        File file = new File(path + "/" + tableName);
+        dir.mkdirs();
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
