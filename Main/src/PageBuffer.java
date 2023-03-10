@@ -10,7 +10,7 @@ public class PageBuffer {
 
     private int totalPages;
 
-    private static String dbPath;
+    private String dbPath;
 
 
     /**
@@ -21,7 +21,7 @@ public class PageBuffer {
 
     private HashSet<TableSchema> tables;
     public PageBuffer(String dbPath, int bufferSize, int pageSize){
-        PageBuffer.dbPath = dbPath;
+        this.dbPath = dbPath;
         this.bufferSize = bufferSize;
         Page.setCapacity(pageSize);
         this.tables = new HashSet<>();
@@ -260,6 +260,23 @@ public class PageBuffer {
      */
     public ArrayList<Page> getPages(){
         return new ArrayList<>(this.activePages);
+    }
+
+    /**
+     * Gets all the pages of a specific table from memory
+     * @param table the table object where pages are read from
+     * @return an arraylist of records
+     */
+    public ArrayList<Record> getRecords(TableSchema table){
+        ArrayList<Record> records = new ArrayList<>();
+
+        // iterate all the page ID's to get the pages
+        for(Integer pageID : table.getPageIds()){
+            Page page = Catalog.readIndividualPageFromMemory(dbPath, table.getName(), pageID, Page.getCapacity(), table.getAttributes());
+            records.addAll(page.getRecords());
+        }
+
+        return records;
     }
 
     public String displayPages(){

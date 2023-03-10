@@ -166,10 +166,8 @@ public class Table {
             throw new TableException(3, "");
         }
         if (Type.validateAll(values, attributes)) {
-            ArrayList<Integer> uniqueAttributes = this.uniqueAttribute(attributes);
-            if (uniqueAttributes.size() > 0) {
-                this.checkUniqueness(values, uniqueAttributes, attributes);
-            }
+
+
             Record record = new Record(new ArrayList<String>(Arrays.asList(values)), attributes);
             this.insertRecord(record);
             return true;
@@ -177,29 +175,6 @@ public class Table {
             // creation of record failed
             throw new InvalidDataTypeException(values, attributes);
         }
-    }
-
-    private void checkUniqueness(String[] values, ArrayList<Integer> uniqueAttributes, ArrayList<Attribute> attributes) throws TableException, UniqueException {
-        for (Integer unique: uniqueAttributes) {
-            for (Record record: records) {
-                Object valueAtUnique = record.getValueAtColumn(unique);
-                for (String value: values) {
-                    if (valueAtUnique.equals(value)) {
-                        throw new UniqueException(1,"");
-                    }
-                }
-            }
-        }
-    }
-
-    private ArrayList<Integer> uniqueAttribute(ArrayList<Attribute> attributes) {
-        ArrayList<Integer> uniqueAttributes = new ArrayList<>();
-        for (int i = 0; i < attributes.size(); i++) {
-            if (attributes.get(i).getUnique() && !attributes.get(i).isIsPrimaryKey()) {
-                uniqueAttributes.add(i);
-            }
-        }
-        return uniqueAttributes;
     }
 
     /**

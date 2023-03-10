@@ -81,7 +81,11 @@ public class Parser {
                             case "char" -> {
                                 for (int i = 3; i < components.length; i++) {
                                     switch (components[i]) {
-                                        case "primarykey" -> primarykey = true;
+                                        case "primarykey" -> {
+                                            primarykey = true;
+                                            notNull = true;
+                                            unique = true;
+                                        }
                                         case "notnull" -> notNull = true;
                                         case "unique" -> unique = true;
                                     }
@@ -96,7 +100,11 @@ public class Parser {
                             case "varchar" -> {
                                 for (int i = 3; i < components.length; i++) {
                                     switch (components[i]) {
-                                        case "primarykey" -> primarykey = true;
+                                        case "primarykey" -> {
+                                            primarykey = true;
+                                            notNull = true;
+                                            unique = true;
+                                        }
                                         case "notnull" -> notNull = true;
                                         case "unique" -> unique = true;
                                     }
@@ -110,7 +118,11 @@ public class Parser {
                             case "bool" -> {
                                 for (int i = 2; i < components.length; i++) {
                                     switch (components[i]) {
-                                        case "primarykey" -> primarykey = true;
+                                        case "primarykey" -> {
+                                            primarykey = true;
+                                            notNull = true;
+                                            unique = true;
+                                        }
                                         case "notnull" -> notNull = true;
                                         case "unique" -> unique = true;
                                     }
@@ -124,7 +136,11 @@ public class Parser {
                             case "integer" -> {
                                 for (int i = 2; i < components.length; i++) {
                                     switch (components[i]) {
-                                        case "primarykey" -> primarykey = true;
+                                        case "primarykey" -> {
+                                            primarykey = true;
+                                            notNull = true;
+                                            unique = true;
+                                        }
                                         case "notnull" -> notNull = true;
                                         case "unique" -> unique = true;
                                     }
@@ -138,7 +154,11 @@ public class Parser {
                             case "double" -> {
                                 for (int i = 2; i < components.length; i++) {
                                     switch (components[i]) {
-                                        case "primarykey" -> primarykey = true;
+                                        case "primarykey" -> {
+                                            primarykey = true;
+                                            notNull = true;
+                                            unique = true;
+                                        }
                                         case "notnull" -> notNull = true;
                                         case "unique" -> unique = true;
                                     }
@@ -187,6 +207,7 @@ public class Parser {
                     String[] vals = input.split(",");
                     try {
                         for (String value : vals) {
+
                             String[] values = value.replaceAll("[();]", "").strip().split(" ");
                             storageManager.insertRecord(table_name, values);
                         }
@@ -260,12 +281,12 @@ public class Parser {
     }
 
     private void select(String attr, String tableName) throws TableException {
-        if (attr.equals("*")) {
-            System.out.println(storageManager.selectFromTable(tableName, null));
-        } else {
-            String[] columns = attr.strip().split(",");
-            System.out.println(storageManager.selectFromTable(tableName, columns));
-        }
+//        if (attr.equals("*")) {
+//            System.out.println(storageManager.selectFromTable(tableName, null));
+//        } else {
+//            String[] columns = attr.strip().split(",");
+//            System.out.println(storageManager.selectFromTable(tableName, columns));
+//        }
     }
 
     public void displayHelp() {

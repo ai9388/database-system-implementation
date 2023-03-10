@@ -361,9 +361,13 @@ public class Catalog {
     {
         File dir = new File(path);
         File file = new File(path + "/" + tableName);
+        RandomAccessFile rand = null;
         dir.mkdirs();
         try {
             file.createNewFile();
+            rand = new RandomAccessFile(file, "rw");
+            rand.writeInt(0); // this table has 0 pages when first created
+            rand.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

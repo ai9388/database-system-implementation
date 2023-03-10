@@ -103,14 +103,6 @@ public class StorageManager {
         System.out.println(table.displayTableSchema());
     }
 
-    public String selectFromTable(String tableName, String[] columns) throws TableException{
-        if (db.getTable(tableName) == null) {
-            throw new TableException(2, tableName);
-        } else {
-            return db.selectFromTable(tableName, columns);
-        }
-    }
-
     /***
      * Get record from the table using primary key
      * @param table the table we're getting the record from
@@ -126,13 +118,17 @@ public class StorageManager {
     }
 
     /***
-     * TODO this is Kind of like select. could be renamed
      * get all records for a given table number
-     * @param tableNumber the table name
+     * @param tableName the table name
      * @return an arraylist of records
      */
-    public ArrayList<Record> getAllRecords(int tableNumber){
-        return null;
+    private ArrayList<Record> loadRecords(TableSchema table){
+
+        ArrayList<Record> records = null;
+
+        records = pageBuffer.getRecords(table);
+
+        return records;
     }
 
     /**
@@ -143,14 +139,16 @@ public class StorageManager {
      * @throws InvalidDataTypeException if the types provided in the record info are invalid
      * @throws PrimaryKeyException if the primary key isn't valid or if repeated
      */
-    public void insertRecord(String tableName, String[] recordInfo) throws TableException, InvalidDataTypeException, PrimaryKeyException, UniqueException{
+    public void insertRecord(String tableName, String[] recordInfo) throws TableException, InvalidDataTypeException, PrimaryKeyException, UniqueException {
         TableSchema table = db.getTable(tableName);
         Record record = null;
         if (table == null) {
             throw new TableException(2, tableName);
         }
         record = db.validateRecord(table, recordInfo);
-        // TODO: validate the primary key uniqueness
+        ArrayList<Record> records = null;
+        // Todo: get records
+        db.checkUniqueness(record, db.uniqueAttribute(table.getAttributes()), records);
         if(record != null){
             pageBuffer.insertRecord(table, record);
         }
@@ -221,7 +219,6 @@ public class StorageManager {
      */
     public void dropTable(String table_name) throws TableException {
         db.dropTable(table_name);
-            //throw new TableException(2, table_name)
     }
 
     /**
