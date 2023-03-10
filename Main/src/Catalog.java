@@ -77,6 +77,29 @@ public class Catalog {
     }
 
     /**
+     * Checks to see if the catalog file initially exists
+     * This is used to determine whether we have to read the existing catalog or not
+     */
+    public boolean checkExistance()
+    {
+        String catalogPath = this.path;
+        if (this.path.contains("\\")) 
+        {
+            catalogPath += "\\Catalog";
+        } else {
+            catalogPath += "/Catalog";
+        }
+
+        File catalogFile = new File(catalogPath);
+        
+        if (catalogFile.exists() && !catalogFile.isDirectory()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Goes through the physical table file and seeks through memory to get an
      * individual page
      * 

@@ -20,6 +20,11 @@ public class StorageManager {
         this.dbPath = dbPath;
         this.pageSize = pageSize;
         this.pageBuffer = new PageBuffer(dbPath, bufferSize, pageSize);
+
+        if (this.catalog.checkExistance())
+        {
+            this.catalog.readCatalog();
+        }
     }
 
     /**
@@ -185,7 +190,6 @@ public class StorageManager {
         this.catalog.setTables(db.getTables());
         byte[] bb = this.catalog.createBytesForCatalog();
         this.catalog.writeBytesToCatalogFile(bb);
-        this.catalog.readCatalog();
     }
 
     /**
