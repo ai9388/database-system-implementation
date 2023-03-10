@@ -99,7 +99,7 @@ public class PageTest {
 
         // write the pages
         for(Page p: pb.getPages()){
-            byte[] bytePage = p.getPageAsBytess().array();
+            byte[] bytePage = p.getPageAsBytes().array();
             rand.write(bytePage);
         }
 
