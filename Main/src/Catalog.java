@@ -39,27 +39,34 @@ public class Catalog {
 
             File file = new File(catalogPath);
 
-            RandomAccessFile raFile = new RandomAccessFile(file, READ);
-            raFile.seek(0);
-            int numOfTables = raFile.readInt();
+            RandomAccessFile catalogRAFile = new RandomAccessFile(file, READ);
+            catalogRAFile.seek(0);
+            int numOfTables = catalogRAFile.readInt();
             TableSchema.setLASTTABLEID(numOfTables);
 
             for (int i = 0; i < numOfTables; i++) {
-                TableSchema t = createTableSchemaObjectFromBytes(raFile);
+                // first create the table schema for the class
+                TableSchema t = createTableSchemaObjectFromBytes(catalogRAFile);
                 
+                // add the table schema to the hashmap
+                tables.add(t);
                 tableNameToTableSchema.put(t.getName(), t);
             }
-
         } catch (IOException e) {
             System.out.println("File doesnt exist.");
             e.printStackTrace();
         }
     }
-
+    
     /**
-     * Goes through the physical table file and seeks through memory to get an individual page
-     * @param tableName
-     * @param pageID
+     * Goes through the physical table file and seeks through memory to get an
+     * individual page
+     * 
+     * @param path path for the table file
+     * @param tableName name of the table to get the page from
+     * @param pageID id of the page we need
+     * @param pageSize given page size from user to 
+     * @param attributes attributes to know when to create 
      * @return
      */
     public static Page readIndividualPageFromMemory(String path, String tableName, int pageID, int pageSize, ArrayList<Attribute> attributes)
