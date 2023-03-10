@@ -219,7 +219,6 @@ public class StorageManager {
      */
     public void dropTable(String table_name) throws TableException {
         db.dropTable(table_name);
-            //throw new TableException(2, table_name)
     }
 
     /**

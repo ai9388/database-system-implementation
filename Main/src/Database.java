@@ -211,6 +211,7 @@ public class Database {
     public void dropAttribute(String attribute_name, String table_name) throws TableException {
         TableSchema table = this.getTable(table_name); // throws except. if table name invalid
         table.removeAttribute(attribute_name); // throws exception if column name invalid
+        // TODO: get records and remove the attribute from those records
 //        this.tables.remove(table_name);
 //        this.tablesID.remove(table.getTableID());
 //        this.tables.put(table_name, table);
@@ -228,6 +229,7 @@ public class Database {
     public void addAttribute(Attribute attribute, String value, String table_name) throws TableException {
         TableSchema table = this.getTable(table_name);
         table.addAttribute(attribute);
+        // TODO: get records and add the attribute to those records with the default [value]
     }
 
 }
