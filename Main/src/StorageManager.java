@@ -142,14 +142,16 @@ public class StorageManager {
      * @throws InvalidDataTypeException if the types provided in the record info are invalid
      * @throws PrimaryKeyException if the primary key isn't valid or if repeated
      */
-    public void insertRecord(String tableName, String[] recordInfo) throws TableException, InvalidDataTypeException, PrimaryKeyException, UniqueException{
+    public void insertRecord(String tableName, String[] recordInfo) throws TableException, InvalidDataTypeException, PrimaryKeyException, UniqueException {
         TableSchema table = db.getTable(tableName);
         Record record = null;
         if (table == null) {
             throw new TableException(2, tableName);
         }
         record = db.validateRecord(table, recordInfo);
-        // TODO: validate the primary key uniqueness
+        ArrayList<Record> records = null;
+        // Todo: get records
+        db.checkUniqueness(record, db.uniqueAttribute(table.getAttributes()), records);
         if(record != null){
             pageBuffer.insertRecord(table, record);
         }

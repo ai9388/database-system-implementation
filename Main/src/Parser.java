@@ -209,6 +209,7 @@ public class Parser {
                     String[] vals = input.split(",");
                     try {
                         for (String value : vals) {
+
                             String[] values = value.replaceAll("[();]", "").strip().split(" ");
                             storageManager.insertRecord(table_name, values);
                         }
