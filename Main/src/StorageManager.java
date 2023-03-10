@@ -57,7 +57,6 @@ public class StorageManager {
      */
     public void createTable(String tableName, ArrayList<Attribute> attributes) throws TableException{
         db.createTable(tableName, attributes);
-        
     }
 
     /***
@@ -191,11 +190,28 @@ public class StorageManager {
     }
 
     /**
-      * calls the page buffer to write all pages to memory
+      * adding the initial information to the file
+      * this includes the file id, number of pages, and number of records
       */
-    public void writeUpdatePages()
+    public void addIntialInfoToTable(File new_table, int fileID, int numOfPages, int numOfRecords)
     {
-        pageBuffer.purge();
+        RandomAccessFile raf;
+        try {
+            raf = new RandomAccessFile(new_table, "rw");
+
+            byte[] bytes = new byte[0];
+
+        //   bytes= Type.concat(bytes, Type.convertIntToByteArray(fileID));
+            bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfPages));
+        //   bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfRecords));
+        
+
+            
+            raf.write(bytes);
+            raf.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

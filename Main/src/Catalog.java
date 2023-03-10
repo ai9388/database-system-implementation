@@ -1,7 +1,8 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
+import java.util.*;
 
 public class Catalog {
 
@@ -17,6 +18,7 @@ public class Catalog {
     private final String path;
     private final int pageSize;
     private ArrayList<TableSchema> tables;
+    private HashMap<String, TableSchema> tableNameToTableSchema;
     public RandomAccessFile raf;
 
     public Catalog(String path, int pageSize) {
@@ -41,7 +43,8 @@ public class Catalog {
 
             for (int i = 0; i < numOfTables; i++) {
                 TableSchema t = createTableFromBytes(raFile);
-                //readTableFromBytes(t.getName());
+                
+                tableNameToTableSchema.put(t.getName(), t);
             }
 
         } catch (IOException e) {
@@ -50,31 +53,84 @@ public class Catalog {
         }
     }
 
-    // public Table readTableFromBytes(String tableName)
-    // {
-    //     try {
-    //         String tablePath = this.path;
-    //         if (path.contains("\\")) {
-    //             tablePath += "\\" + tableName;
-    //         } else {
-    //             tablePath += "/" + tableName;
-    //         }
+    public Page readIndividualPageFromMemory(String tableName, int pageID)
+    {
+        try {
+            String tablePath = this.path;
+            if (path.contains("\\")) {
+                tablePath += "\\" + tableName;
+            } else {
+                tablePath += "/" + tableName;
+            }
 
-    //         File file = new File(tablePath);
+            File file = new File(tablePath);
+            RandomAccessFile raFile = new RandomAccessFile(file, READ);
+            // passing the number of tables in file
+            raFile.seek(4);
 
-    //         RandomAccessFile raFile = new RandomAccessFile(file, READ);
-    //         raFile.seek(0);
-    //         int numOfTables = raFile.readInt();
+            // seeking to the page number
+            // i.e trying to find page 4 means we have to seek pageSize * 4
+            raFile.seek(pageID * this.pageSize);
+            raFile.seek(4);
 
-    //         for (int i = 0; i < numOfTables; i++) {
-    //             createTableFromBytes(raFile);
-    //         }
+            int numberOfRecords = raFile.readInt();
+            ArrayList<Record> records = new ArrayList<>();
+            ArrayList<Attribute> attributes = this.tableNameToTableSchema.get(tableName).getAttributes();
 
-    //     } catch (IOException e) {
-    //         System.out.println("File doesnt exist.");
-    //         e.printStackTrace();
-    //     }
-    // }
+            // iterating over the individual records
+            for (int j = 0; j < numberOfRecords; j++) {
+                ArrayList<Object> recordData = new ArrayList<>();
+
+                for (int k = 0; k < attributes.size(); k++) {
+                    switch (attributes.get(k).getType()) {
+                        case BOOLEAN:
+                            boolean b = raFile.readBoolean();
+                            recordData.add(b);
+                            break;
+                        case CHAR:
+                            int n = attributes.get(k).getN();
+                            char[] ch = new char[n];
+
+                            for (int l = 0; l < n; l++) {
+                                char c = raFile.readChar();
+                                ch[l] = c;
+                            }
+                            recordData.add(new String(ch));
+                            break;
+                        case DOUBLE:
+                            double d = raFile.readDouble();
+                            recordData.add(d);
+                            break;
+                        case INTEGER:
+                            int in = raFile.readInt();
+                            recordData.add(in);
+                            break;
+                        case VARCHAR:
+                            int vn = raFile.readInt();
+                            char[] vch = new char[vn];
+
+                            for (int l = 0; l < vn; l++) {
+                                char c = raFile.readChar();
+                                vch[l] = c;
+                            }
+                            recordData.add(new String(vch));
+                            break;
+                        default:
+                            // program kills itself
+                            break;
+                    }
+                }
+                records.add(new Record(recordData));
+            }
+            raFile.close();
+            return new Page(pageID, records);
+            
+        } catch (IOException e) {
+            System.out.println("messed up while reading individual page from memory");
+            e.printStackTrace();
+        }
+        return null; 
+    }
 
     public ArrayList<Page> readPagesFromTableFile(RandomAccessFile raFile, ArrayList<Attribute> attributes) {
         ArrayList<Page> pages = new ArrayList<>();
@@ -110,7 +166,7 @@ public class Catalog {
                                     ch[l] = c;
                                 }
                                 traversedBytes += (Character.BYTES * n);
-                                recordData.add(ch.toString());
+                                recordData.add(new String(ch));
                                 break;
                             case DOUBLE:
                                 double d = raFile.readDouble();
@@ -123,15 +179,15 @@ public class Catalog {
                                 recordData.add(in);
                                 break;
                             case VARCHAR:
-                                int vn = attributes.get(k).getN();
+                                int vn = raFile.readInt();
                                 char[] vch = new char[vn];
 
                                 for (int l = 0; l < vn; l++) {
                                     char c = raFile.readChar();
                                     vch[l] = c;
                                 }
-                                traversedBytes += (Character.BYTES * vn);
-                                recordData.add(vch.toString());
+                                traversedBytes += (Character.BYTES * vn) + Integer.BYTES;
+                                recordData.add(new String(vch));
                                 break;
                             default:
                                 // program kills itself
@@ -218,6 +274,11 @@ public class Catalog {
      */
     public void setTables(ArrayList<TableSchema> tables) {
         this.tables = tables;
+
+        for (TableSchema t : tables)
+        {
+            this.tableNameToTableSchema.put(t.getName(), t);
+        }
     }
 
     /**
@@ -240,6 +301,10 @@ public class Catalog {
         return bytes;
     }
 
+    /**
+     * Writes byte array to the Catalog file
+     * @param bytes
+     */
     public void writeToCatalogFile(byte[] bytes) {
         try {
             String catalogPath = path;
@@ -259,5 +324,10 @@ public class Catalog {
             System.out.println("Couldn't write catalog to file.");
             e.printStackTrace();
         }
+    }
+
+    public void createTableFile(String tableName)
+    {
+        //TODO: create physical file into 
     }
 }
