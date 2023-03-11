@@ -271,9 +271,9 @@ public class Parser {
                         String attribute_type = input.split(" ")[3];
                         Attribute a;
                         if (attribute_type.startsWith("char")) {
-                            a = new Attribute(attribute_name, Type.CHAR, false, false, false, Integer.parseInt(attribute_type.replaceAll("char\\(\\)", "")));
+                            a = new Attribute(attribute_name, Type.CHAR, false, false, false, Integer.parseInt(attribute_type.replaceAll("char\\(\\);", "")));
                         } else if (attribute_type.startsWith("varchar")) {
-                            a = new Attribute(attribute_name, Type.VARCHAR, false, false, false, Integer.parseInt(attribute_type.replaceAll("char\\(\\)", "")));
+                            a = new Attribute(attribute_name, Type.VARCHAR, false, false, false, Integer.parseInt(attribute_type.replaceAll("varchar\\(\\);", "")));
                         } else if (attribute_type.startsWith("integer")){
                             a = new Attribute(attribute_name, Type.INTEGER, false,false, false, 0);
                         } else if (attribute_type.startsWith("bool")) {
