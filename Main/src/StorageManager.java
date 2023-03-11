@@ -281,8 +281,8 @@ public class StorageManager {
         }
     }
 
-    public void addAttributeToTable(Attribute attribute, String value, String table_name) throws TableException {
-        db.addAttribute(attribute, value, table_name);
+    public void addAttributeToTable(Attribute attribute, String DefaultValue, String table_name) throws TableException {
+        db.addAttribute(attribute, DefaultValue, table_name);
     }
 
     public String formatResults(ArrayList<Attribute> tableAttributes, ArrayList<Record> records) {

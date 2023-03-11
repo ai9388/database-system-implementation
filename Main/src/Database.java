@@ -249,10 +249,13 @@ public class Database {
         ArrayList<Attribute> attributes = new ArrayList<>();
         attributes.addAll(table.getAttributes());
         Attribute attributeToRemove = table.getAttribute(attribute_name);
+
+        if(attributeToRemove.isIsPrimaryKey()){
+            throw new TableException(7, attribute_name);
+        }
+
         attributes.remove(attributeToRemove);
-
         return attributes;
-
     }
 
 
