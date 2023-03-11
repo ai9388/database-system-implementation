@@ -223,9 +223,14 @@ public class StorageManager {
      * drops the table with given name
      * @param table_name
      */
-    public void dropTable(String table_name) throws TableException {
-        db.dropTable(table_name);
-        pageBuffer.dropTable(table_name);
+    public boolean dropTable(String table_name) throws TableException {
+
+         if(pageBuffer.dropTable(table_name)){
+             db.dropTable(table_name);
+             return true;
+         }
+
+         return false;
     }
 
     /**

@@ -282,10 +282,9 @@ public class PageBuffer {
         return records;
     }
 
-    public void dropTable(String TableName){
+    public boolean dropTable(String TableName){
         File file = new File(dbPath + "/" + TableName);
-        boolean del = file.delete();
-        System.out.println(del);
+        return file.delete();
     }
 
     public String displayPages(){
