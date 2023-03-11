@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -104,7 +105,7 @@ public class ParserTest {
     public void testAddAttributeDef(){
         String[] commands = new String[]{
                 "create table foo (num integer primarykey, name varchar(10));",
-                "insert into foo values (45, \"carly\");",
+                // "insert into foo values ((45, \"carly\"), (50, \"hai-yen\"), (1, \"alex\"), (2, \"benson\"));",
                 "insert into foo values (50, \"hai-yen\");",
                 "display info foo;",
                 "Select * from foo;",
@@ -123,7 +124,9 @@ public class ParserTest {
 
     @Test
     public void individualtes(){
-        String s = "insert into foo values (47, \"santa\");";
+        // String s = "insert into foo values (47, \"santa\");";
+        String s = "insert into foo values ((47, \"santa\"), (2, \"hai-yen\"), (3, \"carly\"));";
+        ArrayList<String[]> arr = new ArrayList<>();
 
         String t_name = s.split("into")[1].split("values")[0].strip();
         String[] values = s.split("values");
@@ -137,9 +140,13 @@ public class ParserTest {
         for (int i = 1; i < tuples.length; i++) {
 //            System.out.println(Arrays.toString(tuples[i].split("\\)")));
 //            System.out.println(tuples[i].split("\\)")[0]);
-            System.out.println(Arrays.toString(tuples[i].split("\\)")[0].split(",")));
+            // System.out.println(Arrays.toString(tuples[i].split("\\)")[0].split(",")));
+            arr.add(tuples[i].split("\\)")[0].split(","));
         }
-
+        // System.out.println(arr.size());
+        for(String [] i : arr){
+            System.out.println(Arrays.toString(i));
+        }
 
 
     }
