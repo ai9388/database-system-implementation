@@ -126,13 +126,10 @@ public class Database {
      */
     public void dropTable(String tablename) throws TableException
     {
-        if(tables.containsKey(tablename)){
-            this.tablesID.remove(tables.get(tablename).getTableID());
-            this.tables.remove(tablename);
-        }
-        else{
-            throw new TableException(2, tablename);
-        }
+        TableSchema table = getTable(tablename);
+        // table exists
+        this.tablesID.remove(tables.get(tablename).getTableID());
+        this.tables.remove(tablename);
     }
 
     /**

@@ -298,4 +298,15 @@ public class TableSchema {
 
         return bb;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        boolean res = false;
+        if(obj instanceof TableSchema){
+            TableSchema other = (TableSchema) obj;
+            res = other.getName().equals(this.name) && other.tableID == this.tableID;
+        }
+
+        return res;
+    }
 }
