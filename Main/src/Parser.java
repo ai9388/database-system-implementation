@@ -241,7 +241,7 @@ public class Parser {
                 }
                 case DROP -> {
                     String input = user_input.replaceFirst("drop table", "").strip();
-                    String table_name = input.split(" ")[0];
+                    String table_name = input.split(";")[0];
                     storageManager.dropTable(table_name);
                 }
                 case ALTER -> {
