@@ -242,7 +242,12 @@ public class Parser {
                 case DROP -> {
                     String input = user_input.replaceFirst("drop table", "").strip();
                     String table_name = input.split(";")[0];
-                    storageManager.dropTable(table_name);
+                    if(storageManager.dropTable(table_name)){
+                        System.out.println("Successfully drop table " + table_name);
+                    }
+                    else{
+                        System.out.println("Table " + table_name + " could not be remove");
+                    }
                 }
                 case ALTER -> {
                     String input = user_input.replaceFirst("alter table", "").strip();

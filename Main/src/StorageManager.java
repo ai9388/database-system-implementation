@@ -225,8 +225,9 @@ public class StorageManager {
      */
     public boolean dropTable(String table_name) throws TableException {
 
-         if(pageBuffer.dropTable(table_name)){
-             db.dropTable(table_name);
+        TableSchema table = db.getTable(table_name);
+         if(pageBuffer.dropTable(table.getName())){
+             db.dropTable(table.getName());
              return true;
          }
 

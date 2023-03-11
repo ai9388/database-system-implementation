@@ -133,8 +133,8 @@ public class Database {
     {
         TableSchema table = getTable(tablename);
         // table exists
-        this.tablesID.remove(tables.get(tablename).getTableID());
-        this.tables.remove(tablename);
+        this.tablesID.remove(tables.get(table.getName()).getTableID());
+        this.tables.remove(table.getName());
     }
 
     /**
