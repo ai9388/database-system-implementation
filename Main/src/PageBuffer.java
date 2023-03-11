@@ -219,6 +219,11 @@ public class PageBuffer {
 
     public boolean updatePage(Page page){
         TableSchema table = getTableName(page.getId());
+
+        if (table == null)
+        {
+            return false;
+        }
         String tableName = table.getName();
         // TODO: serialize @ hai-yen
         //update: have the order of pages in tableschema and then update

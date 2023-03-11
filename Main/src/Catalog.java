@@ -348,7 +348,7 @@ public class Catalog {
             e.printStackTrace();
         }
 
-        return new TableSchema(123456789, "thisIsAMistake", new ArrayList<>(), new Integer[123456789]);
+        return new TableSchema(123, "thisIsAMistake", new ArrayList<>(), new Integer[123]);
     }
 
     /**
