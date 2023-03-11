@@ -277,8 +277,16 @@ public class TableSchema {
         int tableNameLength = this.name.length();
         int numOfAttributes = this.attributes.size();
 
+        bb = Type.concat(bb, Type.convertIntToByteArray(this.tableID));
         bb = Type.concat(bb, Type.convertIntToByteArray(tableNameLength));
         bb = Type.concat(bb, Type.convertStringToByteArray(this.name));
+        bb = Type.concat(bb, Type.convertIntToByteArray(pageIds.size()));
+
+        for (Integer i : pageIds)
+        {
+            bb = Type.concat(bb, Type.convertIntToByteArray(i));
+        }
+
         bb = Type.concat(bb, Type.convertIntToByteArray(numOfAttributes));
 
         return bb;

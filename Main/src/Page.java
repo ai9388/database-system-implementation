@@ -197,8 +197,6 @@ public class Page {
             bbf.position(0);
             bb.put(bbf);
         }
-        System.out.println(bb.array().length);
-
         return bb;
     }
 }

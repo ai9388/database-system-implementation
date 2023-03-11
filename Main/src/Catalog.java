@@ -280,6 +280,9 @@ public class Catalog {
      */
     public TableSchema createTableSchemaObjectFromBytes(RandomAccessFile f) {
         try {
+            // getting the tableID
+            int tableID = f.readInt();
+
             // getting the table name
             int tableNameLength = f.readInt();
 
@@ -289,6 +292,16 @@ public class Catalog {
                 tableNameChars[i] = f.readChar();
             }
             String tableName = new String(tableNameChars);
+
+            // getting the number of pages related to that table
+            int numberOfPages = f.readInt();
+
+            // getting the pageIDs
+            ArrayList<Integer> pageIDs = new ArrayList<>();
+
+            for (int i = 0; i < numberOfPages; i++) {
+                pageIDs.add(f.readInt());
+            }
 
             // getting the attributes from the bytes
             int numberOfAttributes = f.readInt();
@@ -329,7 +342,7 @@ public class Catalog {
 
                 attributes.add(attr);
             }
-            return new TableSchema(tableName, attributes);
+            return new TableSchema(tableID, tableName, attributes, pageIDs.toArray(new Integer[pageIDs.size()]));
         } catch (IOException e) {
             System.out.println("exception inside creating method");
             e.printStackTrace();
@@ -420,5 +433,21 @@ public class Catalog {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Gets every single page id from every table schema from the catalog
+     * @return combined arraylist of all page IDs
+     */
+    public ArrayList<Integer> getAllPageIDsFromAllTables()
+    {
+        ArrayList<Integer> ints = new ArrayList<>();
+
+        for (TableSchema ts : this.tables)
+        {
+            ints.addAll(ts.getPageIds());
+        }
+
+        return ints;
     }
 }

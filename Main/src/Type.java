@@ -81,7 +81,6 @@ public enum Type {
             Attribute attribute = attributes.get(i);
             String value = values[i];
             if(!Type.validateType(value, attribute)){
-                System.out.println(value);
                 return false;
             }
         }
