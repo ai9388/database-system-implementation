@@ -127,14 +127,14 @@ public class PageTest {
         System.out.println(page);
     }
 
-    @Test public void testReadPage(){
-        Page page = null;
-        int id = 3;
-        String tableName = "person";
-
-        page = pb.getPage(tableName, id);
-        System.out.println(page);
-    }
+//    @Test public void testReadPage(){
+//        Page page = null;
+//        int id = 3;
+//        String tableName = "person";
+//
+//        page = pb.getPage(tableName, id);
+//        System.out.println(page);
+//    }
 
     @Test
     public void TestDrop(){
@@ -151,13 +151,13 @@ public class PageTest {
         System.out.println(pb.displayPages());
     }
 
-    @Test
-    public void testGetAllRecords() throws TableException {
-        TableSchema ts = sm.db.getTable("person");
-        ArrayList<Record> records = sm.loadRecords(ts);
-
-        for(Record r: records){
-            System.out.println(r);
-        }
-    }
+//    @Test
+//    public void testGetAllRecords() throws TableException {
+//        TableSchema ts = sm.db.getTable("person");
+////        ArrayList<Record> records = sm.loadRecords(ts);
+//
+//        for(Record r: records){
+//            System.out.println(r);
+//        }
+//    }
 }

@@ -1,3 +1,5 @@
+import org.w3c.dom.Attr;
+
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.*;
@@ -163,11 +165,14 @@ public class StorageManager {
             throw new TableException(2, tableName);
         }
         record = db.validateRecord(table, recordInfo);
-        // TODO: validate the primary key uniqueness
+
         if(record != null){
+            ArrayList<Record> records = loadRecords(table);
+            db.validatePrimaryKey(record, table, loadRecords(table));
+            ArrayList<Integer> uniqueAttributes = db.uniqueAttribute(table.getAttributes());
+            db.checkUniqueness(record, uniqueAttributes, records);
             pageBuffer.insertRecord(table, record);
         }
-
     }
 
     /**

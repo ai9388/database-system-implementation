@@ -171,7 +171,8 @@ public class Database {
                     }
                 }
             }
-            Record record = new Record(new ArrayList<>(Arrays.asList(values, attributes)));
+
+            Record record = new Record(new ArrayList<>(Arrays.asList(values)), attributes);
             return record;
         } else {
             // creation of record failed
@@ -185,7 +186,19 @@ public class Database {
                     }
                 }
             }
+
             throw new InvalidDataTypeException(values, attributes);
+        }
+    }
+
+    public void validatePrimaryKey(Record newRecord, TableSchema table, ArrayList<Record> records) throws PrimaryKeyException {
+        int primaryIdx = table.getPrimaryIndex();
+
+        for(int i = 0; i < records.size(); i++){
+            Record r = records.get(i);
+            if(r.compareAtIndex(newRecord, primaryIdx) == 0){
+                throw new PrimaryKeyException(2, "" + (i + 1));
+            }
         }
     }
 
@@ -202,9 +215,9 @@ public class Database {
     public void checkUniqueness(Record record, ArrayList<Integer> uniqueAttribute, ArrayList<Record> records) throws UniqueException {
         if (uniqueAttribute.size() > 0) {
             for (Record r : records) {
-                for (Integer unique : uniqueAttribute) {
-                    if (record.getValueAtColumn(unique).equals(r.getValueAtColumn(unique))) {
-                        throw new UniqueException(1, (String) record.getValueAtColumn(unique));
+                for (Integer uniqueIndex : uniqueAttribute) {
+                    if (record.compareAtIndex(record, uniqueIndex) == 0) {
+                        throw new UniqueException(1, (String) record.getValueAtColumn(uniqueIndex));
                     }
                 }
             }
