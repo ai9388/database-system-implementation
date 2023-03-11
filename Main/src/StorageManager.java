@@ -99,6 +99,7 @@ public class StorageManager {
         }
         for (TableSchema table : tables) {
             System.out.println(table.displayTableSchema());
+            System.out.println("Records: " + loadRecords(table).size());
         }
     }
 
