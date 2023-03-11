@@ -26,22 +26,6 @@ public class Main {
 
         if(directory.exists()){
             System.out.println("The db exist");
-            String catalogPath = dbPath;
-            if(dbPath.contains("\\")){
-                catalogPath += "\\Catalog";
-            }
-            else{
-                catalogPath += "/Catalog";
-            }
-
-            File catalogFile = new File(catalogPath);
-            if(catalogFile.exists() && !catalogFile.isDirectory()){
-                System.out.println("catalog exists - maybe delete this line later");
-            }
-            else{
-                System.out.println("catalog file not exist - delete this line later");
-            }
-            // else creating new catalog
         }
         else{
             System.out.println("No existing db found");

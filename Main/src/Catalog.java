@@ -16,8 +16,8 @@ public class Catalog {
 
     private final String path;
     private final int pageSize;
-    private ArrayList<TableSchema> tables;
-    private HashMap<String, TableSchema> tableNameToTableSchema;
+    private ArrayList<TableSchema> tables = new ArrayList<>();
+    private HashMap<String, TableSchema> tableNameToTableSchema = new HashMap<String, TableSchema>();
     public RandomAccessFile raf;
 
     public Catalog(String path, int pageSize) {
@@ -39,17 +39,19 @@ public class Catalog {
 
             File file = new File(catalogPath);
 
-            RandomAccessFile raFile = new RandomAccessFile(file, READ);
-            raFile.seek(0);
-            int numOfTables = raFile.readInt();
+            RandomAccessFile catalogRAFile = new RandomAccessFile(file, READ);
+            catalogRAFile.seek(0);
+            int numOfTables = catalogRAFile.readInt();
             TableSchema.setLASTTABLEID(numOfTables);
 
             for (int i = 0; i < numOfTables; i++) {
-                TableSchema t = createTableSchemaObjectFromBytes(raFile);
+                // first create the table schema for the class
+                TableSchema t = createTableSchemaObjectFromBytes(catalogRAFile);
                 
+                // add the table schema to the hashmap
+                tables.add(t);
                 tableNameToTableSchema.put(t.getName(), t);
             }
-
         } catch (IOException e) {
             System.out.println("File doesnt exist.");
             e.printStackTrace();
@@ -57,9 +59,55 @@ public class Catalog {
     }
 
     /**
-     * Goes through the physical table file and seeks through memory to get an individual page
-     * @param tableName
-     * @param pageID
+     * returns the hashmap of table names to table schemas
+     * @return
+     */
+    public HashMap<String, TableSchema> getTableNameToTableSchema()
+    {
+        return this.tableNameToTableSchema;   
+    }
+
+    /**
+     * returns the tables
+     * @return
+     */
+    public ArrayList<TableSchema> getTables()
+    {
+        return this.tables;
+    }
+
+    /**
+     * Checks to see if the catalog file initially exists
+     * This is used to determine whether we have to read the existing catalog or not
+     */
+    public boolean checkExistance()
+    {
+        String catalogPath = this.path;
+        if (this.path.contains("\\")) 
+        {
+            catalogPath += "\\Catalog";
+        } else {
+            catalogPath += "/Catalog";
+        }
+
+        File catalogFile = new File(catalogPath);
+        
+        if (catalogFile.exists() && !catalogFile.isDirectory()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Goes through the physical table file and seeks through memory to get an
+     * individual page
+     * 
+     * @param path path for the table file
+     * @param tableName name of the table to get the page from
+     * @param pageID id of the page we need
+     * @param pageSize given page size from user to 
+     * @param attributes attributes to know when to create 
      * @return
      */
     public static Page readIndividualPageFromMemory(String path, String tableName, int pageID, int pageSize, ArrayList<Attribute> attributes)

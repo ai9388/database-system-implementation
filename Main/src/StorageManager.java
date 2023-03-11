@@ -21,6 +21,10 @@ public class StorageManager {
         this.pageSize = pageSize;
         this.pageBuffer = new PageBuffer(dbPath, bufferSize, pageSize);
 
+        if (this.catalog.checkExistance())
+        {
+            this.catalog.readCatalog();
+        }
     }
 
     /**
@@ -30,7 +34,7 @@ public class StorageManager {
     public Database getDb() {
         return this.db;
     }
-    
+
     /***
      * get table using table name from database
      * for parser be able to get the table with the given table name
@@ -123,7 +127,7 @@ public class StorageManager {
      * @param tableName the table name
      * @return an arraylist of records
      */
-    public ArrayList<Record> loadRecords(TableSchema table){
+    private ArrayList<Record> loadRecords(TableSchema table){
 
         ArrayList<Record> records = null;
 
@@ -140,7 +144,7 @@ public class StorageManager {
      * @throws InvalidDataTypeException if the types provided in the record info are invalid
      * @throws PrimaryKeyException if the primary key isn't valid or if repeated
      */
-    public void insertRecord(String tableName, String[] recordInfo) throws TableException, InvalidDataTypeException, PrimaryKeyException, UniqueException{
+    public void insertRecord(String tableName, String[] recordInfo) throws TableException, InvalidDataTypeException, PrimaryKeyException, UniqueException {
         TableSchema table = db.getTable(tableName);
         Record record = null;
         if (table == null) {

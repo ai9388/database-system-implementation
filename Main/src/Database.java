@@ -113,7 +113,6 @@ public class Database {
         if(tables == null){
             return;
         }
-
         for(TableSchema table: tables){
             this.tables.put(table.getName(),table);
             this.tablesID.put(table.getTableID(), table);
@@ -145,7 +144,7 @@ public class Database {
 
     /**
      * validates the record by verifying that all value types are correct
-     * @param tableName the name of the table
+     * @param table the name of the table
      * @param values the values being inserted
      * @return true if all the types are valid
      * @throws TableException if the table name/object does not exist
@@ -169,6 +168,28 @@ public class Database {
         }
     }
 
+    public ArrayList<Integer> uniqueAttribute(ArrayList<Attribute> attributes) {
+        ArrayList<Integer> uniqueAttributes = new ArrayList<>();
+        for (int i = 0; i < attributes.size(); i++) {
+            if (attributes.get(i).getUnique() && !attributes.get(i).isIsPrimaryKey()) {
+                uniqueAttributes.add(i);
+            }
+        }
+        return uniqueAttributes;
+    }
+
+    public void checkUniqueness(Record record, ArrayList<Integer> uniqueAttribute, ArrayList<Record> records) throws UniqueException {
+        if (uniqueAttribute.size() > 0) {
+            for (Record r : records) {
+                for (Integer unique : uniqueAttribute) {
+                    if (record.getValueAtColumn(unique).equals(r.getValueAtColumn(unique))) {
+                        throw new UniqueException(1, (String) record.getValueAtColumn(unique));
+                    }
+                }
+            }
+        }
+    }
+
     public String selectFromTable(String tableName, String[] columns) throws TableException{
         //TODO : how to do this?
 
@@ -186,6 +207,7 @@ public class Database {
     public void dropAttribute(String attribute_name, String table_name) throws TableException {
         TableSchema table = this.getTable(table_name); // throws except. if table name invalid
         table.removeAttribute(attribute_name); // throws exception if column name invalid
+        // TODO: get records and remove the attribute from those records
 //        this.tables.remove(table_name);
 //        this.tablesID.remove(table.getTableID());
 //        this.tables.put(table_name, table);
@@ -203,6 +225,7 @@ public class Database {
     public void addAttribute(Attribute attribute, String value, String table_name) throws TableException {
         TableSchema table = this.getTable(table_name);
         table.addAttribute(attribute);
+        // TODO: get records and add the attribute to those records with the default [value]
     }
 
 }
