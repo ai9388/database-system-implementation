@@ -161,28 +161,15 @@ public class StorageManager {
     public void insertRecord(String tableName, String[] recordInfo) throws TableException, InvalidDataTypeException, PrimaryKeyException, UniqueException {
         TableSchema table = db.getTable(tableName);
         Record record = null;
-        if (table == null) {
-            throw new TableException(2, tableName);
-        }
-        int j = 0;
-        String[] data = new String[table.getAttributes().size()];
-        for (String info : recordInfo) {
-            if (j >= table.getAttributes().size()) {
-                j = 0;
-            }
-            data[j++] = info;
-            if (j == table.getAttributes().size()) {
-                record = db.validateRecord(table, data);
-                if(record != null){
-                    ArrayList<Record> records = loadRecords(table);
-                    db.validatePrimaryKey(record, table, records);
-                    ArrayList<Integer> uniqueAttributes = db.uniqueAttribute(table.getAttributes());
-                    db.checkUniqueness(record, uniqueAttributes, records);
-                    pageBuffer.insertRecord(table, record);
-                }
-            }
-        }
 
+        record = db.validateRecord(table, recordInfo);
+        if(record != null){
+            ArrayList<Record> records = loadRecords(table);
+            db.validatePrimaryKey(record, table, records);
+            ArrayList<Integer> uniqueAttributes = db.uniqueAttribute(table.getAttributes());
+            db.checkUniqueness(record, uniqueAttributes, records);
+            pageBuffer.insertRecord(table, record);
+        }
     }
 
     /**
