@@ -269,8 +269,14 @@ public class Parser {
                             a = new Attribute(attribute_name, Type.CHAR, false, false, false, Integer.parseInt(attribute_type.replaceAll("char\\(\\)", "")));
                         } else if (attribute_type.startsWith("varchar")) {
                             a = new Attribute(attribute_name, Type.VARCHAR, false, false, false, Integer.parseInt(attribute_type.replaceAll("char\\(\\)", "")));
+                        } else if (attribute_type.startsWith("integer")){
+                            a = new Attribute(attribute_name, Type.INTEGER, false,false, false, 0);
+                        } else if (attribute_type.startsWith("bool")) {
+                            a = new Attribute(attribute_name, Type.BOOLEAN, false, false, false, 0);
+                        } else if (attribute_type.startsWith("double")) {
+                            a = new Attribute(attribute_name, Type.DOUBLE, false, false, false, 0);
                         } else {
-                            a = new Attribute(attribute_name, Type.valueOf(attribute_type), false, false, false, 0);
+                            a = null;
                         }
                         if (input.split(" ").length > 5) {
                             String value = input.split(" ")[5];
