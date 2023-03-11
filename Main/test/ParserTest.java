@@ -108,7 +108,7 @@ public class ParserTest {
                 "insert into foo values (50, \"hai-yen\");",
                 "display info foo;",
                 "Select * from foo;",
-                "alter table foo add lastName varchar(20);",
+                "alter table foo add lastName varchar(20) default \"maggiolo\";",
                 "display info foo;",
                 "Select * from foo;"
         };

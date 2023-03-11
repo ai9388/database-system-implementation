@@ -284,6 +284,16 @@ public class StorageManager {
     public void addAttributeToTable(Attribute attribute, String defaultValue, String table_name) throws TableException, InvalidDataTypeException {
         TableSchema table = db.getTable(table_name);
 
+        // remove the quotes
+        if(attribute.getType() == Type.VARCHAR || attribute.getType() == Type.CHAR){
+            if(defaultValue.charAt(0) == '\"'){
+                defaultValue = defaultValue.substring(1);
+            }
+            if(defaultValue.charAt(defaultValue.length() - 1) == '\"'){
+                defaultValue = defaultValue.substring(0, defaultValue.length() - 1);
+            }
+        }
+
         if(!defaultValue.equals("") && !Type.validateType(defaultValue, attribute)){
             throw new InvalidDataTypeException(defaultValue, attribute);
         }
