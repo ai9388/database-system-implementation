@@ -27,7 +27,7 @@ public class Record implements Comparable<Record>{
                     break;
                 case DOUBLE:
                     entries.add(Double.parseDouble(value));
-                    size += Integer.BYTES;
+                    size += Double.BYTES;
                     break;
                 case BOOLEAN:
                     entries.add(Boolean.parseBoolean(value));
@@ -48,8 +48,26 @@ public class Record implements Comparable<Record>{
         this.attr = attr;
     }
 
-    public Record(ArrayList<Object> entries){
-        this.entries = entries;    
+    public Record(ArrayList<Object> entries, ArrayList<Attribute> attr, boolean exits){
+        this.entries = entries;
+
+        for(Object entry: entries){
+            if(entry instanceof Integer){
+                this.size += 4;
+            }
+            else if(entry instanceof Double){
+                this.size += Double.BYTES;
+            }
+            else if(entry instanceof Boolean){
+                this.size += 1;
+            }
+            else if(entry instanceof String){
+                this.size += Integer.BYTES;
+                this.size += (Character.BYTES * ((String)(entry)).length());
+            }
+        }
+
+        this.attr = attr;
     }
 
     /**

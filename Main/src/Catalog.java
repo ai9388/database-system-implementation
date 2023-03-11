@@ -178,7 +178,7 @@ public class Catalog {
                             break;
                     }
                 }
-                records.add(new Record(recordData));
+                records.add(new Record(recordData, attributes, true));
             }
             raFile.close();
             return new Page(pageID, records);
@@ -259,7 +259,7 @@ public class Catalog {
                                 break;
                         }
                     }
-                    records.add(new Record(recordData));
+                    records.add(new Record(recordData, attributes, true));
                 }
                 Page page = new Page(pageID, records);
                 pages.add(page);
