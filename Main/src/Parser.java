@@ -212,10 +212,14 @@ public class Parser {
                         String[] tuples = values[1].split("\\(");
 
                         for (int i = 1; i < tuples.length; i++) {
+                            if(tuples[i].strip().equals("")){
+                                continue;
+                            }
                             String[] temp = tuples[i].split("\\)")[0].split(",");
                             for(int j = 0; j < temp.length; j++){
                                 temp[j] = temp[j].strip();
                             }
+
                             arr.add(temp);
                         }
 

@@ -139,6 +139,7 @@ public class PageBuffer {
                 int pageNumOfRecords = page.getNumOfRecords();
                 // iterate the records in the page if the record has not been inserted
                 for (int x = 0; x < pageNumOfRecords; x++) {
+                    if(inserted) break;
                     Record currentRecord = page.getRecords().get(x);
                     // if record belongs before the current record
                     if (record.compareTo(currentRecord) < 0) {
