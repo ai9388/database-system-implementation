@@ -38,14 +38,8 @@ public class TableSchema {
      */
     private int primaryIndex;
 
-    /**
-     * indicates if the table has been updated
-     * notable updates are:
-     *      number of pages changed
-     *      new pageId
-     *      new page added to hardware list
-     */
-    private boolean updated;
+
+    private int numOfRecords;
 
     /**
      * constructor used to create a table that has no pages yet
@@ -60,6 +54,7 @@ public class TableSchema {
         this.name = name;
         this.attributes = attributes;
         this.pageIds = new ArrayList<>();
+        this.numOfRecords = 0;
         setPrimaryIndex();
     }
 
@@ -70,12 +65,17 @@ public class TableSchema {
      * @param attributes
      * @param pageIds
      */
-    public TableSchema(int id, String name, ArrayList<Attribute> attributes, Integer[] pageIds){
+    public TableSchema(int id, String name, ArrayList<Attribute> attributes, Integer[] pageIds, int numOfRecords){
         this.tableID = id;
         this.name = name;
         this.attributes = attributes;
         this.pageIds = new ArrayList<>(Arrays.asList(pageIds));
+        this.numOfRecords = numOfRecords;
         setPrimaryIndex();
+    }
+
+    public int getNumOfRecords() {
+        return numOfRecords;
     }
 
     /**
