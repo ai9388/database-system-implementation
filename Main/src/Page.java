@@ -4,8 +4,6 @@ import java.util.Collections;
 import java.util.Comparator;
 
 public class Page {
-    
-    private int numOfRecords;
 
     /**
      * page capacity
@@ -26,13 +24,16 @@ public class Page {
 
     ArrayList<Record> records;
 
-    int tableId;
+    private int tableId;
+
+    private boolean isNew;
     
     public Page(int id, int tableId){
         this.size = 0;
         this.records = new ArrayList<>();
         this.id = id;
         this.tableId = tableId;
+        this.isNew = true;
     }
 
     /**
@@ -44,6 +45,7 @@ public class Page {
         this.id = id;
         this.records = records;
         this.size = 0;
+        this.isNew = false;
         setSize();
     }
 
@@ -53,6 +55,17 @@ public class Page {
         for(Record r: this.records){
             this.size += r.getSize();
         }
+    }
+
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setIsNew(){
+        this.isNew = true;
+    }
+    public void setUsed(){
+        this.isNew = false;
     }
 
     public void setTableId(int tableId) {

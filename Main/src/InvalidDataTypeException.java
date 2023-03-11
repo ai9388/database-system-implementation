@@ -23,8 +23,8 @@ public class InvalidDataTypeException extends Exception{
 
     @Override
     public String getMessage() {
-        this.message = "Invalid Data Type: Expected( " + expected + " ) got( " 
-         + got + " )";
+        this.message = "Invalid Data Type: Expected(" + expected.strip() + ") got("
+         + got.strip() + ")";
         return this.message;
     }
 
@@ -36,6 +36,10 @@ public class InvalidDataTypeException extends Exception{
         expected = "";
         got = "";
         for (int i = 0; i < values.length; i++) {
+            if(i != 0){
+                expected += ", ";
+                got += ", ";
+            }
             Attribute a = attributes.get(i);
             String v = values[i];
             if(a.getType() == Type.CHAR || a.getType() == Type.VARCHAR){
@@ -43,12 +47,9 @@ public class InvalidDataTypeException extends Exception{
                 this.got += (Type.identifyType(v, a).getName() + "(" + v.length() + ")");
             }
             else{
-                this.expected += a.getType().getName() ;
+                this.expected += a.getType().getName().strip();
                 this.got += Type.identifyType(v, a).getName();
             }
-
-            expected += " ";
-            got += " ";
         }
     }
     

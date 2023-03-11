@@ -74,13 +74,15 @@ public class Catalog {
 
             File file = new File(tablePath);
             RandomAccessFile raFile = new RandomAccessFile(file, READ);
-            // passing the number of tables in file
+            // passing the number of pages in file
             raFile.seek(4);
 
             // seeking to the page number
-            // i.e trying to find page 4 means we have to seek pageSize * 4
-            raFile.seek(pageID * pageSize);
-            raFile.seek(4);
+            // i.e trying to find page 4 means we have to seek pageSize - 1 * 4
+            if(pageID != 1){
+                raFile.read(new byte[((pageID - 1) * (pageSize + 8))]);
+            }
+            raFile.read(new byte[4]); // skip the table id
 
             int numberOfRecords = raFile.readInt();
             ArrayList<Record> records = new ArrayList<>();

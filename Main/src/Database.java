@@ -113,6 +113,7 @@ public class Database {
         if(tables == null){
             return;
         }
+
         for(TableSchema table: tables){
             this.tables.put(table.getName(),table);
             this.tablesID.put(table.getTableID(), table);
@@ -126,13 +127,10 @@ public class Database {
      */
     public void dropTable(String tablename) throws TableException
     {
-        if(tables.containsKey(tablename)){
-            this.tablesID.remove(tables.get(tablename).getTableID());
-            this.tables.remove(tablename);
-        }
-        else{
-            throw new TableException(2, tablename);
-        }
+        TableSchema table = getTable(tablename);
+        // table exists
+        this.tablesID.remove(tables.get(tablename).getTableID());
+        this.tables.remove(tablename);
     }
 
     /**
@@ -164,7 +162,7 @@ public class Database {
             throw new TableException(3, "");
         }
         if (Type.validateAll(values, attributes)) {
-            return new Record(new ArrayList<>(Arrays.asList(values, attributes)));
+            return new Record(new ArrayList<>(Arrays.asList(values)), attributes);
         } else {
             // creation of record failed
             throw new InvalidDataTypeException(values, attributes);
