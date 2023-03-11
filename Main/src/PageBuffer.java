@@ -203,7 +203,6 @@ public class PageBuffer {
             byte[] bytes = new byte[Page.getCapacity()];
             bytes = page.getPageAsBytes().array();
             
-            
             raf.seek(raf.length());
             raf.write(bytes);
 
@@ -233,7 +232,7 @@ public class PageBuffer {
             int numPages = table.getNumberOfPages();
             raf.writeInt(numPages);
             int skip = (page.getId()-1) * Page.getCapacity();
-            raf.seek(skip);
+            raf.read(new byte[skip]);
             raf.write(bytes);
 
             //need up to figure out the update

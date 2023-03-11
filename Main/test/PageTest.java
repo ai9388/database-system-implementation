@@ -200,7 +200,7 @@ public class PageTest {
                 Page page = new Page(pageID, records);
                 pages.add(page);
 
-                rand.seek(Page.getCapacity() - traversedBytes);
+                rand.read(new byte[Page.getCapacity() - traversedBytes]);
             }
 
         rand.close();

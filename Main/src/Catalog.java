@@ -91,7 +91,7 @@ public class Catalog {
         }
 
         File catalogFile = new File(catalogPath);
-        
+
         if (catalogFile.exists() && !catalogFile.isDirectory()) {
             return true;
         } else {
@@ -123,12 +123,12 @@ public class Catalog {
             File file = new File(tablePath);
             RandomAccessFile raFile = new RandomAccessFile(file, READ);
             // passing the number of tables in file
-            raFile.seek(4);
+            raFile.read(new byte[4]);
 
             // seeking to the page number
             // i.e trying to find page 4 means we have to seek pageSize * 4
-            raFile.seek(pageID * pageSize);
-            raFile.seek(4);
+            raFile.read(new byte[pageID * pageSize]);
+            raFile.read(new byte[4]);
 
             int numberOfRecords = raFile.readInt();
             ArrayList<Record> records = new ArrayList<>();
@@ -262,7 +262,7 @@ public class Catalog {
                 Page page = new Page(pageID, records);
                 pages.add(page);
 
-                raFile.seek(pageSize - traversedBytes);
+                raFile.read(new byte[pageSize - traversedBytes]);
             }
         } catch (IOException e) {
             System.out.println();
@@ -278,6 +278,7 @@ public class Catalog {
      */
     public TableSchema createTableSchemaObjectFromBytes(RandomAccessFile f) {
         try {
+            System.out.println(f.getFilePointer());
             // getting the table name
             int tableNameLength = f.readInt();
 
@@ -329,6 +330,7 @@ public class Catalog {
             }
             return new TableSchema(tableName, attributes);
         } catch (IOException e) {
+            System.out.println("exception inside creating method");
             e.printStackTrace();
         }
 

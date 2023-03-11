@@ -6,7 +6,7 @@ import static java.lang.System.exit;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        args = new String[]{"Main/db/", "100", "15"};
+        // args = new String[]{"Main/db/", "100", "15"};
 
         if(args.length != 3){
             System.out.println("Usage: Filename, Page Size, Buffer Size");
