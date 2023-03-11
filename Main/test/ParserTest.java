@@ -107,7 +107,7 @@ public class ParserTest {
                 "insert into foo values (50, \"hai-yen\");",
                 "display info foo;",
                 "Select * from foo;",
-                "alter table foo add grade default 0.0",
+                "alter table foo add grade double default 0.0",
                 "display info foo;",
                 "Select * from foo;"
         };

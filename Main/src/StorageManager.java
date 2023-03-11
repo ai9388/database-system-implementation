@@ -284,7 +284,7 @@ public class StorageManager {
     public void addAttributeToTable(Attribute attribute, String defaultValue, String table_name) throws TableException, InvalidDataTypeException {
         TableSchema table = db.getTable(table_name);
 
-        if(!Type.validateType(defaultValue, attribute)){
+        if(!defaultValue.equals("") && !Type.validateType(defaultValue, attribute)){
             throw new InvalidDataTypeException(defaultValue, attribute);
         }
 
