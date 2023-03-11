@@ -239,7 +239,34 @@ public class StorageManager {
      * @param table_name
      */
     public void dropAttributeFromTable(String attribute_name, String table_name) throws TableException {
-        db.dropAttribute(attribute_name, table_name);
+        TableSchema table = db.getTable(table_name);
+        int oldAttributeIndex = table.getAttributeIndex(attribute_name);
+        ArrayList<Attribute> newAttributes = db.removeAttribute(attribute_name, table);
+
+        // get all the records
+        ArrayList<Record> records = loadRecords(table);
+        ArrayList<Record> newRecords = new ArrayList<>();
+
+        // drop the old table
+        dropTable(table_name);
+
+        // create a new table
+        createTable(table_name, newAttributes);
+        TableSchema newTable = getTable(table_name);
+
+        // populate new records
+        for(Record r: records){
+            // copy the old entries
+            ArrayList<Object> newEntries = new ArrayList<>();
+            newEntries.addAll(r.getEntries());
+            // remove entry related to old attribute
+            newEntries.remove(oldAttributeIndex);
+            // create the new record
+            Record newRecord = new Record(newEntries);
+            // add the new Record to new collection
+            newRecords.add(newRecord);
+            pageBuffer.insertRecord(newTable, newRecord);
+        }
     }
 
     public void addAttributeToTable(Attribute attribute, String value, String table_name) throws TableException {

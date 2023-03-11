@@ -72,11 +72,14 @@ public class ParserTest {
     @Test
     public void insertTest4(){
         String[] commands = new String[]{
-                "create table foo (num integer primarykey, name varchar(10));",
-//                "insert into foo values (45, \"carly\");",
-//                "insert into foo values (50, \"hai-yen\");",
+                "create table foo (num integer primarykey, name varchar(10), grade double);",
+                "insert into foo values (45, \"carly\", 2.6);",
+                "insert into foo values (50, \"hai-yen\", 3.4);",
                 "display info foo;",
-                "drop table foo;"
+                "Select * from foo;",
+                "alter table foo drop grade",
+                "display info foo;",
+                "Select * from foo;"
         };
         runCommands(commands);
     }

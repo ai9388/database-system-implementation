@@ -237,20 +237,22 @@ public class Database {
 
     /**
      * drops an attribute from the table
+     *
      * @param attribute_name the name of the attribute
-     * @param table_name the name of the table
-     * @throws TableException
-     *         code 2: if the table name provided does not match a table
-     *         code 1: if the attribute name does not match a column
+     * @param table_name     the name of the table
+     * @return
+     * @throws TableException code 2: if the table name provided does not match a table
+     *                        code 1: if the attribute name does not match a column
      */
-    public void dropAttribute(String attribute_name, String table_name) throws TableException {
-        TableSchema table = this.getTable(table_name); // throws except. if table name invalid
-        table.removeAttribute(attribute_name); // throws exception if column name invalid
-        // TODO: get records and remove the attribute from those records
-//        this.tables.remove(table_name);
-//        this.tablesID.remove(table.getTableID());
-//        this.tables.put(table_name, table);
-//        this.tablesID.put(table.getTableID(), table);
+    public ArrayList<Attribute> removeAttribute(String attribute_name, TableSchema table) throws TableException {
+        // get the new attribute list
+        ArrayList<Attribute> attributes = new ArrayList<>();
+        attributes.addAll(table.getAttributes());
+        Attribute attributeToRemove = table.getAttribute(attribute_name);
+        attributes.remove(attributeToRemove);
+
+        return attributes;
+
     }
 
 
@@ -263,7 +265,6 @@ public class Database {
      */
     public void addAttribute(Attribute attribute, String value, String table_name) throws TableException {
         TableSchema table = this.getTable(table_name);
-        table.addAttribute(attribute);
         // TODO: get records and add the attribute to those records with the default [value]
     }
 

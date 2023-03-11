@@ -128,35 +128,22 @@ public class TableSchema {
         return pageIds;
     }
 
-    /**
-     * removes an attribute from the current table schema
-     * @param attributeName the name of the attribute to remove
-     */
-    public void removeAttribute(String attributeName) throws TableException{
-        Attribute a = getAttribute(attributeName);
 
-        if(a == null){
-            throw new TableException(1, attributeName);
+    /**
+     * returns index of attribute based on the name
+     * @param name the name of the attribute
+     * @return the attribute if exists; null otherwise
+     */
+    public int getAttributeIndex(String name) throws TableException {
+        for(int i = 0; i < attributes.size(); i++){
+            Attribute a = attributes.get(i);
+            if(a.getName().equals(name)){
+                return i;
+            }
         }
 
-        // remove the attribute
-        attributes.remove(a);
-    }
-
-    /**
-     * adds a new attribute to the table
-     * @param a
-     * @throws TableException
-     */
-    public void addAttribute(Attribute a) throws TableException{
-        // attribute with same name should not exist
-        Attribute otherAttribute = getAttribute(a.getName());
-         if(otherAttribute != null){
-             throw new TableException(6, a.getName());
-         }
-         else{
-             this.attributes.add(a);
-         }
+        // attribute not found, invalid
+        throw new TableException(1, name);
     }
 
     /**
@@ -164,14 +151,13 @@ public class TableSchema {
      * @param name the name of the attribute
      * @return the attribute if exists; null otherwise
      */
-    public Attribute getAttribute(String name){
+    public Attribute getAttribute(String name) throws TableException {
         for(Attribute a: attributes){
             if(a.getName().equals(name)){
                 return a;
             }
         }
-
-        return null;
+        throw new TableException(1, "name");
     }
 
     public ArrayList<Attribute> getAttributes() {
