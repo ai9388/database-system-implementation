@@ -219,6 +219,10 @@ public class Parser {
                             } else if (value.indexOf("(") != -1) {
                                 value = value.substring(value.indexOf("(") + 1);
                                 value = value.strip();
+                                if (value.indexOf(")") != -1) {
+                                    value = value.substring(0, value.indexOf(")"));
+                                    value = value.strip();
+                                }
                                 values.add(value);
                             } else if (value.indexOf(")") != -1) {
                                 value = value.substring(0, value.indexOf(")"));
@@ -261,6 +265,7 @@ public class Parser {
                     boolean drop = input.split(" ")[1].strip().equals("drop");
                     String attribute_name = input.split(" ")[2];
                     if (drop) {
+                        attribute_name = attribute_name.split(";")[0];
                         storageManager.dropAttributeFromTable(attribute_name, table_name);
                     } else {
                         String attribute_type = input.split(" ")[3];
@@ -280,6 +285,7 @@ public class Parser {
                         }
                         if (input.split(" ").length > 5) {
                             String value = input.split(" ")[5];
+                            value = value.split(";")[0];
                             // TODO: add functionality to storage manager to add attribute to table
                             storageManager.addAttributeToTable(a, value, table_name);
                         } else {
