@@ -172,8 +172,12 @@ public class Record implements Comparable<Record>{
 
     @Override
     public int compareTo(Record o) {
-        Object pkValue1 = this.getValueAtColumn(pkid);
-        Object pkValue2 = o.getValueAtColumn(pkid);
+        return compareAtIndex(o, pkid);
+    }
+
+    public int compareAtIndex(Record other, int index){
+        Object pkValue1 = this.getValueAtColumn(index);
+        Object pkValue2 = other.getValueAtColumn(index);
 
         // INT
         if(pkValue1 instanceof Integer){
@@ -194,7 +198,7 @@ public class Record implements Comparable<Record>{
         else{
             return String.valueOf(pkValue1).toLowerCase().compareTo(String.valueOf(pkValue2).toLowerCase());
         }
-    } 
+    }
     
     @Override
     public boolean equals(Object obj) {

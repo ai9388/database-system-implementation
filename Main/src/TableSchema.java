@@ -37,15 +37,7 @@ public class TableSchema {
      * The primary index for this table
      */
     private int primaryIndex;
-
-    /**
-     * indicates if the table has been updated
-     * notable updates are:
-     *      number of pages changed
-     *      new pageId
-     *      new page added to hardware list
-     */
-    private boolean updated;
+    
 
     /**
      * constructor used to create a table that has no pages yet
@@ -195,6 +187,8 @@ public class TableSchema {
         for (Attribute a : attributes) {
             str += "\t" + a + "\n";
         }
+
+        str += "Pages: " + pageIds.size();
         return str;
     }
 
@@ -270,12 +264,17 @@ public class TableSchema {
         }
 
         boolean isPrimaryKey = attr.isIsPrimaryKey();
+        boolean isNotNull = attr.getNotNull();
+        boolean isUnique = attr.getUnique();
+        
 
         bb = Type.concat(bb, Type.convertIntToByteArray(attributeNameLength));
         bb = Type.concat(bb, Type.convertStringToByteArray(attributeName));
         bb = Type.concat(bb, Type.convertIntToByteArray(attributeType));
         bb = Type.concat(bb, Type.convertIntToByteArray(attributeN));
         bb = Type.concat(bb, Type.convertBooleanToByteArray(isPrimaryKey));
+        bb = Type.concat(bb, Type.convertBooleanToByteArray(isNotNull));
+        bb = Type.concat(bb, Type.convertBooleanToByteArray(isUnique));
 
         return bb;
     }

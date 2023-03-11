@@ -280,7 +280,6 @@ public class Catalog {
      */
     public TableSchema createTableSchemaObjectFromBytes(RandomAccessFile f) {
         try {
-            System.out.println(f.getFilePointer());
             // getting the table name
             int tableNameLength = f.readInt();
 

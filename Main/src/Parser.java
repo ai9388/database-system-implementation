@@ -233,7 +233,7 @@ public class Parser {
                 }
                 case HELP -> displayHelp();
                 case QUIT -> {
-                    storageManager.writeToCatalog();
+                    storageManager.shutDown();
                     System.out.println("Shutting down 11QL...");
                     System.out.println("Shutting down the database...");
                     System.out.println("Purging the page buffer...");
@@ -244,8 +244,13 @@ public class Parser {
                 }
                 case DROP -> {
                     String input = user_input.replaceFirst("drop table", "").strip();
-                    String table_name = input.split(" ")[0];
-                    storageManager.dropTable(table_name);
+                    String table_name = input.split(";")[0];
+                    if(storageManager.dropTable(table_name)){
+                        System.out.println("Successfully drop table " + table_name);
+                    }
+                    else{
+                        System.out.println("Table " + table_name + " could not be remove");
+                    }
                 }
                 case ALTER -> {
                     String input = user_input.replaceFirst("alter table", "").strip();
@@ -299,12 +304,7 @@ public class Parser {
     }
 
     private void select(String attr, String tableName) throws TableException {
-//        if (attr.equals("*")) {
-//            System.out.println(storageManager.selectFromTable(tableName, null));
-//        } else {
-//            String[] columns = attr.strip().split(",");
-//            System.out.println(storageManager.selectFromTable(tableName, columns));
-//        }
+        storageManager.select(tableName);
     }
 
     public void displayHelp() {
