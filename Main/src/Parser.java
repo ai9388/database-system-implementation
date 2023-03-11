@@ -74,7 +74,7 @@ public class Parser {
                     for (String attribute : attr) {
                         String[] components = attribute.strip().replaceAll("\\(", " ").split(" ");
                         String attr_name = components[0];
-                        boolean primarykey = components.length > 2 && components[2].equals("primarykey");
+                        boolean primarykey = false;
                         boolean notNull = false;
                         boolean unique = false;
                         switch (components[1]) {
@@ -90,12 +90,10 @@ public class Parser {
                                         case "unique" -> unique = true;
                                     }
                                 }
-                                hasOnePK = ((primarykey && !hasOnePK) || (components.length <= 3 && hasOnePK));
                                 Attribute a = new Attribute(attr_name, Type.CHAR, primarykey, notNull, unique, Integer.parseInt(components[2].replace(')', ' ').strip()));
                                 primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                                 primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                                 attributes.add(a);
-                                //check component after char to know length
                             }
                             case "varchar" -> {
                                 for (int i = 3; i < components.length; i++) {
@@ -109,7 +107,6 @@ public class Parser {
                                         case "unique" -> unique = true;
                                     }
                                 }
-                                hasOnePK = ((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
                                 Attribute a = new Attribute(attr_name, Type.VARCHAR, primarykey, notNull, unique, Integer.parseInt(components[2].replace(')', ' ').strip()));
                                 primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                                 primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
@@ -127,7 +124,6 @@ public class Parser {
                                         case "unique" -> unique = true;
                                     }
                                 }
-                                hasOnePK = ((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
                                 Attribute a = new Attribute(attr_name, Type.BOOLEAN, primarykey, notNull, unique, 0);
                                 primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                                 primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
@@ -145,7 +141,6 @@ public class Parser {
                                         case "unique" -> unique = true;
                                     }
                                 }
-                                hasOnePK = ((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
                                 Attribute a = new Attribute(attr_name, Type.INTEGER, primarykey, notNull, unique, 0);
                                 primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                                 primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
@@ -163,7 +158,6 @@ public class Parser {
                                         case "unique" -> unique = true;
                                     }
                                 }
-                                hasOnePK = ((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
                                 Attribute a = new Attribute(attr_name, Type.DOUBLE, primarykey, notNull, unique, 0);
                                 primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                                 primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
@@ -173,6 +167,15 @@ public class Parser {
                                 System.out.println("ERROR!");
                                 System.out.println("Invalid data type: " + components[1]);
                             }
+                        }
+                    }
+                    hasOnePK = false;
+                    for (Attribute attribute: attributes) {
+                        if (hasOnePK && attribute.isIsPrimaryKey()) {
+                            hasOnePK = !hasOnePK;
+                            throw new PrimaryKeyException(3, "");
+                        } else if (attribute.isIsPrimaryKey()) {
+                            hasOnePK = true;
                         }
                     }
                     if (!hasOnePK) {
@@ -285,7 +288,7 @@ public class Parser {
                     //
                 }
                 case EMPTY -> {
-                    System.out.println("Somethings wrong");
+                    System.out.println("Somethings wrong...");
                 }
             }
             System.out.println("SUCCESS");
