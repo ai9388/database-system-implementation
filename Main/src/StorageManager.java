@@ -136,6 +136,16 @@ public class StorageManager {
         return records;
     }
 
+
+    public void select(String tableName) throws TableException {
+        TableSchema tableSchema = db.getTable(tableName);
+        ArrayList<Record> records = loadRecords(tableSchema);
+        if(records == null){
+            System.out.println("No Records to show");
+        }
+        System.out.println(formatResults(tableSchema.getAttributes(), records));
+    }
+
     /**
      * inserts a record into the named table pages
      * @param tableName the name of the pages
@@ -219,5 +229,43 @@ public class StorageManager {
 
     public void addAttributeToTable(Attribute attribute, String value, String table_name) throws TableException {
         db.addAttribute(attribute, value, table_name);
+    }
+
+    public String formatResults(ArrayList<Attribute> tableAttributes, ArrayList<Record> records) {
+        String format = "|";
+        String result = "";
+        int len = 1;
+        String dash;
+        Object[] headers = new Object[tableAttributes.size()];
+        for (int i = 0; i < tableAttributes.size(); i++) {
+            Attribute a = tableAttributes.get(i);
+            headers[i] = tableAttributes.get(i).getName().toUpperCase();
+            if (a.getType() == Type.VARCHAR || a.getType() == Type.CHAR) {
+                int temp = Math.max(a.getName().length() + 2, a.getN() + 2);
+                format += "%-" + temp + "s|";
+                len += temp + 1;
+            } else {
+                int temp = (a.getName().length() + 2);
+                format += "%-" + temp + "s|";
+                len += temp + 1;
+            }
+        }
+        // create dashed line
+        dash = String.format("%0" + len + "d", 0).replace("0", "-");
+        // add the header to result
+        result = dash + "\n" + String.format(format, headers) + "\n" + dash;
+
+        // specific columns from all the records
+        for (Record r : records) {
+            ArrayList<Object> entries = new ArrayList<>();
+            for (int x = 0; x < tableAttributes.size(); x++) {
+                entries.add(r.getValueAtColumn(x));
+            }
+            result += "\n" + String.format(format, entries.toArray());
+        }
+
+        // bottom line
+        result += "\n" + dash;
+        return result;
     }
 }
