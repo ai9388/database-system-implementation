@@ -274,7 +274,7 @@ public class StorageManager {
             // remove entry related to old attribute
             newEntries.remove(oldAttributeIndex);
             // create the new record
-            Record newRecord = new Record(newEntries);
+            Record newRecord = new Record(newEntries, newAttributes, true);
             // add the new Record to new collection
             newRecords.add(newRecord);
             pageBuffer.insertRecord(newTable, newRecord);
@@ -333,7 +333,7 @@ public class StorageManager {
                 newEntries.add(defaultValue);
             }
 
-            Record newRecord = new Record(newEntries);
+            Record newRecord = new Record(newEntries, newAttributes, true);
             // add the new Record to new collection
             newRecords.add(newRecord);
             pageBuffer.insertRecord(newTable, newRecord);
