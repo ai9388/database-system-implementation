@@ -183,11 +183,6 @@ public class Page {
     }
 
     public ByteBuffer getPageAsBytes(){
-
-        // number of records + page id + total bytes for all records
-        int bufferContent = Integer.BYTES + this.size;
-        bufferContent += Integer.BYTES;
-
         // allocate space based on the page size
         ByteBuffer bb = ByteBuffer.allocate(capacity + 8);
 

@@ -24,7 +24,9 @@ public class StorageManager {
         if (this.catalog.checkExistance())
         {
             this.catalog.readCatalog();
+            this.db.setTables(this.catalog.getTables());
         }
+
     }
 
     /**

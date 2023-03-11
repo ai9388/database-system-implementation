@@ -203,7 +203,7 @@ public class Parser {
                     String input = user_input.replaceFirst("insert into", "").strip();
                     String table_name = input.split(" ")[0].strip();
                     int start_index = input.indexOf("(");
-                    input = input.substring(start_index - 1);
+                    input = input.substring(start_index + 1);
                     String[] vals = input.split(",");
                     try {
                         ArrayList<String> values = new ArrayList<>();
@@ -213,7 +213,7 @@ public class Parser {
                                 if (value.indexOf("\"") != -1) {
                                     value = value.substring(0, value.indexOf("\""));
                                 }
-                                values.add(value);
+                                values.add("\"" + value + "\"");
                             } else if (value.indexOf(")") != -1) {
                                 value = value.substring(0, value.indexOf(")"));
                                 value = value.strip();
@@ -223,7 +223,7 @@ public class Parser {
                                 values.add(value);
                             }
                         }
-                        storageManager.insertRecord(table_name, (String[]) values.toArray());
+                        storageManager.insertRecord(table_name, values.toArray(new String[values.size()]));
                     } catch (PrimaryKeyException e) {
                         System.out.println(e.getMessage());
                     }
@@ -276,7 +276,9 @@ public class Parser {
                 case UPDATE -> {
                     //
                 }
-                case EMPTY -> throw new Exception();
+                case EMPTY -> {
+                    System.out.println("Somethings wrong");
+                }
             }
             System.out.println("SUCCESS");
         }
@@ -286,8 +288,8 @@ public class Parser {
             System.out.println(e.getMessage());
         } catch (PrimaryKeyException e) {
             System.out.println(e.getMessage());
-        } catch (Exception e) {
-            System.out.println("ERROR");
+        } catch (UniqueException e) {
+            System.out.println(e.getMessage());
         }
 
         return true;

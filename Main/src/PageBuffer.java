@@ -206,7 +206,6 @@ public class PageBuffer {
             byte[] bytes = new byte[Page.getCapacity()];
             bytes = page.getPageAsBytes().array();
             
-            
             raf.seek(raf.length());
             raf.write(bytes);
 

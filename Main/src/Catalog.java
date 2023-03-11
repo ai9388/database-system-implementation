@@ -91,7 +91,7 @@ public class Catalog {
         }
 
         File catalogFile = new File(catalogPath);
-        
+
         if (catalogFile.exists() && !catalogFile.isDirectory()) {
             return true;
         } else {
@@ -264,7 +264,7 @@ public class Catalog {
                 Page page = new Page(pageID, records);
                 pages.add(page);
 
-                raFile.seek(pageSize - traversedBytes);
+                raFile.read(new byte[pageSize - traversedBytes]);
             }
         } catch (IOException e) {
             System.out.println();
@@ -280,6 +280,7 @@ public class Catalog {
      */
     public TableSchema createTableSchemaObjectFromBytes(RandomAccessFile f) {
         try {
+            System.out.println(f.getFilePointer());
             // getting the table name
             int tableNameLength = f.readInt();
 
@@ -331,6 +332,7 @@ public class Catalog {
             }
             return new TableSchema(tableName, attributes);
         } catch (IOException e) {
+            System.out.println("exception inside creating method");
             e.printStackTrace();
         }
 
