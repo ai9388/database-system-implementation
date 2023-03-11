@@ -151,35 +151,11 @@ public class StorageManager {
             throw new TableException(2, tableName);
         }
         record = db.validateRecord(table, recordInfo);
-        ArrayList<Record> records = null;
-        // Todo: get records
-        db.checkUniqueness(record, db.uniqueAttribute(table.getAttributes()), records);
+        // TODO: validate the primary key uniqueness
         if(record != null){
             pageBuffer.insertRecord(table, record);
         }
 
-    }
-
-    /***
-     * delete record by primary key from a given table
-     * @param primaryKey the primary key
-     * @param tablename the table to delete record from
-     * @throws PrimaryKeyException if the primary key is invalid in some way
-     */
-    public void deleteRecord(String primaryKey, String tablename) throws PrimaryKeyException, InvalidDataTypeException{
-        // not due until phase 3
-    }
-
-    /***
-     * update record by primary key from a given table
-     * @param primaryKey
-     * @param table
-     * @throws InvalidDataTypeException
-     * @throws PrimaryKeyException
-     * @throws TableException
-     */
-    public void updateRecord(String primaryKey, TableSchema table,  String column, String newEntry){
-        // not due until phase 3
     }
 
     /**
@@ -187,11 +163,17 @@ public class StorageManager {
      */
     public void writeToCatalog()
     {
-        this.catalog.setTables(db.getTables());
         byte[] bb = this.catalog.createBytesForCatalog();
         this.catalog.writeBytesToCatalogFile(bb);
     }
 
+    public void shutDown(){
+        // purge all the pages
+        pageBuffer.purge();
+
+        // write changes to the catalog
+        writeToCatalog();
+    }
     /**
       * adding the initial information to the file
       * this includes the file id, number of pages, and number of records
@@ -223,6 +205,7 @@ public class StorageManager {
      */
     public void dropTable(String table_name) throws TableException {
         db.dropTable(table_name);
+        pageBuffer.dropTable(table_name);
     }
 
     /**

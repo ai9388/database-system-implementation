@@ -3,6 +3,10 @@ import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class ParserTest {
     
     String[] columns;
@@ -95,21 +99,50 @@ public class ParserTest {
     }
 
     @Test
-    public void parseTest(){
+    public void parseInsertTest(){
         parseValueRecords("(45, \"haiyen\")");
         //test
     }
 
     @Test
-    public void test2(){
+    public void TestWithInvalidVarchar() {
         String[] commands = new String[]{
                 "create table foo (num integer primarykey, name varchar(10));",
-                "insert into foo values (45, \"carly\"), (54, \"hai-yen\");",
                 "display info foo;"
         };
 
         runCommands(commands);
+
+        // insert a valid record
+        String[] values = new String[]{"45", "\"CarlyMaggiolo"};
+        String tableName = "foo";
+        String ex = "Invalid Data Type: Expected(int, varchar(10)) got(int, varchar(14))";
+        try {
+            parser.storageManager.insertRecord(tableName, values);
+        } catch (Exception e) {
+            assertEquals(ex, e.getMessage());
+        }
     }
 
+    @Test
+    public void TestWithValidVarchar() {
+        String[] commands = new String[]{
+                "create table foo (num integer primarykey, name varchar(10));",
+                "display info foo;"
+        };
 
+        runCommands(commands);
+
+        // insert a valid record
+        String[] values = new String[]{"45", "\"Carly"};
+        String tableName = "foo";
+        try {
+            parser.storageManager.insertRecord(tableName, values);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        // there should be one page and one records
+        assertTrue(parser.storageManager.pageBuffer.getPages().get( 0).getNumOfRecords() == 1);
+    }
 }

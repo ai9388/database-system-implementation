@@ -73,6 +73,7 @@ public class PageBuffer {
         }
 
         Page page = readPage(tableName, pageId);
+        page.setUsed();
         // update active pages
         updateBuffer(page);
 
@@ -117,6 +118,7 @@ public class PageBuffer {
             // TODO: insert the page into the table file
             updateBuffer(page); // add page to buffer
             tableSchema.addPageID(page.getId());
+            this.tables.add(tableSchema); // add this table to the local collection. used for writing to mem
             return;
         }
         // read table page in order from table file
@@ -157,6 +159,7 @@ public class PageBuffer {
             // if table becomes overfull, split the page; end
             if(page.overflow()) {
                 Page newPage = page.split(getNextPageID());
+                newPage.setIsNew();
                 tableSchema.addPageID(newPage.getId());
                 updateBuffer(newPage); // update the buffer with new Page
                 inserted = true;
@@ -231,8 +234,8 @@ public class PageBuffer {
             //skip to certain pointer for the page
             int numPages = table.getNumberOfPages();
             raf.writeInt(numPages);
-            int skip = (page.getId()-1) * Page.getCapacity();
-            raf.read(new byte[skip]);
+            int skip = ((page.getId()-1) * Page.getCapacity()) + (2 * Integer.BYTES);
+            raf.seek(skip);
             raf.write(bytes);
 
             //need up to figure out the update
@@ -250,6 +253,7 @@ public class PageBuffer {
      */
     public Page readPage(String tableName, int pageId){
         //TODO: deserialize @ AlexI
+        // every page you get from here set to not new
         return null;
     }
 
@@ -272,10 +276,17 @@ public class PageBuffer {
         // iterate all the page ID's to get the pages
         for(Integer pageID : table.getPageIds()){
             Page page = Catalog.readIndividualPageFromMemory(dbPath, table.getName(), pageID, Page.getCapacity(), table.getAttributes());
+            // every page you get
             records.addAll(page.getRecords());
         }
 
         return records;
+    }
+
+    public void dropTable(String TableName){
+        File file = new File(dbPath + "/" + TableName);
+        boolean del = file.delete();
+        System.out.println(del);
     }
 
     public String displayPages(){
@@ -291,7 +302,12 @@ public class PageBuffer {
     public void purge()
     {
         for(Page page: activePages){
-            updatePage(page);
+            if(page.isNew()){
+                writePage(page);
+            }
+            else {
+                updatePage(page);
+            }
         }
     }
 

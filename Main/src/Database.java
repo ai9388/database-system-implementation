@@ -126,13 +126,10 @@ public class Database {
      */
     public void dropTable(String tablename) throws TableException
     {
-        if(tables.containsKey(tablename)){
-            this.tablesID.remove(tables.get(tablename).getTableID());
-            this.tables.remove(tablename);
-        }
-        else{
-            throw new TableException(2, tablename);
-        }
+        TableSchema table = getTable(tablename);
+        // table exists
+        this.tablesID.remove(tables.get(tablename).getTableID());
+        this.tables.remove(tablename);
     }
 
     /**
@@ -164,10 +161,30 @@ public class Database {
             throw new TableException(3, "");
         }
         if (Type.validateAll(values, attributes)) {
+            for (int i = 0; i < attributes.size(); i++) {
+                if (attributes.get(i).getType().equals(Type.CHAR) || attributes.get(i).getType().equals(Type.VARCHAR)) {
+                    if (values[i].indexOf("\"") != -1) {
+                        values[i] = values[i].substring(values[i].indexOf("\"") + 1);
+                        if (values[i].indexOf("\"") != -1) {
+                            values[i] = values[i].substring(0, values[i].indexOf("\""));
+                        }
+                    }
+                }
+            }
             Record record = new Record(new ArrayList<>(Arrays.asList(values, attributes)));
             return record;
         } else {
             // creation of record failed
+            for (int i = 0; i < attributes.size(); i++) {
+                if (attributes.get(i).getType().equals(Type.CHAR) || attributes.get(i).getType().equals(Type.VARCHAR)) {
+                    if (values[i].indexOf("\"") != -1) {
+                        values[i] = values[i].substring(values[i].indexOf("\"") + 1);
+                        if (values[i].indexOf("\"") != -1) {
+                            values[i] = values[i].substring(0, values[i].indexOf("\""));
+                        }
+                    }
+                }
+            }
             throw new InvalidDataTypeException(values, attributes);
         }
     }

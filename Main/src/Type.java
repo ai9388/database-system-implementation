@@ -49,14 +49,14 @@ public enum Type {
                         Boolean.parseBoolean(value);
                         return true;
                 case CHAR:
-                    if(value.length() != attribute.getN()){
+                    if (value.length() != attribute.getN() + 2 || !value.startsWith("\"") || !value.endsWith("\"")) {
                         break;
                     }
                     else{
                         return true;
                     }
                 case VARCHAR:
-                    if(value.length() > attribute.getN()){
+                    if(value.length() > attribute.getN() + 2){
                         break;
                     }
                     else{
@@ -81,6 +81,7 @@ public enum Type {
             Attribute attribute = attributes.get(i);
             String value = values[i];
             if(!Type.validateType(value, attribute)){
+                System.out.println(value);
                 return false;
             }
         }
