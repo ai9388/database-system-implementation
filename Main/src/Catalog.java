@@ -378,7 +378,7 @@ public class Catalog {
      */
     public void writeBytesToCatalogFile(byte[] bytes) {
         try {
-            String catalogPath = path;
+            String catalogPath = this.path;
             if (path.contains("\\")) {
                 catalogPath += "\\Catalog";
             } else {
@@ -387,6 +387,11 @@ public class Catalog {
 
             File file = new File(catalogPath);
             raf = new RandomAccessFile(file, WRITE);
+
+            // every time we write to the catalog
+            // we have to make sure that everything we are rewriting is updated
+            raf.seek(0);
+            raf.setLength(0);
 
             raf.write(bytes);
 
