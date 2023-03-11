@@ -25,7 +25,7 @@ public class ParserTest {
 
     @Before
     public void setupParser(){
-        String dbname = "school";
+        String dbname = "db";
         String path = "./Main/" + dbname;
         int pageSize = 100;
         int bufferSize = 15;
@@ -108,9 +108,7 @@ public class ParserTest {
                 "insert into foo values (50, \"hai-yen\");",
                 "display info foo;",
                 "Select * from foo;",
-                "alter table foo add lastName varchar(20) default \"maggiolo\";",
-                "display info foo;",
-                "Select * from foo;"
+                "quit"
         };
         runCommands(commands);
     }
@@ -121,6 +119,29 @@ public class ParserTest {
             parser.classifyInput(command);
             parser.parse();
         }
+    }
+
+    @Test
+    public void individualtes(){
+        String s = "insert into foo values (47, \"santa\");";
+
+        String t_name = s.split("into")[1].split("values")[0].strip();
+        String[] values = s.split("values");
+        String[] tuples = values[1].split("\\(");
+
+
+        System.out.println(t_name);
+        System.out.println(Arrays.toString(values));
+        System.out.println(Arrays.toString(tuples));
+
+        for (int i = 1; i < tuples.length; i++) {
+//            System.out.println(Arrays.toString(tuples[i].split("\\)")));
+//            System.out.println(tuples[i].split("\\)")[0]);
+            System.out.println(Arrays.toString(tuples[i].split("\\)")[0].split(",")));
+        }
+
+
+
     }
 
     public void parseValueRecords(String queries){

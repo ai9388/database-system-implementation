@@ -164,9 +164,6 @@ public class StorageManager {
         if (table == null) {
             throw new TableException(2, tableName);
         }
-        if (recordInfo.length % table.getAttributes().size() != 0) {
-            throw new TableException(4, "");
-        }
         int j = 0;
         String[] data = new String[table.getAttributes().size()];
         for (String info : recordInfo) {
@@ -178,7 +175,7 @@ public class StorageManager {
                 record = db.validateRecord(table, data);
                 if(record != null){
                     ArrayList<Record> records = loadRecords(table);
-                    db.validatePrimaryKey(record, table, loadRecords(table));
+                    db.validatePrimaryKey(record, table, records);
                     ArrayList<Integer> uniqueAttributes = db.uniqueAttribute(table.getAttributes());
                     db.checkUniqueness(record, uniqueAttributes, records);
                     pageBuffer.insertRecord(table, record);
