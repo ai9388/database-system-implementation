@@ -270,12 +270,17 @@ public class TableSchema {
         }
 
         boolean isPrimaryKey = attr.isIsPrimaryKey();
+        boolean isNotNull = attr.getNotNull();
+        boolean isUnique = attr.getUnique();
+        
 
         bb = Type.concat(bb, Type.convertIntToByteArray(attributeNameLength));
         bb = Type.concat(bb, Type.convertStringToByteArray(attributeName));
         bb = Type.concat(bb, Type.convertIntToByteArray(attributeType));
         bb = Type.concat(bb, Type.convertIntToByteArray(attributeN));
         bb = Type.concat(bb, Type.convertBooleanToByteArray(isPrimaryKey));
+        bb = Type.concat(bb, Type.convertBooleanToByteArray(isNotNull));
+        bb = Type.concat(bb, Type.convertBooleanToByteArray(isUnique));
 
         return bb;
     }

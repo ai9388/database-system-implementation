@@ -90,4 +90,12 @@ public class Attribute {
     public boolean getUnique() {
         return this.unique;
     }
+
+    /**
+     * @param primaryKey the primaryKey to set
+     */
+    public void setPrimaryKey(boolean primaryKey) {
+        this.primaryKey = primaryKey;
+    }
+
 }
