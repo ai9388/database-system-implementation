@@ -187,6 +187,8 @@ public class TableSchema {
         for (Attribute a : attributes) {
             str += "\t" + a + "\n";
         }
+
+        str += "Pages: " + pageIds.size();
         return str;
     }
 
