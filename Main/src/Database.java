@@ -164,10 +164,30 @@ public class Database {
             throw new TableException(3, "");
         }
         if (Type.validateAll(values, attributes)) {
+            for (int i = 0; i < attributes.size(); i++) {
+                if (attributes.get(i).getType().equals(Type.CHAR) || attributes.get(i).getType().equals(Type.VARCHAR)) {
+                    if (values[i].indexOf("\"") != -1) {
+                        values[i] = values[i].substring(values[i].indexOf("\"") + 1);
+                        if (values[i].indexOf("\"") != -1) {
+                            values[i] = values[i].substring(0, values[i].indexOf("\""));
+                        }
+                    }
+                }
+            }
             Record record = new Record(new ArrayList<>(Arrays.asList(values, attributes)));
             return record;
         } else {
             // creation of record failed
+            for (int i = 0; i < attributes.size(); i++) {
+                if (attributes.get(i).getType().equals(Type.CHAR) || attributes.get(i).getType().equals(Type.VARCHAR)) {
+                    if (values[i].indexOf("\"") != -1) {
+                        values[i] = values[i].substring(values[i].indexOf("\"") + 1);
+                        if (values[i].indexOf("\"") != -1) {
+                            values[i] = values[i].substring(0, values[i].indexOf("\""));
+                        }
+                    }
+                }
+            }
             throw new InvalidDataTypeException(values, attributes);
         }
     }
