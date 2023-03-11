@@ -206,11 +206,24 @@ public class Parser {
                     input = input.substring(start_index - 1);
                     String[] vals = input.split(",");
                     try {
+                        ArrayList<String> values = new ArrayList<>();
                         for (String value : vals) {
-
-                            String[] values = value.replaceAll("[();]", "").strip().split(" ");
-                            storageManager.insertRecord(table_name, values);
+                            if (value.indexOf("\"") != -1) {
+                                value = value.substring(value.indexOf("\"") + 1);
+                                if (value.indexOf("\"") != -1) {
+                                    value = value.substring(0, value.indexOf("\""));
+                                }
+                                values.add(value);
+                            } else if (value.indexOf(")") != -1) {
+                                value = value.substring(0, value.indexOf(")"));
+                                value = value.strip();
+                                values.add(value);
+                            } else {
+                                value = value.strip();
+                                values.add(value);
+                            }
                         }
+                        storageManager.insertRecord(table_name, (String[]) values.toArray());
                     } catch (PrimaryKeyException e) {
                         System.out.println(e.getMessage());
                     }
