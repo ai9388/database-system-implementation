@@ -230,7 +230,7 @@ public class Parser {
                 }
                 case HELP -> displayHelp();
                 case QUIT -> {
-                    storageManager.writeToCatalog();
+                    storageManager.shutDown();
                     System.out.println("Shutting down 11QL...");
                     System.out.println("Shutting down the database...");
                     System.out.println("Purging the page buffer...");
