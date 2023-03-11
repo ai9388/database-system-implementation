@@ -1,6 +1,8 @@
 import java.io.File;
 import java.util.*;
 
+import javax.sound.midi.Soundbank;
+
 public class Parser {
     enum commands {
         CREATE_TABLE, DISPLAY_SCHEMA, DISPLAY_INFO, SELECT, INSERT, HELP, QUIT, DROP, ALTER, DELETE, UPDATE, EMPTY
@@ -202,40 +204,26 @@ public class Parser {
                     select("*", table_name); // This is good for now because we are not selecting by columns just yet
                 }
                 case INSERT -> {
-                    String input = user_input.replaceFirst("insert into", "").strip();
-                    String table_name = input.split(" ")[0].strip();
-                    int start_index = input.indexOf("(");
-                    input = input.substring(start_index + 1);
-                    String[] vals = input.split(",");
                     try {
-                        ArrayList<String> values = new ArrayList<>();
-                        for (String value : vals) {
-                            if (value.indexOf("\"") != -1) {
-                                value = value.substring(value.indexOf("\"") + 1);
-                                if (value.indexOf("\"") != -1) {
-                                    value = value.substring(0, value.indexOf("\""));
-                                }
-                                values.add("\"" + value + "\"");
-                            } else if (value.indexOf("(") != -1) {
-                                value = value.substring(value.indexOf("(") + 1);
-                                value = value.strip();
-                                if (value.indexOf(")") != -1) {
-                                    value = value.substring(0, value.indexOf(")"));
-                                    value = value.strip();
-                                }
-                                values.add(value);
-                            } else if (value.indexOf(")") != -1) {
-                                value = value.substring(0, value.indexOf(")"));
-                                value = value.strip();
-                                values.add(value);
-                            } else {
-                                value = value.strip();
-                                values.add(value);
+                        ArrayList<String[]> arr = new ArrayList<>();
+                        
+                        String t_name = user_input.split("into")[1].split("values")[0].strip();
+                        String[] values = user_input.split("values");
+                        String[] tuples = values[1].split("\\(");
+
+                        for (int i = 1; i < tuples.length; i++) {
+                            String[] temp = tuples[i].split("\\)")[0].split(",");
+                            for(int j = 0; j < temp.length; j++){
+                                temp[j] = temp[j].strip();
                             }
+                            arr.add(temp);
                         }
-                        storageManager.insertRecord(table_name, values.toArray(new String[values.size()]));
+
+                        storageManager.insertRecords(t_name, arr);
                     } catch (PrimaryKeyException e) {
                         System.out.println(e.getMessage());
+                    } catch (ArrayIndexOutOfBoundsException e){
+                        System.out.println("invalid queries");
                     }
                 }
                 case HELP -> displayHelp();
