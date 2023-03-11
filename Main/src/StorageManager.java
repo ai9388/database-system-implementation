@@ -291,6 +291,11 @@ public class StorageManager {
         // get the attributes and add a new one
         ArrayList<Attribute> newAttributes = new ArrayList<>();
         newAttributes.addAll(table.getAttributes());
+
+        if(newAttributes.contains(attribute)){
+            throw new TableException(6, attribute.getName());
+        }
+
         newAttributes.add(attribute);
 
         // get all the records

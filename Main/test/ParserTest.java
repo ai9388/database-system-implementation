@@ -61,10 +61,11 @@ public class ParserTest {
     @Test
     public void insertTest3(){
         String[] commands = new String[]{
-                "create table foo (num integer primarykey, name varchar(10) primarykey);",
-//                "insert into foo values (45, \"carly\");",
-//                "insert into foo values (50, \"hai-yen\");",
-                "display info foo;"
+                "create table foo (num integer primarykey, name varchar(10) unique);",
+                "insert into foo values (45, null);",
+                "insert into foo values (50, null);",
+                "display info foo;",
+                "select * from foo;"
         };
         runCommands(commands);
     }
@@ -92,7 +93,7 @@ public class ParserTest {
                 "insert into foo values (50, \"hai-yen\");",
                 "display info foo;",
                 "Select * from foo;",
-                "alter table foo add grade double",
+                "alter table foo add grade double;",
                 "display info foo;",
                 "Select * from foo;"
         };
@@ -107,7 +108,7 @@ public class ParserTest {
                 "insert into foo values (50, \"hai-yen\");",
                 "display info foo;",
                 "Select * from foo;",
-                "alter table foo add grade double default 0.0",
+                "alter table foo add lastName varchar(20);",
                 "display info foo;",
                 "Select * from foo;"
         };

@@ -2,6 +2,8 @@
 /// Used in the catalog to store the name of the 
 ///
 
+import org.w3c.dom.Attr;
+
 public class Attribute {
 
     private String name;
@@ -98,4 +100,14 @@ public class Attribute {
         this.primaryKey = primaryKey;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        boolean res = false;
+        if(obj instanceof Attribute){
+            Attribute other = (Attribute) obj;
+            res = this.name.equals(other.getName());
+        }
+
+        return res;
+    }
 }
