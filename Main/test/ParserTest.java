@@ -77,12 +77,43 @@ public class ParserTest {
                 "insert into foo values (50, \"hai-yen\", 3.4);",
                 "display info foo;",
                 "Select * from foo;",
-                "alter table foo drop num",
+                "alter table foo drop grade",
                 "display info foo;",
                 "Select * from foo;"
         };
         runCommands(commands);
     }
+
+    @Test
+    public void testAddAttributeNoDef(){
+        String[] commands = new String[]{
+                "create table foo (num integer primarykey, name varchar(10));",
+                "insert into foo values (45, \"carly\");",
+                "insert into foo values (50, \"hai-yen\");",
+                "display info foo;",
+                "Select * from foo;",
+                "alter table foo add grade double",
+                "display info foo;",
+                "Select * from foo;"
+        };
+        runCommands(commands);
+    }
+
+    @Test
+    public void testAddAttributeDef(){
+        String[] commands = new String[]{
+                "create table foo (num integer primarykey, name varchar(10));",
+                "insert into foo values (45, \"carly\");",
+                "insert into foo values (50, \"hai-yen\");",
+                "display info foo;",
+                "Select * from foo;",
+                "alter table foo add grade default 0.0",
+                "display info foo;",
+                "Select * from foo;"
+        };
+        runCommands(commands);
+    }
+
     public void runCommands(String[] commands){
         for(int i = 0; i < commands.length; i++){
             String command = commands[i];
