@@ -178,7 +178,6 @@ public class Parser {
                     if (!hasOnePK) {
                         throw new PrimaryKeyException(1, " ");
                     } else {
-                        System.out.println(attributes.toString());
                         try {
                             storageManager.createTable(table_name.strip(), attributes);
                             System.out.println("SUCCESS! You've created " + table_name);
@@ -214,6 +213,10 @@ public class Parser {
                                     value = value.substring(0, value.indexOf("\""));
                                 }
                                 values.add("\"" + value + "\"");
+                            } else if (value.indexOf("(") != -1) {
+                                value = value.substring(value.indexOf("(") + 1);
+                                value = value.strip();
+                                values.add(value);
                             } else if (value.indexOf(")") != -1) {
                                 value = value.substring(0, value.indexOf(")"));
                                 value = value.strip();

@@ -152,12 +152,24 @@ public class StorageManager {
         if (table == null) {
             throw new TableException(2, tableName);
         }
-        record = db.validateRecord(table, recordInfo);
-        // TODO: validate the primary key uniqueness
-        if(record != null){
-            pageBuffer.insertRecord(table, record);
+        if (recordInfo.length % table.getAttributes().size() != 0) {
+            throw new TableException(4, "");
         }
-
+        int j = 0;
+        String[] data = new String[table.getAttributes().size()];
+        for (String info : recordInfo) {
+            if (j >= table.getAttributes().size()) {
+                j = 0;
+            }
+            data[j++] = info;
+            if (j == table.getAttributes().size()) {
+                record = db.validateRecord(table, data);
+                // TODO: validate the primary key uniqueness
+                if (record != null) {
+                    pageBuffer.insertRecord(table, record);
+                }
+            }
+        }
     }
 
     /**
