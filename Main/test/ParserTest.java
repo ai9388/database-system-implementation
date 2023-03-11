@@ -50,14 +50,36 @@ public class ParserTest {
     @Test
     public void insertTest2(){
         String[] commands = new String[]{
-                "create table foo (num integer primarykey, name varchar(10) unique);"
+                "create table foo (num integer unique, name varchar(10) unique);",
 //                "insert into foo values (45, \"carly\");",
 //                "insert into foo values (50, \"hai-yen\");",
-//                "display info foo;"
+                "display info foo;"
         };
         runCommands(commands);
     }
 
+    @Test
+    public void insertTest3(){
+        String[] commands = new String[]{
+                "create table foo (num integer primarykey, name varchar(10) primarykey);",
+//                "insert into foo values (45, \"carly\");",
+//                "insert into foo values (50, \"hai-yen\");",
+                "display info foo;"
+        };
+        runCommands(commands);
+    }
+
+    @Test
+    public void insertTest4(){
+        String[] commands = new String[]{
+                "create table foo (num integer primarykey, name varchar(10));",
+//                "insert into foo values (45, \"carly\");",
+//                "insert into foo values (50, \"hai-yen\");",
+                "display info foo;",
+                "drop table foo;"
+        };
+        runCommands(commands);
+    }
     public void runCommands(String[] commands){
         for(int i = 0; i < commands.length; i++){
             String command = commands[i];

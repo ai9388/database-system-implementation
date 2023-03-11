@@ -95,7 +95,12 @@ public class Database {
      */
     public TableSchema getTable(String name) throws TableException{
         try {
-            return this.tables.get(name);
+            TableSchema table = this.tables.get(name);
+            if(table == null){
+                throw new TableException(2, name);
+            }
+
+            return table;
         } catch (NullPointerException e) {
             throw new TableException(2, name);
         }
