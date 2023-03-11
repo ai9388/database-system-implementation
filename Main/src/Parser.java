@@ -284,7 +284,7 @@ public class Parser {
                             a = null;
                         }
                         if (input.split(" ").length > 5) {
-                            String value = input.split(" ")[5];
+                            String value = input.split("default")[1].strip();
                             value = value.split(";")[0];
                             // TODO: add functionality to storage manager to add attribute to table
                             storageManager.addAttributeToTable(a, value, table_name);
