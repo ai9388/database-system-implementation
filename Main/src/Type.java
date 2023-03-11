@@ -2,7 +2,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 public enum Type {
-    INTEGER ("int"),
+    INTEGER ("integer"),
     DOUBLE ("double"),
     BOOLEAN ("bool"),
     CHAR ("char"),

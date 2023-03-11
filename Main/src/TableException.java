@@ -5,7 +5,8 @@ public class TableException extends Exception{
         "Too many entries!", // 3
         "Missing Values! ", // 4
         "Table %s already exists!", // 5
-        "Column %s already exists!" // 6
+        "Column %s already exists!", // 6
+        "Cannot drop Primary Attribute %s" // 7
     };
     private String message = "Table Error:";
 

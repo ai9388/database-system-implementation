@@ -128,7 +128,7 @@ public class StorageManager {
 
     /***
      * get all records for a given table number
-     * @param tableName the table name
+     * @param table the table name
      * @return an arraylist of records
      */
     private ArrayList<Record> loadRecords(TableSchema table){
@@ -281,8 +281,48 @@ public class StorageManager {
         }
     }
 
-    public void addAttributeToTable(Attribute attribute, String value, String table_name) throws TableException {
-        db.addAttribute(attribute, value, table_name);
+    public void addAttributeToTable(Attribute attribute, String defaultValue, String table_name) throws TableException, InvalidDataTypeException {
+        TableSchema table = db.getTable(table_name);
+
+        if(!defaultValue.equals("") && !Type.validateType(defaultValue, attribute)){
+            throw new InvalidDataTypeException(defaultValue, attribute);
+        }
+
+        // get the attributes and add a new one
+        ArrayList<Attribute> newAttributes = new ArrayList<>();
+        newAttributes.addAll(table.getAttributes());
+        newAttributes.add(attribute);
+
+        // get all the records
+        ArrayList<Record> records = loadRecords(table);
+        ArrayList<Record> newRecords = new ArrayList<>();
+
+        // drop the old table
+        dropTable(table_name);
+
+        // create a new table
+        createTable(table_name, newAttributes);
+        TableSchema newTable = getTable(table_name);
+
+        // populate new records
+        for(Record r: records){
+            // copy the old entries
+            ArrayList<Object> newEntries = new ArrayList<>();
+            newEntries.addAll(r.getEntries());
+
+            // add the new entry on condition
+            if(defaultValue.equals("")){
+                newEntries.add("null");
+            }
+            else{
+                newEntries.add(defaultValue);
+            }
+
+            Record newRecord = new Record(newEntries);
+            // add the new Record to new collection
+            newRecords.add(newRecord);
+            pageBuffer.insertRecord(newTable, newRecord);
+        }
     }
 
     public String formatResults(ArrayList<Attribute> tableAttributes, ArrayList<Record> records) {

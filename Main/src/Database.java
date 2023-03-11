@@ -1,3 +1,5 @@
+import org.w3c.dom.Attr;
+
 import java.util.*;
 
 public class Database {
@@ -249,23 +251,13 @@ public class Database {
         ArrayList<Attribute> attributes = new ArrayList<>();
         attributes.addAll(table.getAttributes());
         Attribute attributeToRemove = table.getAttribute(attribute_name);
+
+        if(attributeToRemove.isIsPrimaryKey()){
+            throw new TableException(7, attribute_name);
+        }
+
         attributes.remove(attributeToRemove);
-
         return attributes;
-
-    }
-
-
-    /**
-     * adds an attribute to a table
-      * @param attribute the name of the attribute
-     * @param value the value
-     * @param table_name
-     * @throws TableException
-     */
-    public void addAttribute(Attribute attribute, String value, String table_name) throws TableException {
-        TableSchema table = this.getTable(table_name);
-        // TODO: get records and add the attribute to those records with the default [value]
     }
 
 }
