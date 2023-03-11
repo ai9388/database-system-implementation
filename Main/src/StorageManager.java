@@ -1,5 +1,3 @@
-import org.w3c.dom.Attr;
-
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.*;
@@ -166,15 +164,28 @@ public class StorageManager {
         if (table == null) {
             throw new TableException(2, tableName);
         }
-        record = db.validateRecord(table, recordInfo);
-
-        if(record != null){
-            ArrayList<Record> records = loadRecords(table);
-            db.validatePrimaryKey(record, table, loadRecords(table));
-            ArrayList<Integer> uniqueAttributes = db.uniqueAttribute(table.getAttributes());
-            db.checkUniqueness(record, uniqueAttributes, records);
-            pageBuffer.insertRecord(table, record);
+        if (recordInfo.length % table.getAttributes().size() != 0) {
+            throw new TableException(4, "");
         }
+        int j = 0;
+        String[] data = new String[table.getAttributes().size()];
+        for (String info : recordInfo) {
+            if (j >= table.getAttributes().size()) {
+                j = 0;
+            }
+            data[j++] = info;
+            if (j == table.getAttributes().size()) {
+                record = db.validateRecord(table, data);
+                if(record != null){
+                    ArrayList<Record> records = loadRecords(table);
+                    db.validatePrimaryKey(record, table, loadRecords(table));
+                    ArrayList<Integer> uniqueAttributes = db.uniqueAttribute(table.getAttributes());
+                    db.checkUniqueness(record, uniqueAttributes, records);
+                    pageBuffer.insertRecord(table, record);
+                }
+            }
+        }
+
     }
 
     /**
@@ -225,8 +236,9 @@ public class StorageManager {
      */
     public boolean dropTable(String table_name) throws TableException {
 
-         if(pageBuffer.dropTable(table_name)){
-             db.dropTable(table_name);
+        TableSchema table = db.getTable(table_name);
+         if(pageBuffer.dropTable(table.getName())){
+             db.dropTable(table.getName());
              return true;
          }
 

@@ -74,7 +74,7 @@ public class Parser {
                     for (String attribute : attr) {
                         String[] components = attribute.strip().replaceAll("\\(", " ").split(" ");
                         String attr_name = components[0];
-                        boolean primarykey = components.length > 2 && components[2].equals("primarykey");
+                        boolean primarykey = false;
                         boolean notNull = false;
                         boolean unique = false;
                         switch (components[1]) {
@@ -90,12 +90,10 @@ public class Parser {
                                         case "unique" -> unique = true;
                                     }
                                 }
-                                hasOnePK = ((primarykey && !hasOnePK) || (components.length <= 3 && hasOnePK));
                                 Attribute a = new Attribute(attr_name, Type.CHAR, primarykey, notNull, unique, Integer.parseInt(components[2].replace(')', ' ').strip()));
                                 primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                                 primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
                                 attributes.add(a);
-                                //check component after char to know length
                             }
                             case "varchar" -> {
                                 for (int i = 3; i < components.length; i++) {
@@ -109,7 +107,6 @@ public class Parser {
                                         case "unique" -> unique = true;
                                     }
                                 }
-                                hasOnePK = ((components.length > 3 && !hasOnePK) || (components.length <= 3 && hasOnePK));
                                 Attribute a = new Attribute(attr_name, Type.VARCHAR, primarykey, notNull, unique, Integer.parseInt(components[2].replace(')', ' ').strip()));
                                 primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                                 primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
@@ -127,7 +124,6 @@ public class Parser {
                                         case "unique" -> unique = true;
                                     }
                                 }
-                                hasOnePK = ((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
                                 Attribute a = new Attribute(attr_name, Type.BOOLEAN, primarykey, notNull, unique, 0);
                                 primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                                 primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
@@ -145,7 +141,6 @@ public class Parser {
                                         case "unique" -> unique = true;
                                     }
                                 }
-                                hasOnePK = ((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
                                 Attribute a = new Attribute(attr_name, Type.INTEGER, primarykey, notNull, unique, 0);
                                 primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                                 primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
@@ -163,7 +158,6 @@ public class Parser {
                                         case "unique" -> unique = true;
                                     }
                                 }
-                                hasOnePK = ((primarykey && !hasOnePK) || (!primarykey && hasOnePK));
                                 Attribute a = new Attribute(attr_name, Type.DOUBLE, primarykey, notNull, unique, 0);
                                 primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
                                 primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
@@ -175,10 +169,18 @@ public class Parser {
                             }
                         }
                     }
+                    hasOnePK = false;
+                    for (Attribute attribute: attributes) {
+                        if (hasOnePK && attribute.isIsPrimaryKey()) {
+                            hasOnePK = !hasOnePK;
+                            throw new PrimaryKeyException(3, "");
+                        } else if (attribute.isIsPrimaryKey()) {
+                            hasOnePK = true;
+                        }
+                    }
                     if (!hasOnePK) {
                         throw new PrimaryKeyException(1, " ");
                     } else {
-                        System.out.println(attributes.toString());
                         try {
                             storageManager.createTable(table_name.strip(), attributes);
                             System.out.println("SUCCESS! You've created " + table_name);
@@ -214,6 +216,10 @@ public class Parser {
                                     value = value.substring(0, value.indexOf("\""));
                                 }
                                 values.add("\"" + value + "\"");
+                            } else if (value.indexOf("(") != -1) {
+                                value = value.substring(value.indexOf("(") + 1);
+                                value = value.strip();
+                                values.add(value);
                             } else if (value.indexOf(")") != -1) {
                                 value = value.substring(0, value.indexOf(")"));
                                 value = value.strip();
@@ -242,7 +248,12 @@ public class Parser {
                 case DROP -> {
                     String input = user_input.replaceFirst("drop table", "").strip();
                     String table_name = input.split(";")[0];
-                    storageManager.dropTable(table_name);
+                    if(storageManager.dropTable(table_name)){
+                        System.out.println("Successfully drop table " + table_name);
+                    }
+                    else{
+                        System.out.println("Table " + table_name + " could not be remove");
+                    }
                 }
                 case ALTER -> {
                     String input = user_input.replaceFirst("alter table", "").strip();
@@ -277,7 +288,7 @@ public class Parser {
                     //
                 }
                 case EMPTY -> {
-                    System.out.println("Somethings wrong");
+                    System.out.println("Somethings wrong...");
                 }
             }
             System.out.println("SUCCESS");
