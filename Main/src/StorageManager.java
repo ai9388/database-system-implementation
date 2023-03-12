@@ -73,7 +73,7 @@ public class StorageManager {
      * @param recordsInfo the information about all the records to be inserted
      * @throws PrimaryKeyException
      */
-    public void insertRecords(String tableName, ArrayList<String[]> recordsInfo) throws TableException, PrimaryKeyException, InvalidDataTypeException, UniqueException {
+    public void insertRecords(String tableName, ArrayList<String[]> recordsInfo) throws TableException, PrimaryKeyException, InvalidDataTypeException, ConstraintException {
         for(String[] recordInfo: recordsInfo){
             insertRecord(tableName, recordInfo);
         }
@@ -97,7 +97,7 @@ public class StorageManager {
         }
         for (TableSchema table : tables) {
             System.out.println(table.displayTableSchema());
-            System.out.println("Records: " + loadRecords(table).size());
+            System.out.println("Records: " + loadRecords(table).size() + "\n");
         }
     }
 
@@ -109,7 +109,7 @@ public class StorageManager {
     public void displayTableInfo(String tableName) throws TableException {
         TableSchema table = db.getTable(tableName);
         System.out.println(table.displayTableSchema());
-        System.out.println("Records: " + loadRecords(table).size());
+        System.out.println("Records: " + loadRecords(table).size() + "\n");
     }
 
     /***
@@ -144,7 +144,7 @@ public class StorageManager {
      * @throws InvalidDataTypeException if the types provided in the record info are invalid
      * @throws PrimaryKeyException if the primary key isn't valid or if repeated
      */
-    public void insertRecord(String tableName, String[] recordInfo) throws TableException, InvalidDataTypeException, PrimaryKeyException, UniqueException {
+    public void insertRecord(String tableName, String[] recordInfo) throws TableException, InvalidDataTypeException, PrimaryKeyException, ConstraintException {
         TableSchema table = db.getTable(tableName);
         Record record = null;
 
@@ -251,7 +251,7 @@ public class StorageManager {
         }
     }
 
-    public void addAttributeToTable(Attribute attribute, String defaultValue, String table_name) throws TableException, InvalidDataTypeException {
+    public void addAttributeToTable(Attribute attribute, String defaultValue, String table_name) throws TableException, InvalidDataTypeException, ConstraintException {
         TableSchema table = db.getTable(table_name);
 
         // remove the quotes

@@ -29,11 +29,11 @@ public enum Type {
      * @param attribute attribute value is expected to belong to
      * @return true if value valid
      */
-    public static boolean validateType(String value, Attribute attribute){
+    public static boolean validateType(String value, Attribute attribute) throws ConstraintException {
         // verify if null regardless of data type
         // null values are always allowed
-        if (value.equalsIgnoreCase("null") && !attribute.getNotNull()) {
-            return true;
+        if (value.equalsIgnoreCase("null") && attribute.getNotNull()) {
+            throw new ConstraintException(2, attribute.getName());
         } else if (value.equalsIgnoreCase("null")) {
             return false;
         }
@@ -76,7 +76,7 @@ public enum Type {
      * @param attributes attributes containing types of collection
      * @return true if none of the values fail validation
      */
-    public static boolean validateAll(String[] values, ArrayList<Attribute> attributes){
+    public static boolean validateAll(String[] values, ArrayList<Attribute> attributes) throws ConstraintException {
         for (int i = 0; i < values.length; i++) {
             Attribute attribute = attributes.get(i);
             String value = values[i];

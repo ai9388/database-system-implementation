@@ -14,7 +14,6 @@ public class TableException extends Exception{
     public TableException(int errorCode, String arg){
         super();
         this.message = String.format(errorMessages[errorCode - 1], arg);
-
     }
 
     @Override

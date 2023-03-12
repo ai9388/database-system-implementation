@@ -1,5 +1,3 @@
-import org.w3c.dom.Attr;
-
 import java.util.*;
 
 public class Database {
@@ -158,7 +156,7 @@ public class Database {
      * @throws TableException if the table name/object does not exist
      * @throws InvalidDataTypeException if the object type is not valid
      */
-    public Record validateRecord(TableSchema table, String[] values) throws TableException, InvalidDataTypeException {
+    public Record validateRecord(TableSchema table, String[] values) throws TableException, InvalidDataTypeException, ConstraintException {
         // get all the attributes
         ArrayList<Attribute> attributes = table.getAttributes();
 
@@ -235,12 +233,12 @@ public class Database {
         return uniqueAttributes;
     }
 
-    public void checkUniqueness(Record record, ArrayList<Integer> uniqueAttribute, ArrayList<Record> records) throws UniqueException {
+    public void checkUniqueness(Record record, ArrayList<Integer> uniqueAttribute, ArrayList<Record> records) throws ConstraintException {
         if (uniqueAttribute.size() > 0) {
             for (Record r : records) {
                 for (Integer uniqueIndex : uniqueAttribute) {
                     if (record.compareAtIndex(record, uniqueIndex) == 0) {
-                        throw new UniqueException(1, (String) record.getValueAtColumn(uniqueIndex));
+                        throw new ConstraintException(1, (String) record.getValueAtColumn(uniqueIndex));
                     }
                 }
             }
