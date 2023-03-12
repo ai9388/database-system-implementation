@@ -27,7 +27,10 @@ public class Parser {
     public void classifyInput(String str_input) {
 
         this.user_input = str_input.toLowerCase();
-        if (user_input.startsWith("create table")) {
+        if((user_input.charAt(user_input.length() -1 ) != ';') && !user_input.startsWith("quit") && !user_input.startsWith("help") ){
+            command = commands.EMPTY;
+        }
+        else if (user_input.startsWith("create table")) {
             command = commands.CREATE_TABLE;
         } else if (user_input.startsWith("display schema")) {
             command = commands.DISPLAY_SCHEMA;
@@ -191,7 +194,7 @@ public class Parser {
                         }
                     }
                 }
-                case DISPLAY_SCHEMA -> storageManager.displaySchema();
+                case DISPLAY_SCHEMA -> storageManager.displaySchema();           
                 case DISPLAY_INFO -> {
                     String table_name = user_input.replaceFirst("display info", "").strip();
                     storageManager.displayTableInfo(table_name.substring(0, table_name.length() - 1));
@@ -292,10 +295,9 @@ public class Parser {
                     //
                 }
                 case EMPTY -> {
-                    System.out.println("Somethings wrong...");
+                    System.out.println("Invalid queries...");
                 }
             }
-            System.out.println("SUCCESS");
         }
         catch (TableException e) {
             System.out.println(e.getMessage());
