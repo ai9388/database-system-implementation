@@ -194,11 +194,7 @@ public class PageBuffer {
     public boolean writePage(Page page){
         TableSchema table = getTableName(page.getId());
         String tableName = table.getName();
-        // TODO: serialize @ hai-yen
-        //get the table path, then call the page to byte from Pages
-        //get the order of the pages from the table
-        //add new page: get# of pages to skip there #pages X page size
-        //update: have the order of pages in tableschema and then update
+
         File tableFile = new File(dbPath + "/" + tableName);
         RandomAccessFile raf;
         try {
@@ -226,7 +222,6 @@ public class PageBuffer {
             return false;
         }
         String tableName = table.getName();
-        // TODO: serialize @ hai-yen
         //update: have the order of pages in tableschema and then update
         //Future hai-yen: in the future, the page order will be diffrent bc we will delete
         File tableFile = new File(dbPath + "/" + tableName);
@@ -302,7 +297,6 @@ public class PageBuffer {
         return str;
     }
 
-    //TODO: Hai-Yen: writing pages to table fully
     public void purge()
     {
         for(Page page: activePages){
