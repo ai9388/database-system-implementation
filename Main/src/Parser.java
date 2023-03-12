@@ -1,7 +1,4 @@
-import java.io.File;
 import java.util.*;
-
-import javax.sound.midi.Soundbank;
 
 public class Parser {
     enum commands {
@@ -225,7 +222,6 @@ public class Parser {
 
                             arr.add(temp);
                         }
-
                         storageManager.insertRecords(t_name, arr);
                     } catch (PrimaryKeyException e) {
                         System.out.println(e.getMessage());
@@ -307,7 +303,7 @@ public class Parser {
             System.out.println(e.getMessage());
         } catch (PrimaryKeyException e) {
             System.out.println(e.getMessage());
-        } catch (UniqueException e) {
+        } catch (ConstraintException e) {
             System.out.println(e.getMessage());
         }
 

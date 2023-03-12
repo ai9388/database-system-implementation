@@ -29,13 +29,15 @@ public enum Type {
      * @param attribute attribute value is expected to belong to
      * @return true if value valid
      */
-    public static boolean validateType(String value, Attribute attribute){
+    public static boolean validateType(String value, Attribute attribute) throws ConstraintException {
         // verify if null regardless of data type
         // null values are always allowed
         if (value.equalsIgnoreCase("null") && !attribute.getNotNull()) {
             return true;
         } else if (value.equalsIgnoreCase("null")) {
             return false;
+        }else if (value.equalsIgnoreCase("null") && attribute.getNotNull()) {
+            throw new ConstraintException(2, attribute.getName());
         }
         try{
             switch(attribute.getType()){
