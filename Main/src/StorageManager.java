@@ -97,7 +97,7 @@ public class StorageManager {
         }
         for (TableSchema table : tables) {
             System.out.println(table.displayTableSchema());
-            System.out.println("Records: " + loadRecords(table).size());
+            System.out.println("Records: " + loadRecords(table).size() + "\n");
         }
     }
 
@@ -109,7 +109,7 @@ public class StorageManager {
     public void displayTableInfo(String tableName) throws TableException {
         TableSchema table = db.getTable(tableName);
         System.out.println(table.displayTableSchema());
-        System.out.println("Records: " + loadRecords(table).size());
+        System.out.println("Records: " + loadRecords(table).size() + "\n");
     }
 
     /***

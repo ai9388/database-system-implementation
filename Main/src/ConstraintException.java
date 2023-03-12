@@ -2,7 +2,7 @@ public class ConstraintException extends Exception {
 
     private String[] errorMessages = new String[]{
             "Duplicate unique value can't be inserted: %s",
-            "Column %s cannot be null"
+            "Column \"%s\" cannot be null"
     };
     private String message = "";
 

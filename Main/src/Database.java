@@ -156,7 +156,7 @@ public class Database {
      * @throws TableException if the table name/object does not exist
      * @throws InvalidDataTypeException if the object type is not valid
      */
-    public Record validateRecord(TableSchema table, String[] values) throws TableException, InvalidDataTypeException {
+    public Record validateRecord(TableSchema table, String[] values) throws TableException, InvalidDataTypeException, ConstraintException {
         // get all the attributes
         ArrayList<Attribute> attributes = table.getAttributes();
 

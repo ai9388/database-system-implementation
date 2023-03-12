@@ -6,7 +6,6 @@ import static java.lang.System.exit;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        // args = new String[]{"Main/db/", "100", "15"};
 
         if(args.length != 3){
             System.out.println("Usage: Filename, Page Size, Buffer Size");
@@ -25,13 +24,13 @@ public class Main {
         System.out.println("Looking at " + dbPath + " for existing db....");
 
         if(directory.exists()){
-            System.out.println("The db exist");
+            System.out.println("The database exist");
         }
         else{
-            System.out.println("No existing db found");
-            System.out.println("Creating new db at " + dbPath);
+            System.out.println("No existing database found");
+            System.out.println("Creating new database at " + dbPath);
             directory.mkdirs();
-            System.out.println("New db created successfully");
+            System.out.println("New database created successfully");
             System.out.println("Page size: " + pageSize);
             System.out.println("Buffer size: " + buffSize);
         }
@@ -50,7 +49,7 @@ public class Main {
         
         
         boolean flag = true;
-        while (flag == true){
+        while (flag){
             // oh no the user needs help, have to display it   
             // keep asking user for input
             System.out.print("11QL> ");
