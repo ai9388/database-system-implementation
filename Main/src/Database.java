@@ -73,6 +73,7 @@ public class Database {
      * @throws TableException if the table name already exists
      */
     public void createTable(String tablename, ArrayList<Attribute> attributes) throws TableException {
+        validateAttributes(attributes);
         if (!this.tables.containsKey(tablename)) {
             TableSchema table = new TableSchema(tablename, attributes);
             tables.put(tablename, table);
@@ -195,6 +196,21 @@ public class Database {
             }
 
             throw new InvalidDataTypeException(values, attributes);
+        }
+    }
+
+
+    public void validateAttributes(ArrayList<Attribute> attributes) throws TableException {
+        // veirify attributes
+        HashSet<Attribute> uniqueAttributes = new HashSet<>(attributes);
+
+        for(Attribute a: attributes){
+            if(uniqueAttributes.contains(a)){
+                throw new TableException(8, a.getName());
+            }
+            else{
+                uniqueAttributes.add(a);
+            }
         }
     }
 
