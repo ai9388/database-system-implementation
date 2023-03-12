@@ -6,7 +6,6 @@ import static java.lang.System.exit;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        // args = new String[]{"Main/db/", "100", "15"};
 
         if(args.length != 3){
             System.out.println("Usage: Filename, Page Size, Buffer Size");
@@ -47,7 +46,6 @@ public class Main {
         // parser object for this session
         Parser parser = new Parser(directory.getName(), dbPath, pageSize, buffSize);
         // looping until <quit> is taken in
-        
         
         boolean flag = true;
         while (flag == true){

@@ -79,96 +79,105 @@ public class Parser {
                         boolean primarykey = false;
                         boolean notNull = false;
                         boolean unique = false;
-                        switch (components[1]) {
-                            case "char" -> {
-                                for (int i = 3; i < components.length; i++) {
-                                    switch (components[i]) {
-                                        case "primarykey" -> {
-                                            primarykey = true;
-                                            notNull = true;
-                                            unique = true;
+                        
+                        try {
+                            switch (components[1]) {
+                                case "char" -> {
+                                    for (int i = 3; i < components.length; i++) {
+                                        switch (components[i]) {
+                                            case "primarykey" -> {
+                                                primarykey = true;
+                                                notNull = true;
+                                                unique = true;
+                                            }
+                                            case "notnull" -> notNull = true;
+                                            case "unique" -> unique = true;
                                         }
-                                        case "notnull" -> notNull = true;
-                                        case "unique" -> unique = true;
                                     }
+                                    Attribute a = new Attribute(attr_name, Type.CHAR, primarykey, notNull, unique,
+                                            Integer.parseInt(components[2].replace(')', ' ').strip()));
+                                    primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
+                                    primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
+                                    attributes.add(a);
                                 }
-                                Attribute a = new Attribute(attr_name, Type.CHAR, primarykey, notNull, unique, Integer.parseInt(components[2].replace(')', ' ').strip()));
-                                primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
-                                primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
-                                attributes.add(a);
-                            }
-                            case "varchar" -> {
-                                for (int i = 3; i < components.length; i++) {
-                                    switch (components[i]) {
-                                        case "primarykey" -> {
-                                            primarykey = true;
-                                            notNull = true;
-                                            unique = true;
+                                case "varchar" -> {
+                                    for (int i = 3; i < components.length; i++) {
+                                        switch (components[i]) {
+                                            case "primarykey" -> {
+                                                primarykey = true;
+                                                notNull = true;
+                                                unique = true;
+                                            }
+                                            case "notnull" -> notNull = true;
+                                            case "unique" -> unique = true;
                                         }
-                                        case "notnull" -> notNull = true;
-                                        case "unique" -> unique = true;
                                     }
+                                    Attribute a = new Attribute(attr_name, Type.VARCHAR, primarykey, notNull, unique,
+                                            Integer.parseInt(components[2].replace(')', ' ').strip()));
+                                    primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
+                                    primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
+                                    attributes.add(a);
                                 }
-                                Attribute a = new Attribute(attr_name, Type.VARCHAR, primarykey, notNull, unique, Integer.parseInt(components[2].replace(')', ' ').strip()));
-                                primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
-                                primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
-                                attributes.add(a);
-                            }
-                            case "bool" -> {
-                                for (int i = 2; i < components.length; i++) {
-                                    switch (components[i]) {
-                                        case "primarykey" -> {
-                                            primarykey = true;
-                                            notNull = true;
-                                            unique = true;
+                                case "bool" -> {
+                                    for (int i = 2; i < components.length; i++) {
+                                        switch (components[i]) {
+                                            case "primarykey" -> {
+                                                primarykey = true;
+                                                notNull = true;
+                                                unique = true;
+                                            }
+                                            case "notnull" -> notNull = true;
+                                            case "unique" -> unique = true;
                                         }
-                                        case "notnull" -> notNull = true;
-                                        case "unique" -> unique = true;
                                     }
+                                    Attribute a = new Attribute(attr_name, Type.BOOLEAN, primarykey, notNull, unique,
+                                            0);
+                                    primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
+                                    primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
+                                    attributes.add(a);
                                 }
-                                Attribute a = new Attribute(attr_name, Type.BOOLEAN, primarykey, notNull, unique, 0);
-                                primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
-                                primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
-                                attributes.add(a);
-                            }
-                            case "integer" -> {
-                                for (int i = 2; i < components.length; i++) {
-                                    switch (components[i]) {
-                                        case "primarykey" -> {
-                                            primarykey = true;
-                                            notNull = true;
-                                            unique = true;
+                                case "integer" -> {
+                                    for (int i = 2; i < components.length; i++) {
+                                        switch (components[i]) {
+                                            case "primarykey" -> {
+                                                primarykey = true;
+                                                notNull = true;
+                                                unique = true;
+                                            }
+                                            case "notnull" -> notNull = true;
+                                            case "unique" -> unique = true;
                                         }
-                                        case "notnull" -> notNull = true;
-                                        case "unique" -> unique = true;
                                     }
+                                    Attribute a = new Attribute(attr_name, Type.INTEGER, primarykey, notNull, unique,
+                                            0);
+                                    primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
+                                    primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
+                                    attributes.add(a);
                                 }
-                                Attribute a = new Attribute(attr_name, Type.INTEGER, primarykey, notNull, unique, 0);
-                                primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
-                                primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
-                                attributes.add(a);
-                            }
-                            case "double" -> {
-                                for (int i = 2; i < components.length; i++) {
-                                    switch (components[i]) {
-                                        case "primarykey" -> {
-                                            primarykey = true;
-                                            notNull = true;
-                                            unique = true;
+                                case "double" -> {
+                                    for (int i = 2; i < components.length; i++) {
+                                        switch (components[i]) {
+                                            case "primarykey" -> {
+                                                primarykey = true;
+                                                notNull = true;
+                                                unique = true;
+                                            }
+                                            case "notnull" -> notNull = true;
+                                            case "unique" -> unique = true;
                                         }
-                                        case "notnull" -> notNull = true;
-                                        case "unique" -> unique = true;
                                     }
+                                    Attribute a = new Attribute(attr_name, Type.DOUBLE, primarykey, notNull, unique, 0);
+                                    primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
+                                    primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
+                                    attributes.add(a);
                                 }
-                                Attribute a = new Attribute(attr_name, Type.DOUBLE, primarykey, notNull, unique, 0);
-                                primaryAttribute = a.isIsPrimaryKey() ? a : primaryAttribute;
-                                primaryIndex = a.isIsPrimaryKey() ? primaryIndex : primaryIndex + 1;
-                                attributes.add(a);
+                                default -> {
+                                    System.out.println("ERROR!");
+                                    System.out.println("Invalid data type: " + components[1]);
+                                }
                             }
-                            default -> {
-                                System.out.println("ERROR!");
-                                System.out.println("Invalid data type: " + components[1]);
-                            }
+                        } catch (ArrayIndexOutOfBoundsException e) {
+                            System.out.println("Empty table");
                         }
                     }
                     hasOnePK = false;
