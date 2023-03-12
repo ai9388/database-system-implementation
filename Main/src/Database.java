@@ -202,7 +202,7 @@ public class Database {
 
     public void validateAttributes(ArrayList<Attribute> attributes) throws TableException {
         // veirify attributes
-        HashSet<Attribute> uniqueAttributes = new HashSet<>(attributes);
+        HashSet<Attribute> uniqueAttributes = new HashSet<>();
 
         for(Attribute a: attributes){
             if(uniqueAttributes.contains(a)){
