@@ -227,7 +227,7 @@ public class Parser {
                     } catch (PrimaryKeyException e) {
                         System.out.println(e.getMessage());
                     } catch (ArrayIndexOutOfBoundsException e){
-                        System.out.println("invalid queries");
+                        System.out.println("invalid query");
                     }
                 }
                 case HELP -> displayHelp();
@@ -318,10 +318,13 @@ public class Parser {
         System.out.println("\n To run 11QL, use");
         System.out.println("java Main <db loc> <page size> <buffer size>");
         System.out.println("Available functions are:");
-        System.out.println("\tdisplay schema");
-        System.out.println("\tdisplay table <table name>");
-        System.out.println("\tselect * from <table name>");
-        System.out.println("\tinsert into <table name> values");
-        System.out.println("\tcreate table <table name> (<values>)");
+        System.out.println("\tdisplay schema;");
+        System.out.println("\tdisplay table <table name>;");
+        System.out.println("\tselect * from <table name>;");
+        System.out.println("\tinsert into <table name> values (...);");
+        System.out.println("\tcreate table <table name> (<attribute name/type> constraints ...);");
+        System.out.println("\talter table add attribute <attribute name/type> <constraints>");
+        System.out.println("\talter table drop attribute <attribute name>");
+        System.out.println("'quit' to exit");
     }
 }
