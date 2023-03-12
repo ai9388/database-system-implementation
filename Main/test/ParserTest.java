@@ -15,7 +15,6 @@ public class ParserTest {
     int[] pkidx;
     ArrayList<Attribute> attributes;
     int wordMaxLen = 20;
-    Table table;
     Parser parser;
 
     @Before

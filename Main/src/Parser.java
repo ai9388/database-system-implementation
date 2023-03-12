@@ -18,7 +18,6 @@ public class Parser {
     public String dbName;
 
     public Parser(String dbName, String dbLocation, int pageSize, int bufferSize) {
-        // TODO: hai-yen
         this.dbName = dbName;
         this.dbLocation = dbLocation;
         storageManager = new StorageManager(dbName, dbLocation, bufferSize, pageSize);
@@ -291,7 +290,6 @@ public class Parser {
                         if (input.split(" ").length > 5) {
                             String value = input.split("default")[1].strip();
                             value = value.split(";")[0];
-                            // TODO: add functionality to storage manager to add attribute to table
                             storageManager.addAttributeToTable(a, value, table_name);
                         } else {
                             storageManager.addAttributeToTable(a, "", table_name);

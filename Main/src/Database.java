@@ -247,12 +247,6 @@ public class Database {
         }
     }
 
-    public String selectFromTable(String tableName, String[] columns) throws TableException{
-        //TODO : how to do this?
-
-        return "";
-    }
-
     /**
      * drops an attribute from the table
      *

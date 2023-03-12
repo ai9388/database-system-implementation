@@ -113,20 +113,6 @@ public class StorageManager {
     }
 
     /***
-     * Get record from the table using primary key
-     * @param table the table we're getting the record from
-     * @param key the value of the primary key
-     * @return record
-     */
-    public Record getRecordByPrimaryKey(TableSchema table, String key){
-        // TODO
-        // validate the primary key attribute and that the value matches the type
-        // validate the primary key uniqueness
-
-        return null;
-    }
-
-    /***
      * get all records for a given table number
      * @param table the table name
      * @return an arraylist of records
