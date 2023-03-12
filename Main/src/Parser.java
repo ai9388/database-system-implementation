@@ -241,6 +241,7 @@ public class Parser {
                     } catch (ArrayIndexOutOfBoundsException e){
                         System.out.println("invalid query");
                     }
+                    System.out.println("Record inserted successfully");
                 }
                 case HELP -> displayHelp();
                 case QUIT -> {
@@ -257,10 +258,10 @@ public class Parser {
                     String input = user_input.replaceFirst("drop table", "").strip();
                     String table_name = input.split(";")[0];
                     if(storageManager.dropTable(table_name)){
-                        System.out.println("Successfully drop table " + table_name);
+                        System.out.println("Successfully dropped table " + table_name);
                     }
                     else{
-                        System.out.println("Table " + table_name + " could not be remove");
+                        System.out.println("Table " + table_name + " could not be removed");
                     }
                 }
                 case ALTER -> {
@@ -296,6 +297,7 @@ public class Parser {
                             storageManager.addAttributeToTable(a, "", table_name);
                         }
                     }
+                    System.out.println("Table " + table_name + " altered");
                 }
                 case DELETE -> {
                     //
