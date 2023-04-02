@@ -207,9 +207,40 @@ public class Parser {
                 case SELECT -> {
                     String input = user_input.replaceFirst("select", "").strip();
                     int start_index = input.indexOf("from");
-                    int end_index = input.indexOf("m", start_index);
-                    String table_name = input.substring(end_index + 1).replaceAll(";", "").strip();
-                    select("*", table_name); // This is good for now because we are not selecting by columns just yet
+                    ArrayList<String> attributes = new ArrayList<>();
+                    String attribute = input.substring(0, start_index).strip();
+                    if (attribute.equals("*")) {
+                        attributes.add(attribute);
+                    }
+                    else {
+                        attributes.addAll(List.of(attribute.replaceAll(" ", "").split(",")));
+                    }
+                    start_index = input.indexOf("m", start_index);
+                    int end_index = input.indexOf("where") != -1 ? input.indexOf("where") : input.length() - 1;
+                    ArrayList<String> tables = new ArrayList<>();
+                    String table_name = input.substring(start_index + 1, end_index).strip();
+                    // check if multiple tables
+                    if (table_name.indexOf(",") != -1) {
+                        tables.addAll(List.of(table_name.replaceAll(" ", "").split(",")));
+                    } else {
+                        tables.add(table_name);
+                    }
+                    // check for where
+                    if (input.indexOf("where") != -1) {
+                        start_index = end_index;
+                        end_index = input.indexOf("orderby") != -1 ? input.indexOf("orderby") : input.length() - 1;
+                        String where_clause = input.substring(start_index, end_index).replaceFirst("where", "").strip();
+                        // TODO: split where clause
+                    }
+                    // check for orderby
+                    if (input.indexOf("orderby") != -1) {
+                        start_index = end_index;
+                        end_index = input.length() - 1;
+                        String orderby_clause = input.substring(start_index).replace(";", "").replaceFirst("orderby", "").strip();
+                        // TODO: check if asc or desc
+                    }
+                    select("*", table_name);
+                    // TODO: update this with where and orderby and the multiple tables/attributes
                 }
                 case INSERT -> {
                     try {
@@ -223,7 +254,7 @@ public class Parser {
                             if(tuples[i].strip().equals("")){
                                 continue;
                             }
-                            String[] temp = tuples[i].split("\\)")[0].split(",");
+                            String[] temp = tuples[i].split("\\)")[0].split(" ");
                             for(int j = 0; j < temp.length; j++){
                                 temp[j] = temp[j].strip();
                             }
@@ -235,6 +266,8 @@ public class Parser {
                         System.out.println(e.getMessage());
                     } catch (ArrayIndexOutOfBoundsException e){
                         System.out.println("invalid query");
+                    } catch (ConstraintException e) {
+                        System.out.println(e.getMessage());
                     }
                     System.out.println("Record inserted successfully");
                 }
@@ -294,10 +327,19 @@ public class Parser {
                     System.out.println("Table " + table_name + " altered");
                 }
                 case DELETE -> {
-                    //
+                    String input = user_input.replaceFirst("delete from", "").strip();
+                    String table_name = input.split(" ")[0];
+                    if (input.split(" ").length > 1) {
+                        // get where condition to delete by
+                    } else {
+                        // call storage manager delete
+                    }
                 }
                 case UPDATE -> {
-                    //
+                    String input = user_input.replaceFirst("update", "").strip();
+                    String table_name = input.split(" ")[0];
+                    // set [column] = [value]
+                    // where [condition]
                 }
                 case EMPTY -> {
                     System.out.println("Invalid queries...");
