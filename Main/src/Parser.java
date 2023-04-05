@@ -328,10 +328,13 @@ public class Parser {
                 case DELETE -> {
                     String input = user_input.replaceFirst("delete from", "").strip();
                     String table_name = input.split(" ")[0];
-                    if (input.split(" ").length > 1) {
-                        // get where condition to delete by
+                    int start_index = input.indexOf("e", input.indexOf("where"));
+                    int end_index = input.indexOf(";");
+                    if (start_index != -1) {
+                        String where_clause = input.substring(start_index, end_index).strip();
+                        storageManager.delete(table_name, where_clause);
                     } else {
-                        // call storage manager delete
+                        storageManager.deleteRecords(table_name);
                     }
                 }
                 case UPDATE -> {

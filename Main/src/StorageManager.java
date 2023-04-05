@@ -363,4 +363,12 @@ public class StorageManager {
     public void update(String table_name, String column, String value, String where_clause) {
         // TODO: Update table and set column to value where condition is true
     }
+
+    public void delete(String table_name, String where_clause) {
+        // TODO: Delete records from table where condition is true
+    }
+
+    public void deleteRecords(String table_name) {
+        // TODO: Delete all records from table
+    }
 }
