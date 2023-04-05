@@ -336,9 +336,23 @@ public class Parser {
                 }
                 case UPDATE -> {
                     String input = user_input.replaceFirst("update", "").strip();
-                    String table_name = input.split(" ")[0];
-                    // set [column] = [value]
-                    // where [condition]
+                    int start_index = input.indexOf("set");
+                    String table_name = input.substring(0, start_index).strip();
+                    start_index = input.indexOf("t", start_index) + 1;
+                    int end_index = input.indexOf("=");
+                    // TODO: Add functionality for multiple columns/values? (May not be required)
+                    String column = input.substring(start_index, end_index).strip();
+                    start_index = end_index + 1;
+                    end_index = input.indexOf(",", start_index) != -1 ? input.indexOf(",", start_index) : input.indexOf("where", start_index) != -1 ? input.indexOf("where", start_index): input.indexOf(";", start_index);
+                    String value = input.substring(start_index, end_index).strip();
+                    // check for where
+                    String where_clause = "";
+                    if (input.indexOf("where") != -1) {
+                        start_index = end_index;
+                        end_index = input.length() - 1;
+                        where_clause = input.substring(start_index, end_index).replaceFirst("where", "").strip();
+                    }
+                    storageManager.update(table_name, column, value, where_clause);
                 }
                 case EMPTY -> {
                     System.out.println("Invalid queries...");

@@ -359,4 +359,8 @@ public class StorageManager {
     public void selectMultipleTables(String attribute, ArrayList<String> tables, String where_clause, String orderby_clause) {
         // TODO: Get 1 attribute from multiple tables
     }
+
+    public void update(String table_name, String column, String value, String where_clause) {
+        // TODO: Update table and set column to value where condition is true
+    }
 }
