@@ -127,7 +127,7 @@ public class StorageManager {
     }
 
 
-    public void select(String tableName) throws TableException {
+    public void select(String attribute, String tableName, String where_clause) throws TableException {
         TableSchema tableSchema = db.getTable(tableName);
         ArrayList<Record> records = loadRecords(tableSchema);
         if(records == null){
@@ -346,5 +346,17 @@ public class StorageManager {
         // bottom line
         result += "\n" + dash;
         return result;
+    }
+
+    public void selectMultiple(ArrayList<String> attributes, ArrayList<String> tables, String where_clause, String orderby_clause) {
+        // TODO: Get multiple attributes from multiple tables
+    }
+
+    public void selectMultipleAttributes(ArrayList<String> attributes, String table_name, String where_clause, String orderby_clause) {
+        // TODO: Get multiple attributes from 1 table
+    }
+
+    public void selectMultipleTables(String attribute, ArrayList<String> tables, String where_clause, String orderby_clause) {
+        // TODO: Get 1 attribute from multiple tables
     }
 }
