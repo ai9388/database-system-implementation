@@ -270,14 +270,19 @@ public class PageBuffer {
      * @param table the table object where pages are read from
      * @return an arraylist of records
      */
-    public ArrayList<Record> getRecords(TableSchema table){
+    public ArrayList<Record> getRecords(TableSchema table, ArrayList<Attribute> attributeSubset){
         ArrayList<Record> records = new ArrayList<>();
 
         // iterate all the page ID's to get the pages
         for(Integer pageID : table.getPageIds()){
             Page page = getPage(table, pageID);
             // every page you get
-            records.addAll(page.getRecords());
+            if(attributeSubset == null || table.getAttributes().size() == attributeSubset.size()){
+                records.addAll(page.getRecords());
+            }
+            else {
+                records.addAll(page.getRecords(attributeSubset));
+            }
         }
 
         return records;

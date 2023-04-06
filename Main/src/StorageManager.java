@@ -1,3 +1,5 @@
+import org.w3c.dom.Attr;
+
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.*;
@@ -97,7 +99,7 @@ public class StorageManager {
         }
         for (TableSchema table : tables) {
             System.out.println(table.displayTableSchema());
-            System.out.println("Records: " + loadRecords(table).size() + "\n");
+            System.out.println("Records: " + loadRecords(table, null).size() + "\n");
         }
     }
 
@@ -109,7 +111,7 @@ public class StorageManager {
     public void displayTableInfo(String tableName) throws TableException {
         TableSchema table = db.getTable(tableName);
         System.out.println(table.displayTableSchema());
-        System.out.println("Records: " + loadRecords(table).size() + "\n");
+        System.out.println("Records: " + loadRecords(table, null).size() + "\n");
     }
 
     /***
@@ -117,23 +119,103 @@ public class StorageManager {
      * @param table the table name
      * @return an arraylist of records
      */
-    private ArrayList<Record> loadRecords(TableSchema table){
+    private ArrayList<Record> loadRecords(TableSchema table, ArrayList<Attribute> subsetAttributes){
 
         ArrayList<Record> records = null;
 
-        records = pageBuffer.getRecords(table);
+        records = pageBuffer.getRecords(table, subsetAttributes);
 
         return records;
     }
 
+    public void select(ArrayList<String> tableNames, ArrayList<String> columns, String[] conditions) throws TableException {
+        // get all the tables
+        boolean all = columns.get(0).equals("*");
+        HashMap<String, TableSchema> tables = new HashMap();
+        HashMap<TableSchema, List<Attribute>> realAttributes = new HashMap<>();
+        HashMap<String, Attribute> attributes = new HashMap<>();
 
-    public void select(String tableName) throws TableException {
-        TableSchema tableSchema = db.getTable(tableName);
-        ArrayList<Record> records = loadRecords(tableSchema);
-        if(records == null){
-            System.out.println("No Records to show");
+        // validate all tables
+        for(String name: tableNames){
+            TableSchema table =db.getTable(name);
+            tables.put(name.toLowerCase(), table);
+
+            // check the * case
+            if(all){
+                realAttributes.put(table, table.getAttributes());
+            }
         }
-        System.out.println(formatResults(tableSchema.getAttributes(), records));
+
+       if(!all){
+           attributes = getValidColumns(tables, columns);
+       }
+       else{
+           select(realAttributes);
+       }
+
+
+    }
+
+    public HashMap<String, Attribute> getValidColumns(HashMap<String, TableSchema> tables, ArrayList<String> columns) throws TableException {
+        HashMap<String, Attribute> attributes = new HashMap<>();
+        // verify that all columns exist
+        for(String column: columns){
+            String[] colInfo = column.strip().split("\\.");
+            boolean added = false;
+            for(String table: tables.keySet()){
+                if(colInfo.length == 2){
+                    String tableName = colInfo[0].strip();
+                    String attributeName = colInfo[1].strip();
+                    if(tableName.strip().equals(tables.get(table).getName())){
+                        attributes.put(column, tables.get(table).getAttribute(attributeName));
+                        added = true;
+                        break;
+                    }
+                }
+                else{
+                    try{
+                        Attribute a = tables.get(table).getAttribute(column);
+                        // attribute belongs to table
+                        if(added){
+                            throw new TableException(9, column);
+                        }
+                        attributes.put(column, a);
+                        added = true;
+                    }
+                    catch (TableException ta){
+                        if(ta.getErrorCode() == 9){
+                            throw ta;
+                        }
+                    }
+                }
+            }
+            if(colInfo.length == 2 && !added){
+                throw new TableException(1, column);
+            }
+        }
+
+        return attributes;
+    }
+
+
+    public void select(HashMap<TableSchema, List<Attribute>> tables) throws TableException {
+        
+        ArrayList<Record> realRecords = new ArrayList<>();
+        HashMap<TableSchema, ArrayList<Record>> recordsByTable = new HashMap<>();
+
+
+        // extract records for each table
+        for(TableSchema table: tables.keySet()){
+            recordsByTable.put(table, loadRecords(table, null));
+        }
+
+
+//        TableSchema tableSchema = db.getTable(tableName);
+//        ArrayList<Record> records = loadRecords(tableSchema);
+//        if(records == null){
+//            System.out.println("No Records to show");
+//        }
+//        System.out.println(formatResults(tableSchema.getAttributes(), records));
     }
 
     /**
@@ -150,7 +232,7 @@ public class StorageManager {
 
         record = db.validateRecord(table, recordInfo);
         if(record != null){
-            ArrayList<Record> records = loadRecords(table);
+            ArrayList<Record> records = loadRecords(table, null);
             db.validatePrimaryKey(record, table, records);
             ArrayList<Integer> uniqueAttributes = db.uniqueAttribute(table.getAttributes());
             db.checkUniqueness(record, uniqueAttributes, records);
@@ -226,7 +308,7 @@ public class StorageManager {
         ArrayList<Attribute> newAttributes = db.removeAttribute(attribute_name, table);
 
         // get all the records
-        ArrayList<Record> records = loadRecords(table);
+        ArrayList<Record> records = loadRecords(table, null);
         ArrayList<Record> newRecords = new ArrayList<>();
 
         // drop the old table
@@ -279,7 +361,7 @@ public class StorageManager {
         newAttributes.add(attribute);
 
         // get all the records
-        ArrayList<Record> records = loadRecords(table);
+        ArrayList<Record> records = loadRecords(table, null);
         ArrayList<Record> newRecords = new ArrayList<>();
 
         // drop the old table

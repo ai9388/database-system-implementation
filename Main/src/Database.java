@@ -197,7 +197,9 @@ public class Database {
         }
     }
 
-
+    /*
+    makes sure that the attributes are unique
+     */
     public void validateAttributes(ArrayList<Attribute> attributes) throws TableException {
         // veirify attributes
         HashSet<Attribute> uniqueAttributes = new HashSet<>();

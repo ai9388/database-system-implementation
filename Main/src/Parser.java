@@ -23,7 +23,7 @@ public class Parser {
     public void classifyInput(String str_input) {
 
         this.user_input = str_input.toLowerCase();
-        if((user_input.charAt(user_input.length() -1 ) != ';') && !user_input.startsWith("quit") && !user_input.startsWith("help") ){
+        if((user_input.charAt(user_input.strip().length() -1 ) != ';') && !user_input.startsWith("quit") && !user_input.startsWith("help") ){
             command = commands.EMPTY;
         }
         else if (user_input.startsWith("create table")) {
@@ -230,8 +230,11 @@ public class Parser {
                         String orderby_clause = input.substring(start_index).replace(";", "").replaceFirst("orderby", "").strip();
                         // TODO: check if asc or desc
                     }
-                    select("*", table_name);
+                    if(attributes.get(0).equals('*')){
+                        select("*", table_name);
+                    }
                     // TODO: update this with where and orderby and the multiple tables/attributes
+                    storageManager.select(tables, attributes, new String[]{});
                 }
                 case INSERT -> {
                     try {
@@ -351,7 +354,7 @@ public class Parser {
     }
 
     private void select(String attr, String tableName) throws TableException {
-        storageManager.select(tableName);
+//        storageManager.select(tableName);
     }
 
     public void displayHelp() {
