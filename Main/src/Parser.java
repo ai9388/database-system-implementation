@@ -226,21 +226,29 @@ public class Parser {
                         tables.add(table_name);
                     }
                     // check for where
+                    String where_clause = "";
                     if (input.indexOf("where") != -1) {
                         start_index = end_index;
                         end_index = input.indexOf("orderby") != -1 ? input.indexOf("orderby") : input.length() - 1;
-                        String where_clause = input.substring(start_index, end_index).replaceFirst("where", "").strip();
-                        // TODO: split where clause
+                        where_clause = input.substring(start_index, end_index).replaceFirst("where", "").strip();
                     }
                     // check for orderby
+                    String orderby_clause = "";
                     if (input.indexOf("orderby") != -1) {
                         start_index = end_index;
                         end_index = input.length() - 1;
-                        String orderby_clause = input.substring(start_index).replace(";", "").replaceFirst("orderby", "").strip();
+                        orderby_clause = input.substring(start_index).replace(";", "").replaceFirst("orderby", "").strip();
                         // TODO: check if asc or desc
                     }
-                    select("*", table_name);
-                    // TODO: update this with where and orderby and the multiple tables/attributes
+                    if (attributes.size() >= 1 && tables.size() > 1){
+                        selectMultipleAsTs(attributes, tables, where_clause, orderby_clause);
+                    } else if (attributes.size() >= 1) {
+                        selectMultipleAs(attributes, table_name, where_clause, orderby_clause);
+                    } else if (tables.size() > 1) {
+                        selectMultipleTs(attribute, tables, where_clause, orderby_clause);
+                    } else {
+                        select(table_name, where_clause, orderby_clause);
+                    }
                 }
                 case INSERT -> {
                     try {
@@ -329,17 +337,34 @@ public class Parser {
                 case DELETE -> {
                     String input = user_input.replaceFirst("delete from", "").strip();
                     String table_name = input.split(" ")[0];
-                    if (input.split(" ").length > 1) {
-                        // get where condition to delete by
+                    int start_index = input.indexOf("e", input.indexOf("where"));
+                    int end_index = input.indexOf(";");
+                    if (start_index != -1) {
+                        String where_clause = input.substring(start_index, end_index).strip();
+                        storageManager.delete(table_name, where_clause);
                     } else {
-                        // call storage manager delete
+                        storageManager.deleteRecords(table_name);
                     }
                 }
                 case UPDATE -> {
                     String input = user_input.replaceFirst("update", "").strip();
-                    String table_name = input.split(" ")[0];
-                    // set [column] = [value]
-                    // where [condition]
+                    int start_index = input.indexOf("set");
+                    String table_name = input.substring(0, start_index).strip();
+                    start_index = input.indexOf("t", start_index) + 1;
+                    int end_index = input.indexOf("=");
+                    // TODO: Add functionality for multiple columns/values? (May not be required)
+                    String column = input.substring(start_index, end_index).strip();
+                    start_index = end_index + 1;
+                    end_index = input.indexOf(",", start_index) != -1 ? input.indexOf(",", start_index) : input.indexOf("where", start_index) != -1 ? input.indexOf("where", start_index): input.indexOf(";", start_index);
+                    String value = input.substring(start_index, end_index).strip();
+                    // check for where
+                    String where_clause = "";
+                    if (input.indexOf("where") != -1) {
+                        start_index = end_index;
+                        end_index = input.length() - 1;
+                        where_clause = input.substring(start_index, end_index).replaceFirst("where", "").strip();
+                    }
+                    storageManager.update(table_name, column, value, where_clause);
                 }
                 case EMPTY -> {
                     System.out.println("Invalid queries...");
@@ -359,8 +384,25 @@ public class Parser {
         return true;
     }
 
-    private void select(String attr, String tableName) throws TableException {
-        storageManager.select(tableName);
+    private void selectMultipleTs(String attribute, ArrayList<String> tables, String where_clause, String orderby_clause) {
+        storageManager.selectMultipleTables(attribute, tables, where_clause, orderby_clause);
+    }
+
+    private void selectMultipleAs(ArrayList<String> attributes, String table_name, String where_clause, String orderby_clause) {
+        storageManager.selectMultipleAttributes(attributes, table_name, where_clause, orderby_clause);
+    }
+
+    private void selectMultipleAsTs(ArrayList<String> attributes, ArrayList<String> tables, String where_clause, String orderby_clause) {
+        storageManager.selectMultiple(attributes, tables, where_clause, orderby_clause);
+    }
+
+    private void select(String tableName, String where_clause, String orderby_clause) throws TableException {
+        storageManager.select(tableName, where_clause, orderby_clause);
+    }
+
+    public ArrayList<String> splitWhereCondition(String where_clause) {
+        // TODO: split where clause
+        return new ArrayList<>();
     }
 
     public void displayHelp() {
