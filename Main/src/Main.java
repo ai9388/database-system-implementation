@@ -55,6 +55,11 @@ public class Main {
             String strInput = userInput.nextLine();
             parser.classifyInput(strInput);
             flag = parser.parse();
+            // String[] inputLines = strInput.split(";");
+            // for (String input : inputLines) {
+            //     parser.classifyInput(input);
+            //     flag = parser.parse();
+            // }
         }
         userInput.close();
     }
