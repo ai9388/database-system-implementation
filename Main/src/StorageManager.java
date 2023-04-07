@@ -337,11 +337,7 @@ public class StorageManager {
 
             byte[] bytes = new byte[0];
 
-        //   bytes= Type.concat(bytes, Type.convertIntToByteArray(fileID));
             bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfPages));
-        //   bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfRecords));
-        
-
             
             raf.write(bytes);
             raf.close();
