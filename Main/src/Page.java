@@ -24,28 +24,30 @@ public class Page {
 
     ArrayList<Record> records;
 
-    private int tableId;
+    private String tableName;
 
     private boolean isNew;
     
-    public Page(int id, int tableId){
+    public Page(int id, String tableName){
         this.size = 0;
         this.records = new ArrayList<>();
         this.id = id;
-        this.tableId = tableId;
+        this.tableName = tableName;
         this.isNew = true;
     }
 
     /**
      * creates a new table from memory
-     * @param id the table ID
+     * @param id the table ID the id of the table
+     * @param tableName
      * @param records
      */
-    public Page(int id, ArrayList<Record> records){
+    public Page(int id, String tableName, ArrayList<Record> records){
         this.id = id;
         this.records = records;
         this.size = 0;
         this.isNew = false;
+        this.tableName = tableName;
         setSize();
     }
 
@@ -68,8 +70,8 @@ public class Page {
         this.isNew = false;
     }
 
-    public void setTableId(int tableId) {
-        this.tableId = tableId;
+    public void setTableId(String tableName) {
+        this.tableName = tableName;
     }
 
     public int getNumOfRecords() {
@@ -108,6 +110,10 @@ public class Page {
         return Type.concat(Type.convertIntToByteArray(this.id), Type.convertIntToByteArray(this.size));
     }
 
+    public String getTableName() {
+        return tableName;
+    }
+
     public byte[] recordsAsBytes()
     {
         byte[] bb = new byte[0];
@@ -121,7 +127,7 @@ public class Page {
  
     public Page split(int newID){
         int idx = (int)Math.ceil(records.size()/ 2); // the index to split at
-        Page otherPage = new Page(newID, new ArrayList<>(this.records.subList(idx, records.size())));
+        Page otherPage = new Page(newID, this.tableName, new ArrayList<>(this.records.subList(idx, records.size())));
         this.records = new ArrayList<>(this.records.subList(0, idx));
         this.setSize();
 
@@ -177,6 +183,18 @@ public class Page {
             subsetRecords.add(new Record(r.getSubset(attributeSubset), attributeSubset, false));
         }
         return subsetRecords;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        boolean res = false;
+
+        if(obj instanceof Page){
+            Page other = (Page)obj;
+            res = this.id == other.id && this.tableName == other.tableName;
+        }
+
+        return res;
     }
 
     @Override

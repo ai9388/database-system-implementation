@@ -131,55 +131,67 @@ public class StorageManager {
     public void select(ArrayList<String> tableNames, ArrayList<String> columns, String[] conditions) throws TableException {
         // get all the tables
         boolean all = columns.get(0).equals("*");
-        HashMap<String, TableSchema> tables = new HashMap();
-        HashMap<TableSchema, List<Attribute>> realAttributes = new HashMap<>();
-        HashMap<String, Attribute> attributes = new HashMap<>();
+        ArrayList<TableSchema> tables = new ArrayList<>();
+        HashMap<TableSchema, ArrayList<Attribute>> realAttributes = new HashMap<>();
+        ArrayList<Attribute> combined = new ArrayList<>();
 
         // validate all tables
         for(String name: tableNames){
             TableSchema table =db.getTable(name);
-            tables.put(name.toLowerCase(), table);
+            tables.add(table);
 
             // check the * case
             if(all){
                 realAttributes.put(table, table.getAttributes());
+                combined.addAll(table.getAttributes());
+            }
+            else{
+                realAttributes.put(table, new ArrayList<Attribute>());
             }
         }
 
+
        if(!all){
-           attributes = getValidColumns(tables, columns);
+           // validate all columns
+           realAttributes = getValidColumns(realAttributes, tables, columns);
+
+           for(TableSchema table: realAttributes.keySet()){
+               combined.addAll(realAttributes.get(table));
+           }
+           select(realAttributes, tables, combined);
        }
        else{
-           select(realAttributes);
+           select(realAttributes, tables, combined);
        }
 
 
     }
 
-    public HashMap<String, Attribute> getValidColumns(HashMap<String, TableSchema> tables, ArrayList<String> columns) throws TableException {
-        HashMap<String, Attribute> attributes = new HashMap<>();
+    public HashMap<TableSchema, ArrayList<Attribute>> getValidColumns(HashMap<TableSchema, ArrayList<Attribute>> attributes, ArrayList<TableSchema> tables, ArrayList<String> columns) throws TableException {
+        HashMap<TableSchema, ArrayList<Attribute>> attributesByTable = attributes;
         // verify that all columns exist
         for(String column: columns){
             String[] colInfo = column.strip().split("\\.");
             boolean added = false;
-            for(String table: tables.keySet()){
+            for(TableSchema table: tables){
                 if(colInfo.length == 2){
                     String tableName = colInfo[0].strip();
                     String attributeName = colInfo[1].strip();
-                    if(tableName.strip().equals(tables.get(table).getName())){
-                        attributes.put(column, tables.get(table).getAttribute(attributeName));
+                    if(tableName.strip().equals(table.getName())){
+                        Attribute a = table.getAttribute(attributeName);
+                        attributesByTable.get(table).add(a);
                         added = true;
                         break;
                     }
                 }
                 else{
                     try{
-                        Attribute a = tables.get(table).getAttribute(column);
+                        Attribute a = table.getAttribute(column);
                         // attribute belongs to table
                         if(added){
                             throw new TableException(9, column);
                         }
-                        attributes.put(column, a);
+                        attributesByTable.get(table).add(a);
                         added = true;
                     }
                     catch (TableException ta){
@@ -194,28 +206,86 @@ public class StorageManager {
             }
         }
 
-        return attributes;
+        return attributesByTable;
     }
 
 
-    public void select(HashMap<TableSchema, List<Attribute>> tables) throws TableException {
+    public void select(HashMap<TableSchema, ArrayList<Attribute>> attributesByTable, ArrayList<TableSchema> tables, ArrayList<Attribute> combined) throws TableException {
         
         ArrayList<Record> realRecords = new ArrayList<>();
         HashMap<TableSchema, ArrayList<Record>> recordsByTable = new HashMap<>();
+        ArrayList<Record> allRecords = new ArrayList<>();
 
-
-        // extract records for each table
-        for(TableSchema table: tables.keySet()){
-            recordsByTable.put(table, loadRecords(table, null));
+        // if there is only one table
+        if(attributesByTable.size() == 1){
+            TableSchema onlyTable = attributesByTable.keySet().iterator().next();
+            allRecords = loadRecords(onlyTable, onlyTable.getAttributes());
+        }
+        else{
+            // combine all the records
+            allRecords = createResultSet(attributesByTable, tables, combined);
         }
 
+        if(allRecords == null || allRecords.size() == 0){
+            System.out.println("No Records to show");
+        }
+        else {
+            System.out.println(formatResults(combined, allRecords));
+        }
+    }
 
-//        TableSchema tableSchema = db.getTable(tableName);
-//        ArrayList<Record> records = loadRecords(tableSchema);
-//        if(records == null){
-//            System.out.println("No Records to show");
-//        }
-//        System.out.println(formatResults(tableSchema.getAttributes(), records));
+    public ArrayList<Record> createResultSet(HashMap<TableSchema, ArrayList<Attribute>> attributesByTable, ArrayList<TableSchema> tables, ArrayList<Attribute> combined){
+        ArrayList<Record> setOneRecords = new ArrayList<>();
+        ArrayList<Record> setTwoRecords = new ArrayList<>();
+        ArrayList<Record> combinedRecords = new ArrayList<>();
+        ArrayList<Attribute> recordAttributes = new ArrayList<>();
+        ArrayList<Object> recordEntries = new ArrayList<>();
+        int p2 = 1;
+
+        // set one is the first table
+        setOneRecords = loadRecords(tables.get(0), attributesByTable.get(tables.get(0)));
+        // set two is the second table
+        setTwoRecords = loadRecords(tables.get(1), attributesByTable.get(tables.get(1)));
+
+        recordAttributes.addAll(attributesByTable.get(tables.get(0)));
+        while(true){
+            for(Record r1: setOneRecords){
+                for(Record r2: setTwoRecords){
+                    // combine the attributes from table two
+                    recordAttributes.addAll(attributesByTable.get(tables.get(p2)));
+
+                    // combine the record entries
+                    recordEntries.addAll(r1.getEntries());
+                    recordEntries.addAll(r2.getEntries());
+
+                    // create the new combined record
+                    Record combinedRecord = new Record(recordEntries, recordAttributes, false);
+                    combinedRecords.add(combinedRecord);
+                }
+            }
+
+
+
+            // increment p2, so it become the next table in the sequence
+            p2++;
+
+            // make sure p2 is not out of bounds
+            if(p2 == tables.size()){
+                break;
+            }
+
+            // reset set one to be the combined records
+            setOneRecords = combinedRecords;
+
+            // set setTwoRecords to be the next table
+            setTwoRecords = loadRecords(tables.get(p2), attributesByTable.get(tables.get(1)));
+
+            // reset other variables
+            recordEntries = new ArrayList<>();
+            combinedRecords = new ArrayList<>();
+        }
+
+        return combinedRecords;
     }
 
     /**

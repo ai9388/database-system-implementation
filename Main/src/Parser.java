@@ -248,7 +248,7 @@ public class Parser {
                             if(tuples[i].strip().equals("")){
                                 continue;
                             }
-                            String[] temp = tuples[i].split("\\)")[0].split(" ");
+                            String[] temp = tuples[i].split("\\)")[0].split(",");
                             for(int j = 0; j < temp.length; j++){
                                 temp[j] = temp[j].strip();
                             }
