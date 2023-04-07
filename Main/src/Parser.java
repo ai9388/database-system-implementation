@@ -22,11 +22,8 @@ public class Parser {
 
     public void classifyInput(String str_input) {
 
-        this.user_input = str_input.toLowerCase();
-        if((user_input.charAt(user_input.length() -1 ) != ';') && !user_input.startsWith("quit") && !user_input.startsWith("help") ){
-            command = commands.EMPTY;
-        }
-        else if (user_input.startsWith("create table")) {
+        this.user_input = str_input.toLowerCase().strip();
+        if (user_input.startsWith("create table")) {
             command = commands.CREATE_TABLE;
         } else if (user_input.startsWith("display schema")) {
             command = commands.DISPLAY_SCHEMA;
@@ -63,7 +60,7 @@ public class Parser {
                 case CREATE_TABLE -> {
                     String input = user_input.replaceFirst("create table", "").strip();
                     int start_index = input.indexOf("(");
-                    int end_index = input.indexOf(");");
+                    int end_index = input.indexOf(")");
                     String table_name = input.substring(0, start_index);
                     String columns = input.substring(start_index + 1, end_index).strip();
                     String[] attr = columns.split(",");
