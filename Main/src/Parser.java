@@ -225,7 +225,7 @@ public class Parser {
                     if (input.indexOf("orderby") != -1) {
                         start_index = end_index;
                         end_index = input.length() - 1;
-                        orderby_clause = input.substring(start_index).replace(";", "").replaceFirst("orderby", "").strip();
+                        orderby_clause = input.substring(start_index).replaceFirst("orderby", "").strip();
                         // TODO: check if asc or desc
                     }
                     if(attributes.get(0).equals('*')){
@@ -322,7 +322,7 @@ public class Parser {
                     String input = user_input.replaceFirst("delete from", "").strip();
                     String table_name = input.split(" ")[0];
                     int start_index = input.indexOf("e", input.indexOf("where"));
-                    int end_index = input.indexOf(";");
+                    int end_index = input.length() - 1;
                     if (start_index != -1) {
                         String where_clause = input.substring(start_index, end_index).strip();
                         storageManager.delete(table_name, where_clause);
@@ -339,7 +339,7 @@ public class Parser {
                     // TODO: Add functionality for multiple columns/values? (May not be required)
                     String column = input.substring(start_index, end_index).strip();
                     start_index = end_index + 1;
-                    end_index = input.indexOf(",", start_index) != -1 ? input.indexOf(",", start_index) : input.indexOf("where", start_index) != -1 ? input.indexOf("where", start_index): input.indexOf(";", start_index);
+                    end_index = input.indexOf(",", start_index) != -1 ? input.indexOf(",", start_index) : input.indexOf("where", start_index) != -1 ? input.indexOf("where", start_index): input.length() - 1;
                     String value = input.substring(start_index, end_index).strip();
                     // check for where
                     String where_clause = "";
