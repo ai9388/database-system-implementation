@@ -187,11 +187,7 @@ public class StorageManager {
 
             byte[] bytes = new byte[0];
 
-        //   bytes= Type.concat(bytes, Type.convertIntToByteArray(fileID));
             bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfPages));
-        //   bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfRecords));
-        
-
             
             raf.write(bytes);
             raf.close();
@@ -364,8 +360,62 @@ public class StorageManager {
         // TODO: Update table and set column to value where condition is true
     }
 
+    public boolean checkIfRecordMeetsCondition(Record record, String condition)
+    {
+        String[] splitCondition = condition.split(" ");
+        String attribute = splitCondition[0];
+        String operator = splitCondition[1];
+        String cond = splitCondition[2];
+
+        Attribute usedAttribute;
+        for (Attribute a: record.attr)
+        {
+            if (a.getName().equals(attribute))
+            {
+                usedAttribute = a;
+            }
+        }
+        // gonna have to use some tree for this to work better
+        // but that is a problem for tomorrow
+
+        return false;
+    }
+
     public void delete(String table_name, String where_clause) {
-        // TODO: Delete records from table where condition is true
+        try 
+        {
+            String[] clauses;
+            if (where_clause.contains("or"))
+            {
+                clauses = where_clause.split("or");
+            } else
+            {
+                clauses = where_clause.split("");
+            }
+
+            TableSchema taSchema = this.db.getTable(table_name);
+            ArrayList<Integer> pageIDs = taSchema.getPageIds();
+            for (int j = 0; j < clauses.length; j++) 
+            {
+                for (int i = 0; i < pageIDs.size(); i++) {
+                    Page p = this.pageBuffer.getPage(taSchema, pageIDs.get(i));
+
+                    for (Record r : p.records) {
+                        if (this.checkIfRecordMeetsCondition(r, clauses[j])) {
+                            p.removeRecord(r);
+                        } else {
+                            // keep record
+                        }
+                    }
+                }
+            }
+            
+        } catch (TableException e) 
+        {
+            System.out.println("Table doesn't exist");
+        }
+
+
     }
 
     public void deleteRecords(String table_name) {
