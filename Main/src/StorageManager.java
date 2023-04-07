@@ -361,6 +361,73 @@ public class StorageManager {
          return false;
     }
 
+    public boolean checkIfRecordMeetsCondition(Record record, String condition)
+    {
+        String[] splitCondition = condition.split(" ");
+        String attribute = splitCondition[0];
+        String operator = splitCondition[1];
+        String cond = splitCondition[2];
+
+        Attribute usedAttribute;
+        for (Attribute a: record.attr)
+        {
+            if (a.getName().equals(attribute))
+            {
+                usedAttribute = a;
+            }
+        }
+        // gonna have to use some tree for this to work better
+        // but that is a problem for tomorrow
+
+        return false;
+    }
+
+    public void delete(String table_name, String where_clause) {
+        //  TODO: Delete records from table where condition is true
+        try 
+        {
+            String[] clauses;
+            if (where_clause.contains("or"))
+            {
+                clauses = where_clause.split("or");
+            } else
+            {
+                clauses = where_clause.split("");
+            }
+
+            TableSchema taSchema = this.db.getTable(table_name);
+            ArrayList<Integer> pageIDs = taSchema.getPageIds();
+            for (int j = 0; j < clauses.length; j++) 
+            
+            {
+                for (int i = 0; i < pageIDs.size(); i++) {
+                    Page p = this.pageBuffer.getPage(taSchema, pageIDs.get(i));
+  
+                     for (Record r : p.records)  {
+                        if (this.checkIfRecordMeetsCondition(r, clauses[j])) {
+                            p.removeRecord(r);
+                         } else { 
+                            // keep record
+                        }
+                    }
+                }
+             } 
+
+        } catch (TableException e) 
+        {
+            System.out.println("Table doesn't exist");
+        }
+    }
+
+    public void deleteRecords(String table_name) {
+        // TODO: Delete all records from table
+    } 
+
+    public void update(String table_name, String column, String value, String where_clause)
+    {
+ 
+    }
+
     /**
      * Drop the given attribute from given table
      * @param attribute_name
