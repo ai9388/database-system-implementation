@@ -78,6 +78,19 @@ public class Record implements Comparable<Record>{
         return this.entries.get(idx);
     }
 
+    public Object getValueAtColumn(Attribute attribute){
+        Object value = null ;
+
+        for(int i = 0; i < attr.size(); i++){
+            if(attr.get(i).getName().equals(attribute.getName())){
+                value = getValueAtColumn(i);
+                break;
+            }
+        }
+
+        return value;
+    }
+
     public int getSize(){
         return size;
     }

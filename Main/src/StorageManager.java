@@ -560,4 +560,32 @@ public class StorageManager {
         result += "\n" + dash;
         return result;
     }
+
+    public void orderby(ArrayList<Record> records, Attribute attribute){
+        Collections.sort(records, new RecordComparator(attribute));
+    }
+
+    public void selectMultiple(ArrayList<String> attributes, ArrayList<String> tables, String where_clause, String orderby_clause) {
+        // TODO: Get multiple attributes from multiple tables
+    }
+
+    public void selectMultipleAttributes(ArrayList<String> attributes, String table_name, String where_clause, String orderby_clause) {
+        // TODO: Get multiple attributes from 1 table
+    }
+
+    public void selectMultipleTables(String attribute, ArrayList<String> tables, String where_clause, String orderby_clause) {
+        // TODO: Get 1 attribute from multiple tables
+    }
+
+    public void update(String table_name, String column, String value, String where_clause) {
+        // TODO: Update table and set column to value where condition is true
+    }
+
+    public void delete(String table_name, String where_clause) {
+        // TODO: Delete records from table where condition is true
+    }
+
+    public void deleteRecords(String table_name) {
+        // TODO: Delete all records from table
+    }
 }
