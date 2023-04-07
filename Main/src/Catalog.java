@@ -128,7 +128,7 @@ public class Catalog {
             // seeking to the page number
             // i.e trying to find page 4 means we have to seek pageSize - 1 * 4
             if(pageID != 1){
-                raFile.read(new byte[((pageID - 1) * (pageSize + 8))]);
+                raFile.read(new byte[((pageID - 1) * pageSize) + 8]);
             }
             raFile.read(new byte[4]); // skip the table id
 
