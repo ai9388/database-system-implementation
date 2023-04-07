@@ -1,5 +1,3 @@
-import org.w3c.dom.Attr;
-
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.*;
@@ -211,7 +209,7 @@ public class StorageManager {
 
 
     public void select(HashMap<TableSchema, ArrayList<Attribute>> attributesByTable, ArrayList<TableSchema> tables, ArrayList<Attribute> combined) throws TableException {
-        
+
         ArrayList<Record> realRecords = new ArrayList<>();
         HashMap<TableSchema, ArrayList<Record>> recordsByTable = new HashMap<>();
         ArrayList<Record> allRecords = new ArrayList<>();
