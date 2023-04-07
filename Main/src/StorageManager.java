@@ -395,32 +395,64 @@ public class StorageManager {
                 clauses = where_clause.split("");
             }
 
+            // getting the table schema for the table we want
             TableSchema taSchema = this.db.getTable(table_name);
+
+            // getting all of the pageIDs associated with the table
             ArrayList<Integer> pageIDs = taSchema.getPageIds();
-            for (int j = 0; j < clauses.length; j++) 
-            
+            for (int j = 0; j < clauses.length; j++)
             {
+                // looping over all of the page ids
                 for (int i = 0; i < pageIDs.size(); i++) {
                     Page p = this.pageBuffer.getPage(taSchema, pageIDs.get(i));
-  
-                     for (Record r : p.records)  {
-                        if (this.checkIfRecordMeetsCondition(r, clauses[j])) {
+
+                    // looping over all of the page's records
+                    for (Record r : p.records)
+                    {
+                        // checking if we should remove the record
+                        if (this.checkIfRecordMeetsCondition(r, clauses[j])){
                             p.removeRecord(r);
-                         } else { 
+                        } else {
                             // keep record
                         }
                     }
                 }
-             } 
-
+            }
         } catch (TableException e) 
         {
             System.out.println("Table doesn't exist");
         }
     }
 
+    /**
+     * deletes all of the records from a given table
+     * @param table_name name of the table to delete all records from
+     */
     public void deleteRecords(String table_name) {
-        // TODO: Delete all records from table
+        try {
+            // getting the table schema for the table we want
+            TableSchema taSchema = this.db.getTable(table_name);
+
+            // getting all of the pageIDs associated with the table
+            ArrayList<Integer> pageIDs = taSchema.getPageIds();
+
+            // looping over all of the page ids
+            for (int i = 0; i < pageIDs.size(); i++) {
+                // getting the individual page
+                Page p = this.pageBuffer.getPage(taSchema, pageIDs.get(i));
+
+                // looping over all of the records and removing them
+                while (!p.records.isEmpty())
+                {
+                    System.out.println("removed record: ");
+                    System.out.println(p.records.get(0).toString());
+                    p.removeRecord(p.records.get(0));
+                }
+            }
+        }catch(TableException e)
+        {
+            System.out.println("Table doesn't exist");
+        }
     } 
 
     public void update(String table_name, String column, String value, String where_clause)
