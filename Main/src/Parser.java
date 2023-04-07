@@ -60,7 +60,7 @@ public class Parser {
                 case CREATE_TABLE -> {
                     String input = user_input.replaceFirst("create table", "").strip();
                     int start_index = input.indexOf("(");
-                    int end_index = input.indexOf(");");
+                    int end_index = input.indexOf(")");
                     String table_name = input.substring(0, start_index);
                     String columns = input.substring(start_index + 1, end_index).strip();
                     String[] attr = columns.split(",");
