@@ -1,4 +1,6 @@
-public class Conditional {
+public interface Conditional {
 
-
+    public boolean evaluate();
 }
+
+

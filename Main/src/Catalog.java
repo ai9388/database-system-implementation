@@ -181,7 +181,7 @@ public class Catalog {
                 records.add(new Record(recordData, attributes, true));
             }
             raFile.close();
-            return new Page(pageID, records);
+            return new Page(pageID, tableName, records);
             
         } catch (IOException e) {
             System.out.println("messed up while reading individual page from memory");
@@ -261,7 +261,7 @@ public class Catalog {
                     }
                     records.add(new Record(recordData, attributes, true));
                 }
-                Page page = new Page(pageID, records);
+                Page page = new Page(pageID, "", records);
                 pages.add(page);
 
                 raFile.read(new byte[pageSize - traversedBytes]);
