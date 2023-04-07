@@ -60,7 +60,7 @@ public class Parser {
                 case CREATE_TABLE -> {
                     String input = user_input.replaceFirst("create table", "").strip();
                     int start_index = input.indexOf("(");
-                    int end_index = input.indexOf(")");
+                    int end_index = input.indexOf(");");
                     String table_name = input.substring(0, start_index);
                     String columns = input.substring(start_index + 1, end_index).strip();
                     String[] attr = columns.split(",");
@@ -228,15 +228,11 @@ public class Parser {
                         orderby_clause = input.substring(start_index).replace(";", "").replaceFirst("orderby", "").strip();
                         // TODO: check if asc or desc
                     }
-                    if (attributes.size() >= 1 && tables.size() > 1){
-                        selectMultipleAsTs(attributes, tables, where_clause, orderby_clause);
-                    } else if (attributes.size() >= 1) {
-                        selectMultipleAs(attributes, table_name, where_clause, orderby_clause);
-                    } else if (tables.size() > 1) {
-                        selectMultipleTs(attribute, tables, where_clause, orderby_clause);
-                    } else {
-                        select(table_name, where_clause, orderby_clause);
+                    if(attributes.get(0).equals('*')){
+                        select("*", table_name);
                     }
+                    // TODO: update this with where and orderby and the multiple tables/attributes
+                    storageManager.select(tables, attributes, new String[]{});
                 }
                 case INSERT -> {
                     try {
@@ -250,7 +246,7 @@ public class Parser {
                             if(tuples[i].strip().equals("")){
                                 continue;
                             }
-                            String[] temp = tuples[i].split("\\)")[0].split(" ");
+                            String[] temp = tuples[i].split("\\)")[0].split(",");
                             for(int j = 0; j < temp.length; j++){
                                 temp[j] = temp[j].strip();
                             }
@@ -372,25 +368,8 @@ public class Parser {
         return true;
     }
 
-    private void selectMultipleTs(String attribute, ArrayList<String> tables, String where_clause, String orderby_clause) {
-        storageManager.selectMultipleTables(attribute, tables, where_clause, orderby_clause);
-    }
-
-    private void selectMultipleAs(ArrayList<String> attributes, String table_name, String where_clause, String orderby_clause) {
-        storageManager.selectMultipleAttributes(attributes, table_name, where_clause, orderby_clause);
-    }
-
-    private void selectMultipleAsTs(ArrayList<String> attributes, ArrayList<String> tables, String where_clause, String orderby_clause) {
-        storageManager.selectMultiple(attributes, tables, where_clause, orderby_clause);
-    }
-
-    private void select(String tableName, String where_clause, String orderby_clause) throws TableException {
-        storageManager.select(tableName, where_clause, orderby_clause);
-    }
-
-    public ArrayList<String> splitWhereCondition(String where_clause) {
-        // TODO: split where clause
-        return new ArrayList<>();
+    private void select(String attr, String tableName) throws TableException {
+//        storageManager.select(tableName);
     }
 
     public void displayHelp() {

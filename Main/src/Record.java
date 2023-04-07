@@ -89,6 +89,18 @@ public class Record implements Comparable<Record>{
         this.entries = newEntries;
     }
 
+
+    public ArrayList<Object> getSubset(ArrayList<Attribute> subset){
+        ArrayList<Object> subsetRecords = new ArrayList<>();
+        for(int i = 0; i < subset.size(); i++){
+            Attribute a = subset.get(i);
+            if(a != null){
+                subsetRecords.add(this.entries.get(i));
+            }
+        }
+
+        return subsetRecords;
+    }
     /**
      * returns all the entries as an array
      * @return array of entries

@@ -97,7 +97,7 @@ public class StorageManager {
         }
         for (TableSchema table : tables) {
             System.out.println(table.displayTableSchema());
-            System.out.println("Records: " + loadRecords(table).size() + "\n");
+            System.out.println("Records: " + loadRecords(table, null).size() + "\n");
         }
     }
 
@@ -109,7 +109,7 @@ public class StorageManager {
     public void displayTableInfo(String tableName) throws TableException {
         TableSchema table = db.getTable(tableName);
         System.out.println(table.displayTableSchema());
-        System.out.println("Records: " + loadRecords(table).size() + "\n");
+        System.out.println("Records: " + loadRecords(table, null).size() + "\n");
     }
 
     /***
@@ -117,23 +117,173 @@ public class StorageManager {
      * @param table the table name
      * @return an arraylist of records
      */
-    private ArrayList<Record> loadRecords(TableSchema table){
+    private ArrayList<Record> loadRecords(TableSchema table, ArrayList<Attribute> subsetAttributes){
 
         ArrayList<Record> records = null;
 
-        records = pageBuffer.getRecords(table);
+        records = pageBuffer.getRecords(table, subsetAttributes);
 
         return records;
     }
 
+    public void select(ArrayList<String> tableNames, ArrayList<String> columns, String[] conditions) throws TableException {
+        // get all the tables
+        boolean all = columns.get(0).equals("*");
+        ArrayList<TableSchema> tables = new ArrayList<>();
+        HashMap<TableSchema, ArrayList<Attribute>> realAttributes = new HashMap<>();
+        ArrayList<Attribute> combined = new ArrayList<>();
 
-    public void select(String attribute, String tableName, String where_clause) throws TableException {
-        TableSchema tableSchema = db.getTable(tableName);
-        ArrayList<Record> records = loadRecords(tableSchema);
-        if(records == null){
+        // validate all tables
+        for(String name: tableNames){
+            TableSchema table =db.getTable(name);
+            tables.add(table);
+
+            // check the * case
+            if(all){
+                realAttributes.put(table, table.getAttributes());
+                combined.addAll(table.getAttributes());
+            }
+            else{
+                realAttributes.put(table, new ArrayList<Attribute>());
+            }
+        }
+
+
+       if(!all){
+           // validate all columns
+           realAttributes = getValidColumns(realAttributes, tables, columns);
+
+           for(TableSchema table: realAttributes.keySet()){
+               combined.addAll(realAttributes.get(table));
+           }
+           select(realAttributes, tables, combined);
+       }
+       else{
+           select(realAttributes, tables, combined);
+       }
+
+
+    }
+
+    public HashMap<TableSchema, ArrayList<Attribute>> getValidColumns(HashMap<TableSchema, ArrayList<Attribute>> attributes, ArrayList<TableSchema> tables, ArrayList<String> columns) throws TableException {
+        HashMap<TableSchema, ArrayList<Attribute>> attributesByTable = attributes;
+        // verify that all columns exist
+        for(String column: columns){
+            String[] colInfo = column.strip().split("\\.");
+            boolean added = false;
+            for(TableSchema table: tables){
+                if(colInfo.length == 2){
+                    String tableName = colInfo[0].strip();
+                    String attributeName = colInfo[1].strip();
+                    if(tableName.strip().equals(table.getName())){
+                        Attribute a = table.getAttribute(attributeName);
+                        attributesByTable.get(table).add(a);
+                        added = true;
+                        break;
+                    }
+                }
+                else{
+                    try{
+                        Attribute a = table.getAttribute(column);
+                        // attribute belongs to table
+                        if(added){
+                            throw new TableException(9, column);
+                        }
+                        attributesByTable.get(table).add(a);
+                        added = true;
+                    }
+                    catch (TableException ta){
+                        if(ta.getErrorCode() == 9){
+                            throw ta;
+                        }
+                    }
+                }
+            }
+            if(colInfo.length == 2 && !added){
+                throw new TableException(1, column);
+            }
+        }
+
+        return attributesByTable;
+    }
+
+
+    public void select(HashMap<TableSchema, ArrayList<Attribute>> attributesByTable, ArrayList<TableSchema> tables, ArrayList<Attribute> combined) throws TableException {
+
+        ArrayList<Record> realRecords = new ArrayList<>();
+        HashMap<TableSchema, ArrayList<Record>> recordsByTable = new HashMap<>();
+        ArrayList<Record> allRecords = new ArrayList<>();
+
+        // if there is only one table
+        if(attributesByTable.size() == 1){
+            TableSchema onlyTable = attributesByTable.keySet().iterator().next();
+            allRecords = loadRecords(onlyTable, onlyTable.getAttributes());
+        }
+        else{
+            // combine all the records
+            allRecords = createResultSet(attributesByTable, tables, combined);
+        }
+
+        if(allRecords == null || allRecords.size() == 0){
             System.out.println("No Records to show");
         }
-        System.out.println(formatResults(tableSchema.getAttributes(), records));
+        else {
+            System.out.println(formatResults(combined, allRecords));
+        }
+    }
+
+    public ArrayList<Record> createResultSet(HashMap<TableSchema, ArrayList<Attribute>> attributesByTable, ArrayList<TableSchema> tables, ArrayList<Attribute> combined){
+        ArrayList<Record> setOneRecords = new ArrayList<>();
+        ArrayList<Record> setTwoRecords = new ArrayList<>();
+        ArrayList<Record> combinedRecords = new ArrayList<>();
+        ArrayList<Attribute> recordAttributes = new ArrayList<>();
+        ArrayList<Object> recordEntries = new ArrayList<>();
+        int p2 = 1;
+
+        // set one is the first table
+        setOneRecords = loadRecords(tables.get(0), attributesByTable.get(tables.get(0)));
+        // set two is the second table
+        setTwoRecords = loadRecords(tables.get(1), attributesByTable.get(tables.get(1)));
+
+        recordAttributes.addAll(attributesByTable.get(tables.get(0)));
+        while(true){
+            for(Record r1: setOneRecords){
+                for(Record r2: setTwoRecords){
+                    // combine the attributes from table two
+                    recordAttributes.addAll(attributesByTable.get(tables.get(p2)));
+
+                    // combine the record entries
+                    recordEntries.addAll(r1.getEntries());
+                    recordEntries.addAll(r2.getEntries());
+
+                    // create the new combined record
+                    Record combinedRecord = new Record(recordEntries, recordAttributes, false);
+                    combinedRecords.add(combinedRecord);
+                }
+            }
+
+
+
+            // increment p2, so it become the next table in the sequence
+            p2++;
+
+            // make sure p2 is not out of bounds
+            if(p2 == tables.size()){
+                break;
+            }
+
+            // reset set one to be the combined records
+            setOneRecords = combinedRecords;
+
+            // set setTwoRecords to be the next table
+            setTwoRecords = loadRecords(tables.get(p2), attributesByTable.get(tables.get(1)));
+
+            // reset other variables
+            recordEntries = new ArrayList<>();
+            combinedRecords = new ArrayList<>();
+        }
+
+        return combinedRecords;
     }
 
     /**
@@ -150,7 +300,7 @@ public class StorageManager {
 
         record = db.validateRecord(table, recordInfo);
         if(record != null){
-            ArrayList<Record> records = loadRecords(table);
+            ArrayList<Record> records = loadRecords(table, null);
             db.validatePrimaryKey(record, table, records);
             ArrayList<Integer> uniqueAttributes = db.uniqueAttribute(table.getAttributes());
             db.checkUniqueness(record, uniqueAttributes, records);
@@ -187,11 +337,7 @@ public class StorageManager {
 
             byte[] bytes = new byte[0];
 
-        //   bytes= Type.concat(bytes, Type.convertIntToByteArray(fileID));
             bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfPages));
-        //   bytes=Type.concat(bytes, Type.convertIntToByteArray(numOfRecords));
-        
-
             
             raf.write(bytes);
             raf.close();
@@ -215,6 +361,73 @@ public class StorageManager {
          return false;
     }
 
+    public boolean checkIfRecordMeetsCondition(Record record, String condition)
+    {
+        String[] splitCondition = condition.split(" ");
+        String attribute = splitCondition[0];
+        String operator = splitCondition[1];
+        String cond = splitCondition[2];
+
+        Attribute usedAttribute;
+        for (Attribute a: record.attr)
+        {
+            if (a.getName().equals(attribute))
+            {
+                usedAttribute = a;
+            }
+        }
+        // gonna have to use some tree for this to work better
+        // but that is a problem for tomorrow
+
+        return false;
+    }
+
+    public void delete(String table_name, String where_clause) {
+        //  TODO: Delete records from table where condition is true
+        try 
+        {
+            String[] clauses;
+            if (where_clause.contains("or"))
+            {
+                clauses = where_clause.split("or");
+            } else
+            {
+                clauses = where_clause.split("");
+            }
+
+            TableSchema taSchema = this.db.getTable(table_name);
+            ArrayList<Integer> pageIDs = taSchema.getPageIds();
+            for (int j = 0; j < clauses.length; j++) 
+            
+            {
+                for (int i = 0; i < pageIDs.size(); i++) {
+                    Page p = this.pageBuffer.getPage(taSchema, pageIDs.get(i));
+  
+                     for (Record r : p.records)  {
+                        if (this.checkIfRecordMeetsCondition(r, clauses[j])) {
+                            p.removeRecord(r);
+                         } else { 
+                            // keep record
+                        }
+                    }
+                }
+             } 
+
+        } catch (TableException e) 
+        {
+            System.out.println("Table doesn't exist");
+        }
+    }
+
+    public void deleteRecords(String table_name) {
+        // TODO: Delete all records from table
+    } 
+
+    public void update(String table_name, String column, String value, String where_clause)
+    {
+ 
+    }
+
     /**
      * Drop the given attribute from given table
      * @param attribute_name
@@ -226,7 +439,7 @@ public class StorageManager {
         ArrayList<Attribute> newAttributes = db.removeAttribute(attribute_name, table);
 
         // get all the records
-        ArrayList<Record> records = loadRecords(table);
+        ArrayList<Record> records = loadRecords(table, null);
         ArrayList<Record> newRecords = new ArrayList<>();
 
         // drop the old table
@@ -279,7 +492,7 @@ public class StorageManager {
         newAttributes.add(attribute);
 
         // get all the records
-        ArrayList<Record> records = loadRecords(table);
+        ArrayList<Record> records = loadRecords(table, null);
         ArrayList<Record> newRecords = new ArrayList<>();
 
         // drop the old table
@@ -346,29 +559,5 @@ public class StorageManager {
         // bottom line
         result += "\n" + dash;
         return result;
-    }
-
-    public void selectMultiple(ArrayList<String> attributes, ArrayList<String> tables, String where_clause, String orderby_clause) {
-        // TODO: Get multiple attributes from multiple tables
-    }
-
-    public void selectMultipleAttributes(ArrayList<String> attributes, String table_name, String where_clause, String orderby_clause) {
-        // TODO: Get multiple attributes from 1 table
-    }
-
-    public void selectMultipleTables(String attribute, ArrayList<String> tables, String where_clause, String orderby_clause) {
-        // TODO: Get 1 attribute from multiple tables
-    }
-
-    public void update(String table_name, String column, String value, String where_clause) {
-        // TODO: Update table and set column to value where condition is true
-    }
-
-    public void delete(String table_name, String where_clause) {
-        // TODO: Delete records from table where condition is true
-    }
-
-    public void deleteRecords(String table_name) {
-        // TODO: Delete all records from table
     }
 }

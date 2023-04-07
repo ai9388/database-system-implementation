@@ -47,7 +47,6 @@ public class Main {
         Parser parser = new Parser(directory.getName(), dbPath, pageSize, buffSize);
         // looping until <quit> is taken in
         
-        
         boolean flag = true;
         while (flag){
             // oh no the user needs help, have to display it   

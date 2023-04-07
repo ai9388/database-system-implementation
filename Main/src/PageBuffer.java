@@ -66,7 +66,7 @@ public class PageBuffer {
     public Page getPage(TableSchema table, int pageId){
         // get the page from the active pages queue
         for(Page page: activePages){
-            if(page.getId() == pageId){
+            if(page.getId() == pageId && page.getTableName() == table.getName()){
                 Page temp = page;
                 return temp;
             }
@@ -113,7 +113,7 @@ public class PageBuffer {
 
         if(tableNumOfPages == 0) { // if there are no pages for this table
             // TODO: make a new file for the table
-            Page page = new Page(getNextPageID(), tableSchema.getTableID());
+            Page page = new Page(getNextPageID(), tableSchema.getName());
             page.insertRecordAt(record, 0); // add this entry to a new page
             // TODO: insert the page into the table file
             updateBuffer(page); // add page to buffer
@@ -270,14 +270,19 @@ public class PageBuffer {
      * @param table the table object where pages are read from
      * @return an arraylist of records
      */
-    public ArrayList<Record> getRecords(TableSchema table){
+    public ArrayList<Record> getRecords(TableSchema table, ArrayList<Attribute> attributeSubset){
         ArrayList<Record> records = new ArrayList<>();
 
         // iterate all the page ID's to get the pages
         for(Integer pageID : table.getPageIds()){
             Page page = getPage(table, pageID);
             // every page you get
-            records.addAll(page.getRecords());
+            if(attributeSubset == null || table.getAttributes().size() == attributeSubset.size()){
+                records.addAll(page.getRecords());
+            }
+            else {
+                records.addAll(page.getRecords(attributeSubset));
+            }
         }
 
         return records;
@@ -285,6 +290,9 @@ public class PageBuffer {
 
     public boolean dropTable(String TableName){
         File file = new File(dbPath + "/" + TableName);
+        if(!file.exists()){
+            return true;
+        }
         return file.delete();
     }
 
