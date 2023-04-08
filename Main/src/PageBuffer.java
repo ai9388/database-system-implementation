@@ -64,7 +64,7 @@ public class PageBuffer {
      * @param pageId the id of the page
      * @return Page
      */
-    public Page getPage(TableSchema table, int pageId){
+    public Page getPage(TableSchema table, int pageId) throws TableException {
         // get the page from the active pages queue
         for(Page page: activePages){
             if(page.getId() == pageId && page.getTableName().equals((table.getName()))){
@@ -74,6 +74,9 @@ public class PageBuffer {
         }
 
         Page page = readPage(table, pageId);
+        if(page == null){
+            throw new TableException(12, "");
+        }
         tables.add(table);
         page.setUsed();
         // update active pages
@@ -108,7 +111,7 @@ public class PageBuffer {
      * @param record the record to be inserted
      * @return true if inserted
      */
-    public void insertRecord(TableSchema tableSchema, Record record){
+    public void insertRecord(TableSchema tableSchema, Record record) throws TableException {
         boolean inserted = false;
         int tableNumOfPages = tableSchema.getNumberOfPages();
         boolean split = false;
@@ -211,7 +214,7 @@ public class PageBuffer {
             //need up to figure out the update
             raf.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Unable to write to page");
         }
         return false;
     }
@@ -273,7 +276,7 @@ public class PageBuffer {
      * @param table the table object where pages are read from
      * @return an arraylist of records
      */
-    public ArrayList<Record> getRecords(TableSchema table, ArrayList<Attribute> attributeSubset){
+    public ArrayList<Record> getRecords(TableSchema table, ArrayList<Attribute> attributeSubset) throws TableException {
         ArrayList<Record> records = new ArrayList<>();
 
         // iterate all the page ID's to get the pages

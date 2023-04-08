@@ -85,7 +85,7 @@ public class StorageManager {
     /***
      * displaying database schema
      */
-    public void displaySchema(){
+    public void displaySchema() throws TableException {
         System.out.println("DB location: " + dbPath);
         System.out.println("Page Size: " + this.pageSize);
         System.out.println("Buffer Size: " + this.bufferSize);
@@ -120,9 +120,10 @@ public class StorageManager {
      * @param table the table name
      * @return an arraylist of records
      */
-    private ArrayList<Record> loadRecords(TableSchema table, ArrayList<Attribute> subsetAttributes){
-
+    private ArrayList<Record> loadRecords(TableSchema table, ArrayList<Attribute> subsetAttributes) throws TableException {
         ArrayList<Record> records = null;
+
+        // in case the attribute names have been changed
 
         records = pageBuffer.getRecords(table, subsetAttributes);
 
@@ -221,6 +222,7 @@ public class StorageManager {
                     String attributeName = colInfo[1].strip();
                     if(tableName.strip().equals(table.getName())){
                         Attribute a = table.getAttribute(attributeName);
+                        a.setAlias(column); // set the column alias
                         attributesByTable.get(table).add(a);
                         added = true;
                         break;
@@ -272,7 +274,7 @@ public class StorageManager {
         return allRecords;
     }
 
-    public ArrayList<Record> createResultSet(HashMap<TableSchema, ArrayList<Attribute>> attributesByTable, ArrayList<TableSchema> tables, ArrayList<Attribute> combined){
+    public ArrayList<Record> createResultSet(HashMap<TableSchema, ArrayList<Attribute>> attributesByTable, ArrayList<TableSchema> tables, ArrayList<Attribute> combined) throws TableException {
         ArrayList<Record> setOneRecords = new ArrayList<>();
         ArrayList<Record> setTwoRecords = new ArrayList<>();
         ArrayList<Record> combinedRecords = new ArrayList<>();
@@ -420,80 +422,66 @@ public class StorageManager {
         return false;
     }
 
-    public void delete(String table_name, String where_clause) {
-        //  TODO: Delete records from table where condition is true
-        try 
-        {
-            String[] clauses;
-            if (where_clause.contains("or"))
-            {
-                clauses = where_clause.split("or");
-            } else
-            {
-                clauses = where_clause.split("");
-            }
-
-            // getting the table schema for the table we want
-            TableSchema taSchema = this.db.getTable(table_name);
-
-            // getting all of the pageIDs associated with the table
-            ArrayList<Integer> pageIDs = taSchema.getPageIds();
-            for (int j = 0; j < clauses.length; j++)
-            {
-                // looping over all of the page ids
-                for (int i = 0; i < pageIDs.size(); i++) {
-                    Page p = this.pageBuffer.getPage(taSchema, pageIDs.get(i));
-
-                    // looping over all of the page's records
-                    for (Record r : p.records)
-                    {
-                        // checking if we should remove the record
-                        if (this.checkIfRecordMeetsCondition(r, clauses[j])){
-                            p.removeRecord(r);
-                        } else {
-                            // keep record
-                        }
-                    }
-                }
-            }
-        } catch (TableException e) 
-        {
-            System.out.println("Table doesn't exist");
-        }
-    }
-
     /**
      * deletes all of the records from a given table
      * @param table_name name of the table to delete all records from
      */
-    public void deleteRecords(String table_name) {
-        try {
-            // getting the table schema for the table we want
-            TableSchema taSchema = this.db.getTable(table_name);
+    public int deleteRecords(String table_name, String where) throws TableException, ConditionalException {
 
-            // getting all of the pageIDs associated with the table
-            ArrayList<Integer> pageIDs = taSchema.getPageIds();
+        // keep track of rows affected
+        int count = 0;
 
-            // looping over all of the page ids
-            for (int i = 0; i < pageIDs.size(); i++) 
+        // set the condition flag
+        boolean condition = !where.equals("");
+
+        // flag to determine if a page has been updated
+        boolean pageUpdated = false;
+
+        // getting the table schema for the table we want
+        TableSchema taSchema = this.db.getTable(table_name);
+
+        // getting all of the pageIDs associated with the table
+        ArrayList<Integer> pageIDs = taSchema.getPageIds();
+
+        // create the conditional object
+        Conditional conditional = null;
+        if(condition){
+            // run the conditional tokenizer
+            conditional = Conditional.run(taSchema.getAttributes(), where);
+        }
+
+        // looping over all of the page ids
+        for (int i = 0; i < pageIDs.size(); i++)
+        {
+            // getting the individual page
+            Page p = this.pageBuffer.getPage(taSchema, pageIDs.get(i));
+
+            // make a copy of the records to refernce (READ - ONLY)
+            ArrayList<Record> records = new ArrayList<>(p.getRecords());
+            int pointer = 0; // to aid iteration
+
+            // looping over all of the records and removing them
+            for(Record record: records)
             {
-                // getting the individual page
-                Page p = this.pageBuffer.getPage(taSchema, pageIDs.get(i));
-
-                // looping over all of the records and removing them
-                while (!p.records.isEmpty())
-                {
-                    System.out.println("removed record: ");
-                    System.out.println(p.records.get(0).toString());
-                    p.removeRecord(p.records.get(0));
+                // (if there is a condition) check if the record meets condition
+                if(condition && conditional.evaluateRecord(record)){
+                    p.removeRecord(record);
+                    count ++;
+                    pageUpdated = true;
+                }
+                else if(!condition){
+                    p.removeRecord(record);
+                    pageUpdated = true;
                 }
 
+            }
+
+            // update this page in the buffer if there has been a change
+            if(pageUpdated) {
                 this.pageBuffer.updateBuffer(p);
             }
-        }catch(TableException e)
-        {
-            System.out.println("Table doesn't exist");
         }
+        return count;
     } 
 
     public void update(String table_name, String column, String value, String where_clause)

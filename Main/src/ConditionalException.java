@@ -9,7 +9,8 @@ public class ConditionalException extends Exception {
             "Left operand cannot be a literal value", // 7
             "Logical operands must equate to a boolean", // 8
             "Data types of relational operands must match", // 9
-            "left value for relational operator \"%s\" must be an attribute" // 10
+            "left value for relational operator \"%s\" must be an attribute", // 10
+            "unable to interpret where clause", //11
     };
     private String message = "SelectError:";
 

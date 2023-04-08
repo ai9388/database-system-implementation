@@ -56,7 +56,7 @@ public enum Type {
                         return true;
                     }
                 case VARCHAR:
-                    if(value.length() > attribute.getN() + 2){
+                    if(value.length() > attribute.getN() + 2 || !value.startsWith("\"") || !value.endsWith("\"")){
                         break;
                     }
                     else{

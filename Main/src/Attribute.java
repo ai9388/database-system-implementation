@@ -5,6 +5,7 @@
 public class Attribute {
 
     private String name;
+    private String alias;
     private Type type;
     private boolean primaryKey;
     private final boolean notNull;
@@ -22,6 +23,15 @@ public class Attribute {
         this.notNull = notNull;
         this.unique = unique;
         this.N = N;
+        this.alias = name;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 
     /**
@@ -103,7 +113,7 @@ public class Attribute {
         boolean res = false;
         if(obj instanceof Attribute){
             Attribute other = (Attribute) obj;
-            res = this.name.equals(other.getName());
+            res = this.name.equals(other.getName()) && this.alias.equals(other.getAlias());
         }
 
         return res;

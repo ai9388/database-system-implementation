@@ -17,8 +17,10 @@ public abstract class Conditional{
      private ArrayList<Attribute> attributes;
     public static Conditional run(ArrayList<Attribute> attributes, String expression) throws ConditionalException {
         List<String> postfix = toPostfix(expression, attributes);
-        System.out.println(postfix);
         Conditional conditional = tokenize(postfix, attributes);
+        if(conditional == null){
+            // ERROR: unable to interpret where clause
+        }
         return conditional;
     }
 
@@ -122,6 +124,9 @@ public abstract class Conditional{
         }
 
         return idx;
+    }
+    public boolean evaluateRecord(Record record) throws ConditionalException{
+        return (boolean) evaluate(record);
     }
 
     public abstract Object evaluate(Record record) throws ConditionalException;

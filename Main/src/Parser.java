@@ -1,3 +1,4 @@
+import java.sql.SQLOutput;
 import java.util.*;
 
 public class Parser {
@@ -47,7 +48,10 @@ public class Parser {
     public void classifyInput(String str_input) {
 
         this.user_input = str_input.toLowerCase().strip();
-        if((user_input.charAt(user_input.strip().length() -1 ) != ';') && !user_input.strip().startsWith("quit") && !user_input.strip().startsWith("help") ){
+        if(user_input.equals("")){
+            command = commands.EMPTY;
+        }
+        else if((user_input.charAt(user_input.strip().length() -1 ) != ';') && !user_input.strip().startsWith("quit") && !user_input.strip().startsWith("help") ){
             command = commands.EMPTY;
         }
         else if (user_input.startsWith("create table")) {
@@ -73,7 +77,6 @@ public class Parser {
         } else if (user_input.startsWith("delete from")) {
             command = commands.DELETE;
         } else {
-            System.out.println("Invalid Command.");
             command = commands.EMPTY;
         }
     }
@@ -228,20 +231,28 @@ public class Parser {
                 case SELECT -> {
                     String input = user_input.replaceFirst("select", "").strip();
                     String replaceSemi = input.replace(";", "").strip();
-                    int start_index = input.indexOf("from");
+                    String table_name = "";
+                    String where_clause = "";
+                    String orderby_clause = "";
+                    String[] splitFrom = replaceSemi.split("from");
                     ArrayList<String> attributes = new ArrayList<>();
-                    String attribute = input.substring(0, start_index).strip();
+                    String attribute;
+                    if(splitFrom.length == 2){
+                        attribute = splitFrom[0].strip();
+                    }
+                    else{
+                        displayInvalidMSSG();
+                        break;
+                    }
+
+                    // add the attributes
                     if (attribute.equals("*")) {
                         attributes.add(attribute);
                     }
                     else {
                         attributes.addAll(List.of(attribute.replaceAll(" ", "").split(",")));
                     }
-                    
-                    String table_name = "";
-                    String where_clause = "";
-                    String orderby_clause = "";
-                    String[] splitFrom = replaceSemi.split("from");
+
                     if(splitFrom[1].contains("where") && splitFrom[1].contains("orderby")){
                         String[] splitWhere = splitFrom[1].split("where");
                         table_name = splitWhere[0].strip();
@@ -313,13 +324,7 @@ public class Parser {
                 }
                 case HELP -> displayHelp();
                 case QUIT -> {
-                    storageManager.shutDown();
-                    System.out.println("Shutting down 11QL...");
-                    System.out.println("Shutting down the database...");
-                    System.out.println("Purging the page buffer...");
-                    System.out.println("Saving catalog...");
-                    System.out.println("\nExiting the database...");
-
+                    quit();
                     return false;
                 }
                 case DROP -> {
@@ -373,14 +378,13 @@ public class Parser {
                     String input = user_input.replaceFirst("delete from", "").strip();
                     String replaceSemi = input.replace(";", "").strip();
                     String table_name = replaceSemi.split(" ")[0];
-                    int start_index = replaceSemi.indexOf("e", replaceSemi.indexOf("where"));
-                    int end_index = replaceSemi.length() - 1;
-                    if (start_index != -1) {
-                        String where_clause = replaceSemi.substring(start_index, end_index).strip();
-                        storageManager.delete(table_name, where_clause);
-                    } else {
-                        storageManager.deleteRecords(table_name);
+                    String where_clause = "";
+                    String[] where_info = replaceSemi.split("where");
+                    if(where_info.length == 2){
+                        where_clause = where_info[1].strip();
                     }
+                    int res = storageManager.deleteRecords(table_name, where_clause);
+                    System.out.println(res + " rows affected");
                 }
                 case UPDATE -> {
                     String input = user_input.replaceFirst("update", "").strip();
@@ -403,21 +407,50 @@ public class Parser {
 //                    storageManager.update(table_name, column, value, where_clause);
                 }
                 case EMPTY -> {
-                    System.out.println("Invalid queries...");
+                    if(!user_input.equals("")) {
+                        displayInvalidMSSG();
+                    }
                 }
             }
         }
         catch (TableException e) {
-            System.out.println(e.getMessage());
+            if(e.getErrorCode() == 12){
+                System.out.println(e.getMessage());
+            }
+            else if(e.getErrorCode() == 10){
+                try {
+                    storageManager.dropTable(e.getArg());
+                    System.out.println(e.getMessage());
+                } catch (TableException ex) {
+                    System.out.println(e.getMessage());
+                }
+            }else {
+                System.out.println(e.getMessage());
+            }
         } catch (InvalidDataTypeException e) {
             System.out.println(e.getMessage());
         } catch (PrimaryKeyException e) {
             System.out.println(e.getMessage());
         } catch (ConstraintException e) {
             System.out.println(e.getMessage());
+        } catch (ConditionalException e) {
+            System.out.println(e.getMessage());
         }
 
         return true;
+    }
+
+    public void displayInvalidMSSG(){
+        System.out.println("Invalid Command");
+    }
+
+    public void quit(){
+        storageManager.shutDown();
+        System.out.println("Shutting down 11QL...");
+        System.out.println("Shutting down the database...");
+        System.out.println("Purging the page buffer...");
+        System.out.println("Saving catalog...");
+        System.out.println("\nExiting the database...");
     }
 
     public void displayHelp() {

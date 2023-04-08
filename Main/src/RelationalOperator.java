@@ -33,7 +33,7 @@ public class RelationalOperator extends Conditional{
             valLeft = record.getValueAtColumn(a);
         }else{
             //left must be an attribute
-            throw new ConditionalException(7, operator);
+            throw new ConditionalException(10, operator);
         }
 
         if(right instanceof AttributeOperand){
@@ -57,6 +57,10 @@ public class RelationalOperator extends Conditional{
             // make sure right value is the same type
             try {
                 if(Type.validateType(val, a)){ // same type if true
+                    // if the type is string, remove the quotes
+                    if(a.getType() == Type.VARCHAR || a.getType() == Type.CHAR){
+                        val = val.substring(1, val.length()-1);
+                    }
                     valRight = val;
                 }
                 else{

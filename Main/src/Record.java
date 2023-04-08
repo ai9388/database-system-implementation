@@ -82,7 +82,7 @@ public class Record implements Comparable<Record>{
         Object value = null ;
 
         for(int i = 0; i < attr.size(); i++){
-            if(attr.get(i).getName().equals(attribute.getName())){
+            if(attr.get(i).equals(attribute)){
                 value = getValueAtColumn(i);
                 break;
             }
