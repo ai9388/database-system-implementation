@@ -127,7 +127,7 @@ public class StorageManager {
         return records;
     }
 
-    public void select(ArrayList<String> tableNames, ArrayList<String> columns, String conditions, String orderbyAtt) throws TableException {
+    public void select(ArrayList<String> tableNames, ArrayList<String> columns, String conditions, String orderbyAtt) throws TableException, ConditionalException {
         // get all the tables
         boolean all = columns.get(0).equals("*");
         if(all){

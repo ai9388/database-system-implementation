@@ -251,19 +251,23 @@ public class Parser {
                     String where_clause = "";
                     String orderby_clause = "";
                     String[] splitFrom = replaceSemi.split("from");
-                    if(splitFrom[1].contains("where")){
+                    if(splitFrom[1].contains("where") && splitFrom[1].contains("orderby")){
                         String[] splitWhere = splitFrom[1].split("where");
-                        if(splitWhere.length == 1){ //no where
-                            String[] splitOrder = splitWhere[0].split("orderby");
-                            table_name = splitOrder[0].strip();
-                            orderby_clause = splitOrder[1].strip();
-                        }
-                        else{ // if there is where
-                            table_name = splitWhere[0].strip();
-                            String[] splitOrder = splitWhere[1].split("orderby");
-                            where_clause = splitOrder[0].strip();
-                            orderby_clause = splitOrder[1].strip();
-                        }
+                        table_name = splitWhere[0].strip();
+                        String[] splitOrder = splitWhere[1].split("orderby");
+                        where_clause = splitOrder[0].strip();
+                        orderby_clause = splitOrder[1].strip();
+                    }
+                    else if(splitFrom[1].contains("where")){
+                        String[] splitWhere = splitFrom[1].split("where");
+                        table_name = splitWhere[0].strip();
+                        where_clause = splitWhere[1].strip();
+                
+                    }
+                    else if(splitFrom[1].contains("orderby")){
+                        String[] splitOrder = splitFrom[1].split("orderby");
+                        table_name = splitOrder[0].strip();
+                        orderby_clause = splitOrder[1].strip();
                     }
                     else{
                         table_name = splitFrom[1].strip();
