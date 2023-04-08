@@ -87,7 +87,7 @@ public class Parser {
                 case CREATE_TABLE -> {
                     String input = user_input.replaceFirst("create table", "").strip();
                     int start_index = input.indexOf("(");
-                    int end_index = input.indexOf(")");
+                    int end_index = input.length() - 2;
                     String table_name = input.substring(0, start_index).strip();
                     if(invalidWords.contains(table_name.toLowerCase())){
                         throw new TableException(2, table_name);
