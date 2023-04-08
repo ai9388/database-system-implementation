@@ -139,8 +139,18 @@ public class Record implements Comparable<Record>{
      * @param index column index where update is happening
      * @param newValue new value replacing old at column
      */
-    public void updateAtColumn(int index, Object newValue){
+    public Record updateAtColumn(int index, Object newValue){
+        if (attr.get(index).getType().equals(Type.VARCHAR)) {
+            String oldString = String.valueOf(this.entries.get(index));
+            String newString = String.valueOf(newValue);
+            if (oldString.length() > newString.length()) {
+                this.size = size - (oldString.length() - newString.length());
+            } if (newString.length() > oldString.length()) {
+                this.size = size + (newString.length() - oldString.length());
+            }
+        }
         this.entries.set(index, newValue);
+        return this;
     }
 
     /**

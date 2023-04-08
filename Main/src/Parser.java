@@ -223,11 +223,10 @@ public class Parser {
                 }
                 case SELECT -> {
                     String input = user_input.replaceFirst("select", "").strip();
-                    String replaceSemi = input.replace(";", "").strip();
                     String table_name = "";
                     String where_clause = "";
                     String orderby_clause = "";
-                    String[] splitFrom = replaceSemi.split("from");
+                    String[] splitFrom = input.split("from");
                     ArrayList<String> attributes = new ArrayList<>();
                     String attribute;
                     if(splitFrom.length == 2){
@@ -367,15 +366,12 @@ public class Parser {
                 }
                 case DELETE -> {
                     String input = user_input.replaceFirst("delete from", "").strip();
-                    String replaceSemi = input.replace(";", "").strip();
-                    String table_name = replaceSemi.split(" ")[0];
+                    String table_name = input.split(" ")[0];
                     String where_clause = "";
-                    String[] where_info = replaceSemi.split("where");
+                    String[] where_info = input.split("where");
                     if(where_info.length == 2){
                         where_clause = where_info[1].strip();
                     }
-                    int res = storageManager.deleteRecords(table_name, where_clause);
-                    System.out.println(res + " rows affected");
                 }
                 case UPDATE -> {
                     String input = user_input.replaceFirst("update", "").strip();
@@ -395,7 +391,7 @@ public class Parser {
                         end_index = input.length() - 1;
                         where_clause = input.substring(start_index, end_index).replaceFirst("where", "").strip();
                     }
-//                    storageManager.update(table_name, column, value, where_clause);
+                    storageManager.update(table_name, column, value, where_clause);
                 }
                 case EMPTY -> {
                     if(!user_input.equals("")) {
@@ -423,8 +419,6 @@ public class Parser {
         } catch (PrimaryKeyException e) {
             System.out.println(e.getMessage());
         } catch (ConstraintException e) {
-            System.out.println(e.getMessage());
-        } catch (ConditionalException e) {
             System.out.println(e.getMessage());
         }
 

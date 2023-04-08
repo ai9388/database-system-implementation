@@ -311,4 +311,9 @@ public class TableSchema {
 
         return res;
     }
+
+    @Override
+    public String toString() {
+        return tableID + ": " + name;
+    }
 }

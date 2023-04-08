@@ -69,6 +69,13 @@ public class Page {
     public void setUsed(){
         this.isNew = false;
     }
+    public void updateRecord(int index, Record record) {
+        this.records.remove(index);
+        this.records.add(record);
+    }
+    public void addRecord (Record record) {
+        this.records.add(record);
+    }
 
     public void setTableId(String tableName) {
         this.tableName = tableName;

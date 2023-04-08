@@ -1,9 +1,6 @@
-import org.w3c.dom.Attr;
-
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class StorageManager {
     public Database db;
@@ -100,7 +97,16 @@ public class StorageManager {
         }
         for (TableSchema table : tables) {
             System.out.println(table.displayTableSchema());
-            System.out.println("Records: " + loadRecords(table, null).size() + "\n");
+            ArrayList<Integer> pageIDs = table.getPageIds();
+            System.out.print("Records: ");
+            for (int pageid: pageIDs) {
+                System.out.println(pageid);
+                Page page = pageBuffer.getPage(table, pageid);
+                for (Record r : page.records)
+                {
+                    System.out.print(r);
+                }
+            }
         }
     }
 
@@ -484,9 +490,66 @@ public class StorageManager {
         return count;
     } 
 
-    public void update(String table_name, String column, String value, String where_clause)
-    {
- 
+    public int update(String table_name, String column, String value, String where_clause) throws TableException, ConditionalException {
+
+        // keep track of rows affected
+        int count = 0;
+
+        // set the condition flag
+        boolean condition = !where_clause.equals("");
+
+        // flag to determine if a page has been updated
+        boolean pageUpdated = false;
+
+        // getting the table schema for the table we want
+        TableSchema taSchema = this.db.getTable(table_name);
+
+        // getting all of the pageIDs associated with the table
+        ArrayList<Integer> pageIDs = taSchema.getPageIds();
+
+        // create the conditional object
+        Conditional conditional = null;
+        if(condition){
+            // run the conditional tokenizer
+            conditional = Conditional.run(taSchema.getAttributes(), where_clause);
+        }
+
+        // looping over all of the page ids
+        for (int i = 0; i < pageIDs.size(); i++)
+        {
+            // getting the individual page
+            Page p = this.pageBuffer.getPage(taSchema, pageIDs.get(i));
+
+            // make a copy of the records to refernce (READ - ONLY)
+            ArrayList<Record> records = new ArrayList<>(p.getRecords());
+            int pointer = 0; // to aid iteration
+
+            // looping over all of the records and removing them
+            for(Record record: records)
+            {
+                // (if there is a condition) check if the record meets condition
+                if(condition && conditional.evaluateRecord(record)){
+                    p.removeRecord(record);
+                    Record newRecord = record.updateAtColumn(taSchema.getAttributeIndex(column), value);
+                    p.addRecord(newRecord);
+                    count ++;
+                    pageUpdated = true;
+                }
+                else if(!condition){
+                    p.removeRecord(record);
+                    Record newRecord = record.updateAtColumn(taSchema.getAttributeIndex(column), value);
+                    p.addRecord(newRecord);
+                    count ++;
+                    pageUpdated = true;
+                }
+            }
+
+            // update this page in the buffer if there has been a change
+            if(pageUpdated) {
+                this.pageBuffer.updateBuffer(p);
+            }
+        }
+        return count;
     }
 
     /**
