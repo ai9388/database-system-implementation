@@ -597,16 +597,4 @@ public class StorageManager {
         Collections.sort(records, new RecordComparator(attribute));
     }
 
-    public void selectMultiple(ArrayList<String> attributes, ArrayList<String> tables, String where_clause, String orderby_clause) {
-        // TODO: Get multiple attributes from multiple tables
-    }
-
-    public void selectMultipleAttributes(ArrayList<String> attributes, String table_name, String where_clause, String orderby_clause) {
-        // TODO: Get multiple attributes from 1 table
-    }
-
-    public void selectMultipleTables(String attribute, ArrayList<String> tables, String where_clause, String orderby_clause) {
-        // TODO: Get 1 attribute from multiple tables
-    }
-
 }

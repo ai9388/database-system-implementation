@@ -232,7 +232,7 @@ public class Parser {
                 case DISPLAY_SCHEMA -> storageManager.displaySchema();           
                 case DISPLAY_INFO -> {
                     String table_name = user_input.replaceFirst("display info", "").strip();
-                    storageManager.displayTableInfo(table_name.substring(0, table_name.length() - 1));
+                    storageManager.displayTableInfo(table_name);
                 }
                 case SELECT -> {
                     String input = user_input.replaceFirst("select", "").strip();
@@ -329,6 +329,27 @@ public class Parser {
                 case ALTER -> {
                     String input = user_input.replaceFirst("alter table", "").strip();
                     String table_name = input.split(" ")[0];
+                    switch (table_name) {
+                        case "integer": throw new TableException(1, "Integer");
+                        case "create": throw new TableException(1, "create");
+                        case "table": throw new TableException(1, "table");
+                        case "drop": throw new TableException(1, "drop");
+                        case "alter": throw new TableException(1, "alter");
+                        case "display": throw new TableException(1, "display");
+                        case "quit": throw new TableException(1, "quit");
+                        case "update": throw new TableException(1, "update");
+                        case "delete": throw new TableException(1, "delete");
+                        case "insert": throw new TableException(1, "insert");
+                        case "select": throw new TableException(1, "select");
+                        case "help": throw new TableException(1, "help");
+                        case "char": throw new TableException(1, "char");
+                        case "varchar": throw new TableException(1, "varchar");
+                        case "primarykey": throw new TableException(1, "primarykey");
+                        case "notnull": throw new TableException(1, "notnull");
+                        case "unique": throw new TableException(1, "unique");
+                        case "bool": throw new TableException(1, "bool");
+                        case "double": throw new TableException(1, "double");
+                    }
                     boolean drop = input.split(" ")[1].strip().equals("drop");
                     String attribute_name = input.split(" ")[2];
                     switch (attribute_name) {
