@@ -127,7 +127,7 @@ public class StorageManager {
         return records;
     }
 
-    public void select(ArrayList<String> tableNames, ArrayList<String> columns, String[] conditions, String orderbyAtt) throws TableException {
+    public void select(ArrayList<String> tableNames, ArrayList<String> columns, String[] conditions, String orderbyAtt) throws TableException, ConditionalException {
         // get all the tables
         boolean all = columns.get(0).equals("*");
         if(all){
@@ -179,15 +179,17 @@ public class StorageManager {
        //order by
         Attribute orderAttribute = null;
        for(Attribute a: combined){
-           if(a.getName().equals(orderAttribute)){
+           if(a.getName().equals(orderbyAtt)){
                orderAttribute = a;
                break;
            }
        }
-       if(orderAttribute == null){
-           // TODO: error: order by attribute should be valid
+       if(orderAttribute == null && !orderbyAtt.equals("")){
+           throw new ConditionalException(3, orderbyAtt);
        }
-       orderby(records, orderAttribute);
+       else if(orderAttribute != null && orderbyAtt.equals("")){
+           orderby(records, orderAttribute);
+       }
 
         System.out.println(formatResults(combined, records));
     }

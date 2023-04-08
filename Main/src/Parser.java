@@ -54,7 +54,7 @@ public class Parser {
     /**
      * Assume user passes in database
      */
-    public boolean parse() {
+    public boolean parse() throws ConditionalException {
         try {
             switch (command) {
                 case CREATE_TABLE -> {
