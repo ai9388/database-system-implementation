@@ -118,9 +118,9 @@ public class PageBuffer {
             // TODO: insert the page into the table file
             updateBuffer(page); // add page to buffer
             tableSchema.addPageID(page.getId());
-            this.tables.add(tableSchema); // add this table to the local collection. used for writing to mem
             return;
         }
+        this.tables.add(tableSchema); // add this table to the local collection. used for writing to mem
         // read table page in order from table file
         for(int i = 0; i < tableSchema.getNumberOfPages(); i++) {
             // get the page id

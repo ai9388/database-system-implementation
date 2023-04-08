@@ -437,7 +437,8 @@ public class StorageManager {
             ArrayList<Integer> pageIDs = taSchema.getPageIds();
 
             // looping over all of the page ids
-            for (int i = 0; i < pageIDs.size(); i++) {
+            for (int i = 0; i < pageIDs.size(); i++) 
+            {
                 // getting the individual page
                 Page p = this.pageBuffer.getPage(taSchema, pageIDs.get(i));
 
@@ -448,6 +449,8 @@ public class StorageManager {
                     System.out.println(p.records.get(0).toString());
                     p.removeRecord(p.records.get(0));
                 }
+
+                this.pageBuffer.addPage(p);
             }
         }catch(TableException e)
         {
