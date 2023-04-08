@@ -165,13 +165,16 @@ public class StorageManager {
            for(TableSchema table: realAttributes.keySet()){
                combined.addAll(realAttributes.get(table));
            }
-           select(realAttributes, tables, combined);
+           ArrayList<Record> records = select(realAttributes, tables, combined);
+        //    orderby(records, comb);
        }
        else{
            // validate all columns
            realAttributes = getValidColumns(realAttributes, tables, columns);
            select(realAttributes, tables, combined);
        }
+
+       // where
 
 
     }
@@ -219,7 +222,7 @@ public class StorageManager {
     }
 
 
-    public void select(HashMap<TableSchema, ArrayList<Attribute>> attributesByTable, ArrayList<TableSchema> tables, ArrayList<Attribute> combined) throws TableException {
+    public ArrayList<Record> select(HashMap<TableSchema, ArrayList<Attribute>> attributesByTable, ArrayList<TableSchema> tables, ArrayList<Attribute> combined) throws TableException {
 
         ArrayList<Record> realRecords = new ArrayList<>();
         HashMap<TableSchema, ArrayList<Record>> recordsByTable = new HashMap<>();
@@ -235,12 +238,14 @@ public class StorageManager {
             allRecords = createResultSet(attributesByTable, tables, combined);
         }
 
-        if(allRecords == null || allRecords.size() == 0){
-            System.out.println("No Records to show");
-        }
-        else {
-            System.out.println(formatResults(combined, allRecords));
-        }
+        // if(allRecords == null || allRecords.size() == 0){
+        //     System.out.println("No Records to show");
+        // }
+        // else {
+        //     System.out.println(formatResults(combined, allRecords));
+        // }
+
+        return allRecords;
     }
 
     public ArrayList<Record> createResultSet(HashMap<TableSchema, ArrayList<Attribute>> attributesByTable, ArrayList<TableSchema> tables, ArrayList<Attribute> combined){
