@@ -239,8 +239,8 @@ public class Database {
         if (uniqueAttribute.size() > 0) {
             for (Record r : records) {
                 for (Integer uniqueIndex : uniqueAttribute) {
-                    if (record.compareAtIndex(record, uniqueIndex) == 0) {
-                        throw new ConstraintException(1, (String) record.getValueAtColumn(uniqueIndex));
+                    if (record.compareAtIndex(r, uniqueIndex) == 0) {
+                        throw new ConstraintException(1, String.valueOf(record.getValueAtColumn(uniqueIndex)));
                     }
                 }
             }

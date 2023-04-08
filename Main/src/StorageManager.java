@@ -142,7 +142,7 @@ public class StorageManager {
 
         // validate all tables
         for(String name: tableNames){
-            TableSchema table =db.getTable(name);
+            TableSchema table = db.getTable(name);
             tables.add(table);
 
             // check the * case

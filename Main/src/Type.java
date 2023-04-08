@@ -35,7 +35,7 @@ public enum Type {
         if (value.equalsIgnoreCase("null") && attribute.getNotNull()) {
             throw new ConstraintException(2, attribute.getName());
         } else if (value.equalsIgnoreCase("null")) {
-            return false;
+            return true;
         }
         try{
             switch(attribute.getType()){
