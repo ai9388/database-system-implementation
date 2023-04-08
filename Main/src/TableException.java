@@ -8,7 +8,8 @@ public class TableException extends Exception{
         "Column %s already exists!", // 6
         "Cannot drop Primary Attribute %s" ,// 7
         "Duplicate attribute \"%s\"", // 8
-        "Ambiguous column \"%s\", belongs to multiple tables", // 10
+        "Ambiguous column \"%s\", belongs to multiple tables", // 9
+        "No data for table \"%s\"", // 10
     };
 
     private int errorCode;

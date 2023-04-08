@@ -74,6 +74,7 @@ public class PageBuffer {
         }
 
         Page page = readPage(table, pageId);
+        tables.add(table);
         page.setUsed();
         // update active pages
         updateBuffer(page);
@@ -255,6 +256,7 @@ public class PageBuffer {
      */
     public Page readPage(TableSchema table, int pageID){
         Page page = Catalog.readIndividualPageFromMemory(dbPath, table.getName(), pageID, Page.getCapacity(), table.getAttributes());
+        tables.add(table);
         return page;
     }
 

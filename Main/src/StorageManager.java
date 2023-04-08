@@ -127,7 +127,7 @@ public class StorageManager {
         return records;
     }
 
-    public void select(ArrayList<String> tableNames, ArrayList<String> columns, String conditions, String orderbyAtt) throws TableException, ConditionalException {
+    public void select(ArrayList<String> tableNames, ArrayList<String> columns, String condition, String orderbyAtt) throws TableException, ConditionalException {
         // get all the tables
         boolean all = columns.get(0).equals("*");
         if(all){
@@ -175,11 +175,24 @@ public class StorageManager {
        }
 
        // where
+        if(!condition.equals("")){
+            Conditional conditional = Conditional.run(combined, condition);
+            ArrayList<Record> filteredRecords = new ArrayList<>();
+
+            for(Record r: records){
+                if((boolean)conditional.evaluate(r)){
+                    filteredRecords.add(r);
+                }
+            }
+
+            records = filteredRecords;
+            // iterate through all records and filter
+        }
 
        //order by
         Attribute orderAttribute = null;
        for(Attribute a: combined){
-           if(a.getName().equals(orderbyAtt)){
+           if(a.getName().equals(orderbyAtt.strip())){
                orderAttribute = a;
                break;
            }
@@ -252,13 +265,6 @@ public class StorageManager {
             // combine all the records
             allRecords = createResultSet(attributesByTable, tables, combined);
         }
-
-        if(allRecords == null || allRecords.size() == 0){
-            System.out.println("No Records to show");
-        }
-//        else {
-//            System.out.println(formatResults(combined, allRecords));
-//        }
 
         return allRecords;
     }
@@ -479,7 +485,7 @@ public class StorageManager {
                     p.removeRecord(p.records.get(0));
                 }
 
-                this.pageBuffer.addPage(p, taSchema);
+                this.pageBuffer.updateBuffer(p);
             }
         }catch(TableException e)
         {
@@ -588,6 +594,9 @@ public class StorageManager {
     }
 
     public String formatResults(ArrayList<Attribute> tableAttributes, ArrayList<Record> records) {
+        if(records == null || records.size() == 0){
+            return "No Records to show";
+        }
         String format = "|";
         String result = "";
         int len = 1;

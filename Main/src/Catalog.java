@@ -54,7 +54,6 @@ public class Catalog {
             }
         } catch (IOException e) {
             System.out.println("File doesnt exist.");
-            e.printStackTrace();
         }
     }
 
@@ -185,7 +184,6 @@ public class Catalog {
             
         } catch (IOException e) {
             System.out.println("messed up while reading individual page from memory");
-            e.printStackTrace();
         }
         return null; 
     }
@@ -344,8 +342,7 @@ public class Catalog {
             }
             return new TableSchema(tableID, tableName, attributes, pageIDs.toArray(new Integer[pageIDs.size()]));
         } catch (IOException e) {
-            System.out.println("exception inside creating method");
-            e.printStackTrace();
+            System.out.println("exception inside creating table");
         }
 
         return new TableSchema(123, "thisIsAMistake", new ArrayList<>(), new Integer[123]);

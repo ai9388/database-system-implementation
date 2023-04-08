@@ -14,7 +14,7 @@ public class LogicalOperator extends Conditional{
     }
 
     @Override
-    public Object evaluate(Record record) {
+    public Object evaluate(Record record) throws ConditionalException {
 
         boolean leftRes = false;
         boolean rightRes = false;
@@ -23,14 +23,14 @@ public class LogicalOperator extends Conditional{
         if(left instanceof AttributeOperand) {
             AttributeOperand ao = (AttributeOperand) left;
             if (ao.getAttribute().getType() != Type.BOOLEAN) {
-                // TODO: error
+                throw new ConditionalException(6, operator);
             }
             leftRes = (boolean) record.getValueAtColumn(ao.getAttribute());
         }
 
         // lfet cannot be a value
         else if(left instanceof ValueOperand){
-            // TODO: error
+            throw new ConditionalException(7, "");
         }
 
         else { // the left is a conditional
@@ -42,7 +42,7 @@ public class LogicalOperator extends Conditional{
         if(right instanceof AttributeOperand) {
             AttributeOperand aor = (AttributeOperand) right;
             if(aor.getAttribute().getType() != Type.BOOLEAN){
-                // TODO
+                throw new ConditionalException(8, "");
             }
             rightRes = (boolean)record.getValueAtColumn(aor.getAttribute());
         }
@@ -59,7 +59,7 @@ public class LogicalOperator extends Conditional{
                 rightRes = false;
             }
             else{
-                // TODO: error
+                throw new ConditionalException(8, "");
             }
         }
 

@@ -15,7 +15,7 @@ public abstract class Conditional{
         precedence.put("!=", 4);
     }
      private ArrayList<Attribute> attributes;
-    public static Conditional run(ArrayList<Attribute> attributes, String expression){
+    public static Conditional run(ArrayList<Attribute> attributes, String expression) throws ConditionalException {
         List<String> postfix = toPostfix(expression, attributes);
         System.out.println(postfix);
         Conditional conditional = tokenize(postfix, attributes);
@@ -45,7 +45,7 @@ public abstract class Conditional{
         return outputQueue;
     }
 
-    public static Conditional tokenize(List<String> postfixTokens, ArrayList<Attribute> attributes){
+    public static Conditional tokenize(List<String> postfixTokens, ArrayList<Attribute> attributes) throws ConditionalException {
 
         Stack<Conditional> conditionals = new Stack<>();
         for(String token: postfixTokens){
@@ -60,7 +60,7 @@ public abstract class Conditional{
             // token is an operator
             else if(precedence.containsKey(token)){
                 if(conditionals.size() < 2){
-                    // TODO: exception
+                    throw new ConditionalException(5, token);
                 }
                 Conditional right = conditionals.pop();
                 Conditional left = conditionals.pop();
@@ -124,6 +124,6 @@ public abstract class Conditional{
         return idx;
     }
 
-    public abstract Object evaluate(Record record);
+    public abstract Object evaluate(Record record) throws ConditionalException;
 }
 

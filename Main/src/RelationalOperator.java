@@ -20,7 +20,7 @@ public class RelationalOperator extends Conditional{
         this.operator = operator;
     }
     @Override
-    public Object evaluate(Record record) {
+    public Object evaluate(Record record) throws ConditionalException {
 
         AttributeOperand ao;
         Attribute a;
@@ -32,8 +32,8 @@ public class RelationalOperator extends Conditional{
             a = ao.getAttribute();
             valLeft = record.getValueAtColumn(a);
         }else{
-            //TODO: error: left must be an attribute
-            return null;
+            //left must be an attribute
+            throw new ConditionalException(7, operator);
         }
 
         if(right instanceof AttributeOperand){
@@ -42,8 +42,8 @@ public class RelationalOperator extends Conditional{
 
             // make sure right attribute is the same type
             if(aR.getType() != a.getType()){
-                // TODO: ERROR: left and right attributes must be of the same type
-                return null;
+                // left and right attributes must be of the same type
+                throw new ConditionalException(9, "");
             }
             else{
                 valRight = record.getValueAtColumn(aR);
@@ -60,8 +60,8 @@ public class RelationalOperator extends Conditional{
                     valRight = val;
                 }
                 else{
-                    // TODO: ERROR: left and right attributes must be of the same type
-                    return null;
+                    // left and right attributes must be of the same type
+                    throw new ConditionalException(9, "");
                 }
             } catch (ConstraintException e) {
                 throw new RuntimeException(e);
@@ -72,9 +72,8 @@ public class RelationalOperator extends Conditional{
         int res = compareValues(valLeft, valRight, a.getType());
 
         // evaluate the booleans separately
-        if(a.getType() == Type.BOOLEAN && (operator != E || operator != NE)){
-            // ERROR: operator does not apply to  boolean
-            return null;
+        if(a.getType() == Type.BOOLEAN && (!operator.equals(E) && !operator.equals(NE))){
+            throw new ConditionalException(4, operator);
         }
 
         // evaluate depending on the operator
@@ -113,9 +112,14 @@ public class RelationalOperator extends Conditional{
             return Double.compare(lD, rD);
         }
         else if(type == Type.CHAR || type == Type.VARCHAR){
-                String lString = (String)l;
-                String rString = (String)r;
-                return lString.compareTo(rString);
+            String lString = (String)l;
+            String rString = (String)r;
+            return lString.compareTo(rString);
+        }
+        else if(type == Type.BOOLEAN){
+            boolean lb = (Boolean) l;
+            boolean lr = Boolean.parseBoolean(r.toString());
+            return Boolean.compare(lb, lr);
         }
         return small;
     }
