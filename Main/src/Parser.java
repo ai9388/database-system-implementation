@@ -294,7 +294,7 @@ public class Parser {
                         // select("*", table_name);
                     // }
                     // TODO: update this with where and orderby and the multiple tables/attributes
-                    storageManager.select(tables, attributes, new String[]{});
+                    storageManager.select(tables, attributes, new String[]{}, orderby_clause);
                 }
                 case INSERT -> {
                     try {

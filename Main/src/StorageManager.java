@@ -188,6 +188,8 @@ public class StorageManager {
            // TODO: error: order by attribute should be valid
        }
        orderby(records, orderAttribute);
+
+        System.out.println(formatResults(combined, records));
     }
 
     public HashMap<TableSchema, ArrayList<Attribute>> getValidColumns(HashMap<TableSchema, ArrayList<Attribute>> attributes, ArrayList<TableSchema> tables, ArrayList<String> columns) throws TableException {
@@ -252,9 +254,9 @@ public class StorageManager {
         if(allRecords == null || allRecords.size() == 0){
             System.out.println("No Records to show");
         }
-        else {
-            System.out.println(formatResults(combined, allRecords));
-        }
+//        else {
+//            System.out.println(formatResults(combined, allRecords));
+//        }
 
         return allRecords;
     }
