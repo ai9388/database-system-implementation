@@ -98,12 +98,12 @@ public class Database {
         try {
             TableSchema table = this.tables.get(name);
             if(table == null){
-                throw new TableException(2, name);
+                throw new TableException(10, name);
             }
 
             return table;
         } catch (NullPointerException e) {
-            throw new TableException(2, name);
+            throw new TableException(10, name);
         }
     }
 
