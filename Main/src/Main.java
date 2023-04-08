@@ -53,11 +53,13 @@ public class Main {
             // keep asking user for input
             System.out.print("11QL> ");
             String strInput = userInput.nextLine();
-            String[] inputLines = strInput.split(";");
-            for (String input : inputLines) {
-                parser.classifyInput(input);
-                flag = parser.parse();
-            }
+            parser.classifyInput(strInput);
+            flag = parser.parse();
+            // String[] inputLines = strInput.split(";");
+            // for (String input : inputLines) {
+            //     parser.classifyInput(input);
+            //     flag = parser.parse();
+            // }
         }
         userInput.close();
     }

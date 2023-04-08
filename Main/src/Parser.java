@@ -46,7 +46,7 @@ public class Parser {
         } else if (user_input.startsWith("delete from")) {
             command = commands.DELETE;
         } else {
-            // System.out.println("Invalid Command.");
+            System.out.println("Invalid Command.");
             command = commands.EMPTY;
         }
     }
