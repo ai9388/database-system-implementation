@@ -26,7 +26,7 @@ public class Parser {
         if((user_input.charAt(user_input.strip().length() -1 ) != ';') && !user_input.strip().startsWith("quit") && !user_input.strip().startsWith("help") ){
             command = commands.EMPTY;
         }
-        if (user_input.startsWith("create table")) {
+        else if (user_input.startsWith("create table")) {
             command = commands.CREATE_TABLE;
         } else if (user_input.startsWith("display schema")) {
             command = commands.DISPLAY_SCHEMA;
