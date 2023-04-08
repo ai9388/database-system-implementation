@@ -187,7 +187,7 @@ public class StorageManager {
        if(orderAttribute == null && !orderbyAtt.equals("")){
            throw new ConditionalException(3, orderbyAtt);
        }
-       else if(orderAttribute != null && orderbyAtt.equals("")){
+       else if(orderAttribute != null && !orderbyAtt.equals("")){
            orderby(records, orderAttribute);
        }
 

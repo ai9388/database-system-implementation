@@ -23,6 +23,9 @@ public class Parser {
     public void classifyInput(String str_input) {
 
         this.user_input = str_input.toLowerCase().strip();
+        if((user_input.charAt(user_input.strip().length() -1 ) != ';') && !user_input.strip().startsWith("quit") && !user_input.strip().startsWith("help") ){
+            command = commands.EMPTY;
+        }
         if (user_input.startsWith("create table")) {
             command = commands.CREATE_TABLE;
         } else if (user_input.startsWith("display schema")) {
@@ -272,13 +275,7 @@ public class Parser {
                     else{
                         table_name = splitFrom[1].strip();
                     }
-                    
-                    System.out.println(replaceSemi);
-                    
-                    System.out.println("Table name: " + table_name);
-                    System.out.println("Where clause " + where_clause);
-                    System.out.println("orderby clause " + orderby_clause);
-                    
+                                
                     // start_index = input.indexOf("m", start_index);
                     // int end_index = input.indexOf("where") != -1 ? input.indexOf("where") : input.length() - 1;
                     ArrayList<String> tables = new ArrayList<>();
@@ -505,8 +502,9 @@ public class Parser {
         System.out.println("\tselect * from <table name>;");
         System.out.println("\tinsert into <table name> values (...);");
         System.out.println("\tcreate table <table name> (<attribute name/type> constraints ...);");
-        System.out.println("\talter table add attribute <attribute name/type> <constraints>");
-        System.out.println("\talter table drop attribute <attribute name>");
+        System.out.println("\talter table <name> add <attribute name/type> <constraints>");
+        System.out.println("\talter table <name> drop <attribute name>");
+        System.out.println("\talter table <name> add <a_name> <a_type> default <value>;");
         System.out.println("'quit' to exit");
     }
 }
