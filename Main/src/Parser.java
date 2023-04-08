@@ -1,4 +1,3 @@
-import java.sql.SQLOutput;
 import java.util.*;
 
 public class Parser {
@@ -51,9 +50,6 @@ public class Parser {
         if(user_input.equals("")){
             command = commands.EMPTY;
         }
-        else if((user_input.charAt(user_input.strip().length() -1 ) != ';') && !user_input.strip().startsWith("quit") && !user_input.strip().startsWith("help") ){
-            command = commands.EMPTY;
-        }
         else if (user_input.startsWith("create table")) {
             command = commands.CREATE_TABLE;
         } else if (user_input.startsWith("display schema")) {
@@ -90,7 +86,7 @@ public class Parser {
                 case CREATE_TABLE -> {
                     String input = user_input.replaceFirst("create table", "").strip();
                     int start_index = input.indexOf("(");
-                    int end_index = input.length() - 2;
+                    int end_index = input.length() - 1;
                     String table_name = input.substring(0, start_index).strip();
                     if(invalidWords.contains(table_name.toLowerCase())){
                         throw new TableException(2, table_name);
@@ -329,12 +325,11 @@ public class Parser {
                 }
                 case DROP -> {
                     String input = user_input.replaceFirst("drop table", "").strip();
-                    String table_name = input.split(";")[0];
-                    if(storageManager.dropTable(table_name)){
-                        System.out.println("Successfully dropped table " + table_name);
+                    if(storageManager.dropTable(input)){
+                        System.out.println("Successfully dropped table " + input);
                     }
                     else{
-                        System.out.println("Table " + table_name + " could not be removed");
+                        System.out.println("Table " + input + " could not be removed");
                     }
                 }
                 case ALTER -> {
@@ -346,7 +341,7 @@ public class Parser {
                         throw new TableException(1, attribute_name);
                     }
                     if (drop) {
-                        attribute_name = attribute_name.split(";")[0];
+                        attribute_name = attribute_name.strip();
                         storageManager.dropAttributeFromTable(attribute_name, table_name);
                     } else {
                         String attribute_type = input.split(" ")[3];
@@ -366,7 +361,6 @@ public class Parser {
                         }
                         if (input.split(" ").length > 5) {
                             String value = input.split("default")[1].strip();
-                            value = value.split(";")[0];
                             storageManager.addAttributeToTable(a, value, table_name);
                         } else {
                             storageManager.addAttributeToTable(a, "", table_name);
@@ -460,11 +454,15 @@ public class Parser {
         System.out.println("\tdisplay schema;");
         System.out.println("\tdisplay table <table name>;");
         System.out.println("\tselect * from <table name>;");
-        System.out.println("\tinsert into <table name> values (...);");
-        System.out.println("\tcreate table <table name> (<attribute name/type> constraints ...);");
-        System.out.println("\talter table <name> add <attribute name/type> <constraints>");
-        System.out.println("\talter table <name> drop <attribute name>");
-        System.out.println("\talter table <name> add <a_name> <a_type> default <value>;");
+        System.out.println("\tselect <attribute names> from <table names> [where <conditions>] [orderby <attribute name>];");
+        System.out.println("\tinsert into <table name> values (<values>);");
+        System.out.println("\tcreate table <table name> (<attribute name/type> [constraints] ...);");
+        System.out.println("\talter table <name> add <attribute name/type> <constraints>;");
+        System.out.println("\talter table <name> drop <attribute name>;");
+        System.out.println("\talter table <name> add <a_name> <a_type> [default <value>];");
+        System.out.println("\tupdate <table name> set <attribute name> = <value> [where <conditions>];");
+        System.out.println("\tdelete from <table name> [where <conditions>];");
         System.out.println("'quit' to exit");
+        System.out.println("[] are optional additions to the commands.");
     }
 }

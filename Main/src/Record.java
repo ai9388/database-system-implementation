@@ -22,15 +22,27 @@ public class Record implements Comparable<Record>{
             }
             switch(attribute.getType()){
                 case INTEGER:
-                    entries.add(Integer.parseInt(value));
+                    if (value.equals("null")) {
+                        entries.add(value);
+                    } else {
+                        entries.add(Integer.parseInt(value));
+                    }
                     size += Integer.BYTES;
                     break;
                 case DOUBLE:
-                    entries.add(Double.parseDouble(value));
+                    if (value.equals("null")) {
+                        entries.add(value);
+                    } else {
+                        entries.add(Double.parseDouble(value));
+                    }
                     size += Double.BYTES;
                     break;
                 case BOOLEAN:
-                    entries.add(Boolean.parseBoolean(value));
+                    if (value.equals("null")) {
+                        entries.add(value);
+                    } else {
+                        entries.add(Boolean.parseBoolean(value));
+                    }
                     size += 1;
                     break;
                 case VARCHAR:
