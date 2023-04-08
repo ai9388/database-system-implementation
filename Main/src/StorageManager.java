@@ -127,7 +127,7 @@ public class StorageManager {
         return records;
     }
 
-    public void select(ArrayList<String> tableNames, ArrayList<String> columns, String[] conditions) throws TableException {
+    public void select(ArrayList<String> tableNames, ArrayList<String> columns, String[] conditions, String orderbyAtt) throws TableException {
         // get all the tables
         boolean all = columns.get(0).equals("*");
         if(all){
@@ -136,6 +136,7 @@ public class StorageManager {
         ArrayList<TableSchema> tables = new ArrayList<>();
         HashMap<TableSchema, ArrayList<Attribute>> realAttributes = new HashMap<>();
         ArrayList<Attribute> combined = new ArrayList<>();
+        ArrayList<Record> records = new ArrayList<>();
 
         // validate all tables
         for(String name: tableNames){
@@ -165,18 +166,19 @@ public class StorageManager {
            for(TableSchema table: realAttributes.keySet()){
                combined.addAll(realAttributes.get(table));
            }
-           ArrayList<Record> records = select(realAttributes, tables, combined);
-        //    orderby(records, comb);
+           records = select(realAttributes, tables, combined);
        }
        else{
            // validate all columns
            realAttributes = getValidColumns(realAttributes, tables, columns);
-           select(realAttributes, tables, combined);
+           records = select(realAttributes, tables, combined);
        }
 
        // where
 
+       //order by
 
+       orderby(records, combined);
     }
 
     public HashMap<TableSchema, ArrayList<Attribute>> getValidColumns(HashMap<TableSchema, ArrayList<Attribute>> attributes, ArrayList<TableSchema> tables, ArrayList<String> columns) throws TableException {
@@ -238,12 +240,12 @@ public class StorageManager {
             allRecords = createResultSet(attributesByTable, tables, combined);
         }
 
-        // if(allRecords == null || allRecords.size() == 0){
-        //     System.out.println("No Records to show");
-        // }
-        // else {
-        //     System.out.println(formatResults(combined, allRecords));
-        // }
+        if(allRecords == null || allRecords.size() == 0){
+            System.out.println("No Records to show");
+        }
+        else {
+            System.out.println(formatResults(combined, allRecords));
+        }
 
         return allRecords;
     }
