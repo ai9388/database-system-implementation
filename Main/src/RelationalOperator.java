@@ -111,17 +111,17 @@ public class RelationalOperator extends Conditional{
             return Integer.compare(lInt, rInt);
         }
         else if(type == Type.DOUBLE) {
-            double lD = (Double) l;
-            double rD = (Double) r;
+            double lD = Double.parseDouble(l.toString());
+            double rD = Double.parseDouble(r.toString());
             return Double.compare(lD, rD);
         }
         else if(type == Type.CHAR || type == Type.VARCHAR){
-            String lString = (String)l;
-            String rString = (String)r;
+            String lString = l.toString();
+            String rString = r.toString();
             return lString.compareTo(rString);
         }
         else if(type == Type.BOOLEAN){
-            boolean lb = (Boolean) l;
+            boolean lb = Boolean.parseBoolean(l.toString());
             boolean lr = Boolean.parseBoolean(r.toString());
             return Boolean.compare(lb, lr);
         }

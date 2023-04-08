@@ -241,8 +241,11 @@ public class PageBuffer {
             int numPages = table.getNumberOfPages();
             raf.writeInt(numPages);
             int order = table.getPageOrder(page.getId());
-            int skip = ((order-1) * Page.getCapacity()) + (2 * Integer.BYTES);
-            raf.seek(skip);
+            if(order != 1){
+                int skip = ((order-1) * Page.getCapacity()) + (2 * Integer.BYTES);
+                raf.seek(skip);
+            }
+
             raf.write(bytes);
 
             //need up to figure out the update
