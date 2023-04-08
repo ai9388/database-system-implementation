@@ -270,9 +270,9 @@ public class Parser {
                         orderby_clause = input.substring(start_index).replaceFirst("orderby", "").strip();
                         // TODO: check if asc or desc
                     }
-                    if(attributes.get(0).equals('*')){
-                        select("*", table_name);
-                    }
+//                    if(attributes.get(0).equals('*')){
+//                        select("*", table_name);
+//                    }
                     // TODO: update this with where and orderby and the multiple tables/attributes
                     storageManager.select(tables, attributes, new String[]{});
                 }
@@ -409,9 +409,9 @@ public class Parser {
                     int end_index = input.length() - 1;
                     if (start_index != -1) {
                         String where_clause = input.substring(start_index, end_index).strip();
-                        storageManager.delete(table_name, where_clause);
+//                        storageManager.delete(table_name, where_clause);
                     } else {
-                        storageManager.deleteRecords(table_name);
+//                        storageManager.deleteRecords(table_name);
                     }
                 }
                 case UPDATE -> {
@@ -432,7 +432,7 @@ public class Parser {
                         end_index = input.length() - 1;
                         where_clause = input.substring(start_index, end_index).replaceFirst("where", "").strip();
                     }
-                    storageManager.update(table_name, column, value, where_clause);
+//                    storageManager.update(table_name, column, value, where_clause);
                 }
                 case EMPTY -> {
                     System.out.println("Invalid queries...");

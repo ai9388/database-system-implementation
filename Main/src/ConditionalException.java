@@ -1,6 +1,7 @@
 public class ConditionalException extends Exception {
     private String[] errorMessages = new String[]{
             "Unknown Table: \"%s\"", // 1
+            "Conditional expression in where clause must contain operators", //2
 
     };
     private String message = "SelectError:";
