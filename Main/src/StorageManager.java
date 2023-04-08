@@ -1,3 +1,5 @@
+import org.w3c.dom.Attr;
+
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.*;
@@ -259,7 +261,8 @@ public class StorageManager {
         // if there is only one table
         if(attributesByTable.size() == 1){
             TableSchema onlyTable = attributesByTable.keySet().iterator().next();
-            allRecords = loadRecords(onlyTable, onlyTable.getAttributes());
+            allRecords = loadRecords(onlyTable, attributesByTable.get(onlyTable));
+
         }
         else{
             // combine all the records

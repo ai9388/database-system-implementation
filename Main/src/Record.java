@@ -108,7 +108,7 @@ public class Record implements Comparable<Record>{
         for(int i = 0; i < subset.size(); i++){
             Attribute a = subset.get(i);
             if(a != null){
-                subsetRecords.add(this.entries.get(i));
+                subsetRecords.add(this.getValueAtColumn(a));
             }
         }
 
