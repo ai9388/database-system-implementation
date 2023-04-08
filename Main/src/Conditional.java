@@ -117,7 +117,7 @@ public abstract class Conditional{
 
         for (int i = 0; i < attributes.size(); i++) {
             Attribute a = attributes.get(i);
-            if(a.getName().equals(name)){
+            if(a.getAlias().equals(name)){
                 idx = i;
                 break;
             }
