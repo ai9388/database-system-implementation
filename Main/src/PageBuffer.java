@@ -66,7 +66,7 @@ public class PageBuffer {
     public Page getPage(TableSchema table, int pageId){
         // get the page from the active pages queue
         for(Page page: activePages){
-            if(page.getId() == pageId && page.getTableName() == table.getName()){
+            if(page.getId() == pageId && page.getTableName().equals((table.getName()))){
                 Page temp = page;
                 return temp;
             }

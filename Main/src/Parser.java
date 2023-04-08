@@ -62,6 +62,27 @@ public class Parser {
                     int start_index = input.indexOf("(");
                     int end_index = input.indexOf(")");
                     String table_name = input.substring(0, start_index);
+                    switch (table_name) {
+                        case "integer": throw new TableException(2, "Integer");
+                        case "create": throw new TableException(2, "create");
+                        case "table": throw new TableException(2, "table");
+                        case "drop": throw new TableException(2, "drop");
+                        case "alter": throw new TableException(2, "alter");
+                        case "display": throw new TableException(2, "display");
+                        case "quit": throw new TableException(2, "quit");
+                        case "update": throw new TableException(2, "update");
+                        case "delete": throw new TableException(2, "delete");
+                        case "insert": throw new TableException(2, "insert");
+                        case "select": throw new TableException(2, "select");
+                        case "help": throw new TableException(2, "help");
+                        case "char": throw new TableException(2, "char");
+                        case "varchar": throw new TableException(2, "varchar");
+                        case "primarykey": throw new TableException(2, "primarykey");
+                        case "notnull": throw new TableException(2, "notnull");
+                        case "unique": throw new TableException(2, "unique");
+                        case "bool": throw new TableException(2, "bool");
+                        case "double": throw new TableException(2, "double");
+                    }
                     String columns = input.substring(start_index + 1, end_index).strip();
                     String[] attr = columns.split(",");
                     ArrayList<Attribute> attributes = new ArrayList<>();
@@ -72,6 +93,27 @@ public class Parser {
                     for (String attribute : attr) {
                         String[] components = attribute.strip().replaceAll("\\(", " ").split(" ");
                         String attr_name = components[0];
+                        switch (attr_name) {
+                            case "integer": throw new TableException(1, "Integer");
+                            case "create": throw new TableException(1, "create");
+                            case "table": throw new TableException(1, "table");
+                            case "drop": throw new TableException(1, "drop");
+                            case "alter": throw new TableException(1, "alter");
+                            case "display": throw new TableException(1, "display");
+                            case "quit": throw new TableException(1, "quit");
+                            case "update": throw new TableException(1, "update");
+                            case "delete": throw new TableException(1, "delete");
+                            case "insert": throw new TableException(1, "insert");
+                            case "select": throw new TableException(1, "select");
+                            case "help": throw new TableException(1, "help");
+                            case "char": throw new TableException(1, "char");
+                            case "varchar": throw new TableException(1, "varchar");
+                            case "primarykey": throw new TableException(1, "primarykey");
+                            case "notnull": throw new TableException(1, "notnull");
+                            case "unique": throw new TableException(1, "unique");
+                            case "bool": throw new TableException(1, "bool");
+                            case "double": throw new TableException(1, "double");
+                        }
                         boolean primarykey = false;
                         boolean notNull = false;
                         boolean unique = false;
@@ -190,7 +232,7 @@ public class Parser {
                 case DISPLAY_SCHEMA -> storageManager.displaySchema();           
                 case DISPLAY_INFO -> {
                     String table_name = user_input.replaceFirst("display info", "").strip();
-                    storageManager.displayTableInfo(table_name.substring(0, table_name.length() - 1));
+                    storageManager.displayTableInfo(table_name);
                 }
                 case SELECT -> {
                     String input = user_input.replaceFirst("select", "").strip();
@@ -228,9 +270,9 @@ public class Parser {
                         orderby_clause = input.substring(start_index).replaceFirst("orderby", "").strip();
                         // TODO: check if asc or desc
                     }
-                    if(attributes.get(0).equals('*')){
-                        select("*", table_name);
-                    }
+//                    if(attributes.get(0).equals('*')){
+//                        select("*", table_name);
+//                    }
                     // TODO: update this with where and orderby and the multiple tables/attributes
                     storageManager.select(tables, attributes, new String[]{});
                 }
@@ -287,8 +329,50 @@ public class Parser {
                 case ALTER -> {
                     String input = user_input.replaceFirst("alter table", "").strip();
                     String table_name = input.split(" ")[0];
+                    switch (table_name) {
+                        case "integer": throw new TableException(1, "Integer");
+                        case "create": throw new TableException(1, "create");
+                        case "table": throw new TableException(1, "table");
+                        case "drop": throw new TableException(1, "drop");
+                        case "alter": throw new TableException(1, "alter");
+                        case "display": throw new TableException(1, "display");
+                        case "quit": throw new TableException(1, "quit");
+                        case "update": throw new TableException(1, "update");
+                        case "delete": throw new TableException(1, "delete");
+                        case "insert": throw new TableException(1, "insert");
+                        case "select": throw new TableException(1, "select");
+                        case "help": throw new TableException(1, "help");
+                        case "char": throw new TableException(1, "char");
+                        case "varchar": throw new TableException(1, "varchar");
+                        case "primarykey": throw new TableException(1, "primarykey");
+                        case "notnull": throw new TableException(1, "notnull");
+                        case "unique": throw new TableException(1, "unique");
+                        case "bool": throw new TableException(1, "bool");
+                        case "double": throw new TableException(1, "double");
+                    }
                     boolean drop = input.split(" ")[1].strip().equals("drop");
                     String attribute_name = input.split(" ")[2];
+                    switch (attribute_name) {
+                        case "integer": throw new TableException(1, "Integer");
+                        case "create": throw new TableException(1, "create");
+                        case "table": throw new TableException(1, "table");
+                        case "drop": throw new TableException(1, "drop");
+                        case "alter": throw new TableException(1, "alter");
+                        case "display": throw new TableException(1, "display");
+                        case "quit": throw new TableException(1, "quit");
+                        case "update": throw new TableException(1, "update");
+                        case "delete": throw new TableException(1, "delete");
+                        case "insert": throw new TableException(1, "insert");
+                        case "select": throw new TableException(1, "select");
+                        case "help": throw new TableException(1, "help");
+                        case "char": throw new TableException(1, "char");
+                        case "varchar": throw new TableException(1, "varchar");
+                        case "primarykey": throw new TableException(1, "primarykey");
+                        case "notnull": throw new TableException(1, "notnull");
+                        case "unique": throw new TableException(1, "unique");
+                        case "bool": throw new TableException(1, "bool");
+                        case "double": throw new TableException(1, "double");
+                    }
                     if (drop) {
                         attribute_name = attribute_name.split(";")[0];
                         storageManager.dropAttributeFromTable(attribute_name, table_name);
@@ -325,9 +409,9 @@ public class Parser {
                     int end_index = input.length() - 1;
                     if (start_index != -1) {
                         String where_clause = input.substring(start_index, end_index).strip();
-                        storageManager.delete(table_name, where_clause);
+//                        storageManager.delete(table_name, where_clause);
                     } else {
-                        storageManager.deleteRecords(table_name);
+//                        storageManager.deleteRecords(table_name);
                     }
                 }
                 case UPDATE -> {
@@ -348,7 +432,7 @@ public class Parser {
                         end_index = input.length() - 1;
                         where_clause = input.substring(start_index, end_index).replaceFirst("where", "").strip();
                     }
-                    storageManager.update(table_name, column, value, where_clause);
+//                    storageManager.update(table_name, column, value, where_clause);
                 }
                 case EMPTY -> {
                     System.out.println("Invalid queries...");

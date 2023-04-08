@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class StorageManager {
     public Database db;
@@ -129,6 +130,9 @@ public class StorageManager {
     public void select(ArrayList<String> tableNames, ArrayList<String> columns, String[] conditions) throws TableException {
         // get all the tables
         boolean all = columns.get(0).equals("*");
+        if(all){
+            columns = new ArrayList<>();
+        }
         ArrayList<TableSchema> tables = new ArrayList<>();
         HashMap<TableSchema, ArrayList<Attribute>> realAttributes = new HashMap<>();
         ArrayList<Attribute> combined = new ArrayList<>();
@@ -140,8 +144,13 @@ public class StorageManager {
 
             // check the * case
             if(all){
-                realAttributes.put(table, table.getAttributes());
-                combined.addAll(table.getAttributes());
+                realAttributes.put(table, new ArrayList<>());
+
+                for(Attribute a: table.getAttributes()){
+                    columns.add(a.getName());
+                    combined.add(a);
+                }
+
             }
             else{
                 realAttributes.put(table, new ArrayList<Attribute>());
@@ -159,6 +168,8 @@ public class StorageManager {
            select(realAttributes, tables, combined);
        }
        else{
+           // validate all columns
+           realAttributes = getValidColumns(realAttributes, tables, columns);
            select(realAttributes, tables, combined);
        }
 
@@ -246,12 +257,13 @@ public class StorageManager {
         setTwoRecords = loadRecords(tables.get(1), attributesByTable.get(tables.get(1)));
 
         recordAttributes.addAll(attributesByTable.get(tables.get(0)));
+
         while(true){
+            // combine the attributes from table two
+            recordAttributes.addAll(attributesByTable.get(tables.get(p2)));
+
             for(Record r1: setOneRecords){
                 for(Record r2: setTwoRecords){
-                    // combine the attributes from table two
-                    recordAttributes.addAll(attributesByTable.get(tables.get(p2)));
-
                     // combine the record entries
                     recordEntries.addAll(r1.getEntries());
                     recordEntries.addAll(r2.getEntries());
@@ -259,10 +271,9 @@ public class StorageManager {
                     // create the new combined record
                     Record combinedRecord = new Record(recordEntries, recordAttributes, false);
                     combinedRecords.add(combinedRecord);
+                    recordEntries = new ArrayList<>();
                 }
             }
-
-
 
             // increment p2, so it become the next table in the sequence
             p2++;
@@ -277,9 +288,7 @@ public class StorageManager {
 
             // set setTwoRecords to be the next table
             setTwoRecords = loadRecords(tables.get(p2), attributesByTable.get(tables.get(1)));
-
-            // reset other variables
-            recordEntries = new ArrayList<>();
+            // reset combined records
             combinedRecords = new ArrayList<>();
         }
 
@@ -598,18 +607,6 @@ public class StorageManager {
 
     public void orderby(ArrayList<Record> records, Attribute attribute){
         Collections.sort(records, new RecordComparator(attribute));
-    }
-
-    public void selectMultiple(ArrayList<String> attributes, ArrayList<String> tables, String where_clause, String orderby_clause) {
-        // TODO: Get multiple attributes from multiple tables
-    }
-
-    public void selectMultipleAttributes(ArrayList<String> attributes, String table_name, String where_clause, String orderby_clause) {
-        // TODO: Get multiple attributes from 1 table
-    }
-
-    public void selectMultipleTables(String attribute, ArrayList<String> tables, String where_clause, String orderby_clause) {
-        // TODO: Get 1 attribute from multiple tables
     }
 
 }
