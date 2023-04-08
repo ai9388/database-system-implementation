@@ -13,8 +13,8 @@ public class Main {
         }
 
         String dbPath = args[0];
-        int pageSize = Integer.parseInt(args[1]);
-        int buffSize = Integer.parseInt(args[2]);
+        int buffSize = Integer.parseInt(args[1]);
+        int pageSize = Integer.parseInt(args[2]);
 
         System.out.println("Welcome to 11QL....");
 

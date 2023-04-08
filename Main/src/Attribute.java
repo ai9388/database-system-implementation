@@ -2,8 +2,6 @@
 /// Used in the catalog to store the name of the 
 ///
 
-import org.w3c.dom.Attr;
-
 public class Attribute {
 
     private String name;

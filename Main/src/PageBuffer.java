@@ -51,7 +51,8 @@ public class PageBuffer {
      * created from hardware
      * @param page
      */
-    public void addPage(Page page){
+    public void addPage(Page page, TableSchema tschema){
+        this.tables.add(tschema);
         this.activePages.add(page);
     }
 
@@ -242,9 +243,9 @@ public class PageBuffer {
             //need up to figure out the update
             raf.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Unable to write to page");
         }
-        return false;
+        return true;
     }
 
     /**

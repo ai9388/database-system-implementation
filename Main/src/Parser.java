@@ -445,9 +445,9 @@ public class Parser {
                     int end_index = input.length() - 1;
                     if (start_index != -1) {
                         String where_clause = input.substring(start_index, end_index).strip();
-//                        storageManager.delete(table_name, where_clause);
+                        storageManager.delete(table_name, where_clause);
                     } else {
-//                        storageManager.deleteRecords(table_name);
+                        storageManager.deleteRecords(table_name);
                     }
                 }
                 case UPDATE -> {
