@@ -288,28 +288,9 @@ public class Parser {
                     } else {
                         tables.add(table_name);
                     }
-                    // check for where
+        
                     
-                    // if (input.indexOf("where") != -1) {
-                    //     start_index = end_index;
-                    //     end_index = input.indexOf("orderby") != -1 ? input.indexOf("orderby") : input.length() - 1;
-                    //     where_clause = input.substring(start_index, end_index).replaceFirst("where", "").strip();
-                    // }
-                    // check for orderby
                     
-                    // System.out.println("input " + input);
-                    // if (input.indexOf("orderby") != -1) {
-                    //     start_index = end_index;
-                    //     end_index = input.length() - 1;
-                    //     String[] tokens = replaceSemi.strip().split("orderby");
-                    //     orderby_clause = tokens[tokens.length-1];
-                        // orderby_clause = input.substring(start_index).replaceFirst("orderby", "").strip();
-                        // System.out.println("Order by" + orderby_clause);
-                        // TODO: check if asc or desc
-                    // }
-                    // if(attributes.get(0).equals('*')){
-                        // select("*", table_name);
-                    // }
                     // TODO: update this with where and orderby and the multiple tables/attributes
                     storageManager.select(tables, attributes, where_clause, orderby_clause);
                 }
@@ -441,11 +422,12 @@ public class Parser {
                 }
                 case DELETE -> {
                     String input = user_input.replaceFirst("delete from", "").strip();
-                    String table_name = input.split(" ")[0];
-                    int start_index = input.indexOf("e", input.indexOf("where"));
-                    int end_index = input.length() - 1;
+                    String replaceSemi = input.replace(";", "").strip();
+                    String table_name = replaceSemi.split(" ")[0];
+                    int start_index = replaceSemi.indexOf("e", replaceSemi.indexOf("where"));
+                    int end_index = replaceSemi.length() - 1;
                     if (start_index != -1) {
-                        String where_clause = input.substring(start_index, end_index).strip();
+                        String where_clause = replaceSemi.substring(start_index, end_index).strip();
                         storageManager.delete(table_name, where_clause);
                     } else {
                         storageManager.deleteRecords(table_name);
