@@ -177,8 +177,17 @@ public class StorageManager {
        // where
 
        //order by
-
-       orderby(records, combined);
+        Attribute orderAttribute = null;
+       for(Attribute a: combined){
+           if(a.getName().equals(orderAttribute)){
+               orderAttribute = a;
+               break;
+           }
+       }
+       if(orderAttribute == null){
+           // TODO: error: order by attribute should be valid
+       }
+       orderby(records, orderAttribute);
     }
 
     public HashMap<TableSchema, ArrayList<Attribute>> getValidColumns(HashMap<TableSchema, ArrayList<Attribute>> attributes, ArrayList<TableSchema> tables, ArrayList<String> columns) throws TableException {
