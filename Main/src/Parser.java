@@ -248,19 +248,35 @@ public class Parser {
                     }
                     
                     String table_name = "";
+                    String where_clause = "";
+                    String orderby_clause = "";
                     String[] splitFrom = replaceSemi.split("from");
-                    String[] splitWhere = splitFrom[1].split("where");
-                    if(splitWhere.length == 1){
-                        String[] splitOrder = splitWhere[0].split("orderby");
-                        table_name = splitOrder[0].strip();
+                    if(splitFrom[1].contains("where")){
+                        String[] splitWhere = splitFrom[1].split("where");
+                        if(splitWhere.length == 1){ //no where
+                            String[] splitOrder = splitWhere[0].split("orderby");
+                            table_name = splitOrder[0].strip();
+                            orderby_clause = splitOrder[1].strip();
+                        }
+                        else{ // if there is where
+                            table_name = splitWhere[0].strip();
+                            String[] splitOrder = splitWhere[1].split("orderby");
+                            where_clause = splitOrder[0].strip();
+                            orderby_clause = splitOrder[1].strip();
+                        }
                     }
                     else{
-                        table_name = splitWhere[0].strip();
+                        table_name = splitFrom[1].strip();
                     }
-                    System.out.println("Table name: " + table_name);
                     
-                    start_index = input.indexOf("m", start_index);
-                    int end_index = input.indexOf("where") != -1 ? input.indexOf("where") : input.length() - 1;
+                    System.out.println(replaceSemi);
+                    
+                    System.out.println("Table name: " + table_name);
+                    System.out.println("Where clause " + where_clause);
+                    System.out.println("orderby clause " + orderby_clause);
+                    
+                    // start_index = input.indexOf("m", start_index);
+                    // int end_index = input.indexOf("where") != -1 ? input.indexOf("where") : input.length() - 1;
                     ArrayList<String> tables = new ArrayList<>();
                     // String table_name = input.substring(start_index + 1, end_index).strip();
 
@@ -272,29 +288,29 @@ public class Parser {
                         tables.add(table_name);
                     }
                     // check for where
-                    String where_clause = "";
-                    if (input.indexOf("where") != -1) {
-                        start_index = end_index;
-                        end_index = input.indexOf("orderby") != -1 ? input.indexOf("orderby") : input.length() - 1;
-                        where_clause = input.substring(start_index, end_index).replaceFirst("where", "").strip();
-                    }
+                    
+                    // if (input.indexOf("where") != -1) {
+                    //     start_index = end_index;
+                    //     end_index = input.indexOf("orderby") != -1 ? input.indexOf("orderby") : input.length() - 1;
+                    //     where_clause = input.substring(start_index, end_index).replaceFirst("where", "").strip();
+                    // }
                     // check for orderby
-                    String orderby_clause = "";
+                    
                     // System.out.println("input " + input);
-                    if (input.indexOf("orderby") != -1) {
-                        start_index = end_index;
-                        end_index = input.length() - 1;
-                        String[] tokens = replaceSemi.strip().split("orderby");
-                        orderby_clause = tokens[tokens.length-1];
+                    // if (input.indexOf("orderby") != -1) {
+                    //     start_index = end_index;
+                    //     end_index = input.length() - 1;
+                    //     String[] tokens = replaceSemi.strip().split("orderby");
+                    //     orderby_clause = tokens[tokens.length-1];
                         // orderby_clause = input.substring(start_index).replaceFirst("orderby", "").strip();
                         // System.out.println("Order by" + orderby_clause);
                         // TODO: check if asc or desc
-                    }
+                    // }
                     // if(attributes.get(0).equals('*')){
                         // select("*", table_name);
                     // }
                     // TODO: update this with where and orderby and the multiple tables/attributes
-                    storageManager.select(tables, attributes, new String[]{}, orderby_clause);
+                    storageManager.select(tables, attributes, where_clause, orderby_clause);
                 }
                 case INSERT -> {
                     try {
