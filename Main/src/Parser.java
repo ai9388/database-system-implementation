@@ -47,10 +47,7 @@ public class Parser {
     public void classifyInput(String str_input) {
 
         this.user_input = str_input.toLowerCase().strip();
-        if(user_input.equals("")){
-            command = commands.EMPTY;
-        }
-        else if (user_input.startsWith("create table")) {
+        if (user_input.startsWith("create table")) {
             command = commands.CREATE_TABLE;
         } else if (user_input.startsWith("display schema")) {
             command = commands.DISPLAY_SCHEMA;

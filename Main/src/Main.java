@@ -54,6 +54,9 @@ public class Main {
             System.out.print("11QL> ");
             String strInput = userInput.nextLine();
             boolean hasSemicolon = strInput.indexOf(";") != -1;
+            if(strInput.equals("")){
+                continue;
+            }
             if (hasSemicolon | strInput.equals("quit") | strInput.equals("help")) {
                 String[] inputLines = strInput.split(";");
 

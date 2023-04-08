@@ -109,7 +109,7 @@ public class Catalog {
      * @param attributes attributes to know when to create 
      * @return
      */
-    public static Page readIndividualPageFromMemory(String path, String tableName, int pageID, int pageSize, ArrayList<Attribute> attributes)
+    public static Page readIndividualPageFromMemory(String path, String tableName, int order, int pageID, int pageSize, ArrayList<Attribute> attributes)
     {
         try {
             String tablePath = path;
@@ -126,8 +126,8 @@ public class Catalog {
 
             // seeking to the page number
             // i.e trying to find page 4 means we have to seek pageSize - 1 * 4
-            if(pageID != 1){
-                raFile.read(new byte[((pageID - 1) * pageSize) + 8]);
+            if(order != 1){
+                raFile.read(new byte[((order - 1) * pageSize) + 8]);
             }
             raFile.read(new byte[4]); // skip the table id
 

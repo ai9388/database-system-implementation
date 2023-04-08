@@ -207,7 +207,7 @@ public class PageBuffer {
 
             byte[] bytes = new byte[Page.getCapacity()];
             bytes = page.getPageAsBytes().array();
-            
+            raf.writeInt(getTableName(page.getId()).getNumberOfPages());
             raf.seek(raf.length());
             raf.write(bytes);
 
@@ -240,7 +240,8 @@ public class PageBuffer {
             //skip to certain pointer for the page
             int numPages = table.getNumberOfPages();
             raf.writeInt(numPages);
-            int skip = ((page.getId()-1) * Page.getCapacity()) + (2 * Integer.BYTES);
+            int order = table.getPageOrder(page.getId());
+            int skip = ((order-1) * Page.getCapacity()) + (2 * Integer.BYTES);
             raf.seek(skip);
             raf.write(bytes);
 
@@ -258,7 +259,8 @@ public class PageBuffer {
      * @return the page object
      */
     public Page readPage(TableSchema table, int pageID){
-        Page page = Catalog.readIndividualPageFromMemory(dbPath, table.getName(), pageID, Page.getCapacity(), table.getAttributes());
+        int order = table.getPageOrder(pageID);
+        Page page = Catalog.readIndividualPageFromMemory(dbPath, table.getName(), order, pageID, Page.getCapacity(), table.getAttributes());
         tables.add(table);
         return page;
     }

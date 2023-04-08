@@ -146,6 +146,15 @@ public class TableSchema {
         throw new TableException(1, name);
     }
 
+    public int getPageOrder(int pageId){
+        for (int i = 0; i < this.pageIds.size(); i++) {
+            if(this.pageIds.get(i) == pageId){
+                return i + 1;
+            }
+        }
+        return 1;
+    }
+
     /**
      * returns an attribute based on the name
      * @param name the name of the attribute
