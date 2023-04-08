@@ -62,6 +62,27 @@ public class Parser {
                     int start_index = input.indexOf("(");
                     int end_index = input.indexOf(")");
                     String table_name = input.substring(0, start_index);
+                    switch (table_name) {
+                        case "integer": throw new TableException(2, "Integer");
+                        case "create": throw new TableException(2, "create");
+                        case "table": throw new TableException(2, "table");
+                        case "drop": throw new TableException(2, "drop");
+                        case "alter": throw new TableException(2, "alter");
+                        case "display": throw new TableException(2, "display");
+                        case "quit": throw new TableException(2, "quit");
+                        case "update": throw new TableException(2, "update");
+                        case "delete": throw new TableException(2, "delete");
+                        case "insert": throw new TableException(2, "insert");
+                        case "select": throw new TableException(2, "select");
+                        case "help": throw new TableException(2, "help");
+                        case "char": throw new TableException(2, "char");
+                        case "varchar": throw new TableException(2, "varchar");
+                        case "primarykey": throw new TableException(2, "primarykey");
+                        case "notnull": throw new TableException(2, "notnull");
+                        case "unique": throw new TableException(2, "unique");
+                        case "bool": throw new TableException(2, "bool");
+                        case "double": throw new TableException(2, "double");
+                    }
                     String columns = input.substring(start_index + 1, end_index).strip();
                     String[] attr = columns.split(",");
                     ArrayList<Attribute> attributes = new ArrayList<>();
@@ -72,6 +93,27 @@ public class Parser {
                     for (String attribute : attr) {
                         String[] components = attribute.strip().replaceAll("\\(", " ").split(" ");
                         String attr_name = components[0];
+                        switch (attr_name) {
+                            case "integer": throw new TableException(1, "Integer");
+                            case "create": throw new TableException(1, "create");
+                            case "table": throw new TableException(1, "table");
+                            case "drop": throw new TableException(1, "drop");
+                            case "alter": throw new TableException(1, "alter");
+                            case "display": throw new TableException(1, "display");
+                            case "quit": throw new TableException(1, "quit");
+                            case "update": throw new TableException(1, "update");
+                            case "delete": throw new TableException(1, "delete");
+                            case "insert": throw new TableException(1, "insert");
+                            case "select": throw new TableException(1, "select");
+                            case "help": throw new TableException(1, "help");
+                            case "char": throw new TableException(1, "char");
+                            case "varchar": throw new TableException(1, "varchar");
+                            case "primarykey": throw new TableException(1, "primarykey");
+                            case "notnull": throw new TableException(1, "notnull");
+                            case "unique": throw new TableException(1, "unique");
+                            case "bool": throw new TableException(1, "bool");
+                            case "double": throw new TableException(1, "double");
+                        }
                         boolean primarykey = false;
                         boolean notNull = false;
                         boolean unique = false;
@@ -289,6 +331,27 @@ public class Parser {
                     String table_name = input.split(" ")[0];
                     boolean drop = input.split(" ")[1].strip().equals("drop");
                     String attribute_name = input.split(" ")[2];
+                    switch (attribute_name) {
+                        case "integer": throw new TableException(1, "Integer");
+                        case "create": throw new TableException(1, "create");
+                        case "table": throw new TableException(1, "table");
+                        case "drop": throw new TableException(1, "drop");
+                        case "alter": throw new TableException(1, "alter");
+                        case "display": throw new TableException(1, "display");
+                        case "quit": throw new TableException(1, "quit");
+                        case "update": throw new TableException(1, "update");
+                        case "delete": throw new TableException(1, "delete");
+                        case "insert": throw new TableException(1, "insert");
+                        case "select": throw new TableException(1, "select");
+                        case "help": throw new TableException(1, "help");
+                        case "char": throw new TableException(1, "char");
+                        case "varchar": throw new TableException(1, "varchar");
+                        case "primarykey": throw new TableException(1, "primarykey");
+                        case "notnull": throw new TableException(1, "notnull");
+                        case "unique": throw new TableException(1, "unique");
+                        case "bool": throw new TableException(1, "bool");
+                        case "double": throw new TableException(1, "double");
+                    }
                     if (drop) {
                         attribute_name = attribute_name.split(";")[0];
                         storageManager.dropAttributeFromTable(attribute_name, table_name);
