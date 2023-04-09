@@ -372,6 +372,7 @@ public class Parser {
                     if(where_info.length == 2){
                         where_clause = where_info[1].strip();
                     }
+                        storageManager.deleteRecords(table_name, where_clause);
                 }
                 case UPDATE -> {
                     String input = user_input.replaceFirst("update", "").strip();
@@ -382,7 +383,7 @@ public class Parser {
                     // TODO: Add functionality for multiple columns/values? (May not be required)
                     String column = input.substring(start_index, end_index).strip();
                     start_index = end_index + 1;
-                    end_index = input.indexOf(",", start_index) != -1 ? input.indexOf(",", start_index) : input.indexOf("where", start_index) != -1 ? input.indexOf("where", start_index): input.length() - 1;
+                    end_index = input.indexOf(",", start_index) != -1 ? input.indexOf(",", start_index) : input.indexOf("where", start_index) != -1 ? input.indexOf("where", start_index): input.length();
                     String value = input.substring(start_index, end_index).strip();
                     // check for where
                     String where_clause = "";
