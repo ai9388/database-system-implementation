@@ -63,6 +63,7 @@ public class Record implements Comparable<Record>{
     public Record(ArrayList<Object> entries, ArrayList<Attribute> attr, boolean exits){
         this.entries = entries;
 
+        int i = 0;
         for(Object entry: entries){
             if(entry instanceof Integer){
                 this.size += 4;
@@ -74,9 +75,13 @@ public class Record implements Comparable<Record>{
                 this.size += 1;
             }
             else if(entry instanceof String){
-                this.size += Integer.BYTES;
+                if (attr.get(i).getType() == Type.VARCHAR)
+                {
+                    this.size += Integer.BYTES;
+                }
                 this.size += (Character.BYTES * ((String)(entry)).length());
             }
+            i += 1;
         }
 
         this.attr = attr;
