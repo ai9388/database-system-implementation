@@ -5,7 +5,8 @@ public class PrimaryKeyException extends Exception {
         "Duplicate primary key for row: ", // 2
         "More than one primary key", // 3
         "Invalid primary key value: ", // 4
-        "Invalid primary key type: " // 5
+        "Invalid primary key type: ", // 5
+        "Primary attribute \"%s\" cannot be updated" // 6
     };
     private String message = "";
 

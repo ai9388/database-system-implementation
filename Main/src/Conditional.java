@@ -46,6 +46,13 @@ public abstract class Conditional{
         return outputQueue;
     }
 
+    /**
+     * tokenizes the
+     * @param postfixTokens
+     * @param attributes
+     * @return
+     * @throws ConditionalException
+     */
     public static Conditional tokenize(List<String> postfixTokens, ArrayList<Attribute> attributes) throws ConditionalException {
 
         Stack<Conditional> conditionals = new Stack<>();
@@ -84,33 +91,14 @@ public abstract class Conditional{
         return conditionals.get(0);
     }
 
-//    public static void main(String[] args) {
-//        String expression = "age > 50";
-//
-//        String[] columns = new String[]{"student", "person", "age"};
-//        String[] data = new String[]{"true", "false", "23"};
-//        ArrayList<String> entries = new ArrayList<>(Arrays.asList(data));
-//        Type[] types = new Type[]{Type.BOOLEAN, Type.BOOLEAN, Type.INTEGER};
-//        ArrayList<Attribute> attributes = createAttributes(0, columns, types);
-//        Conditional conditional = run(attributes, expression);
-//        System.out.println(conditional.evaluate(new Record(entries, attributes)));
-//    }
-//
-//    public static ArrayList<Attribute> createAttributes(int pkidx, String[] c, Type[] t) {
-//        ArrayList<Attribute> attributes = new ArrayList<>();
-//        for (int i = 0; i < c.length; i++) {
-//            Attribute a = new Attribute(c[i], t[i], i == pkidx ? true : false, false, false,
-//                    t[i] == Type.VARCHAR || t[i] == Type.CHAR ? 30 : 0);
-//            attributes.add(a);
-//        }
-//
-//        attributes.get(pkidx).setIsPrimaryKey(true);
-//        return attributes;
-//    }
-//    public boolean evaluateClause(Record record){
-//        return (boolean)evaluate(record);
-//    }
-
+    /**
+     * method that checks if an attribute name is valid
+     * based on its table name.
+     * @param attributes the attributes used to verify the attribite name
+     * @param name the name of the operand
+     * @return int representing the index of the attribute within the array
+     *          -1 if not a valid attribute
+     */
     public static int getAttribute(List<Attribute> attributes, String name){
         int idx = -1;
 
@@ -124,10 +112,24 @@ public abstract class Conditional{
 
         return idx;
     }
+
+    /**
+     * method used to call evaluate on the child classes
+     * converts the (object) result to boolean
+     * @param record the record object
+     * @return boolean result of the condition evaluation
+     * @throws ConditionalException
+     */
     public boolean evaluateRecord(Record record) throws ConditionalException{
         return (boolean) evaluate(record);
     }
 
+    /**
+     * evaluates a conditional expression based on the operator
+     * @param record the record to evaluate
+     * @return boolean result
+     * @throws ConditionalException
+     */
     public abstract Object evaluate(Record record) throws ConditionalException;
 }
 
