@@ -584,7 +584,7 @@ public class StorageManager {
         TableSchema table = db.getTable(table_name);
 
         // remove the quotes
-        if(attribute.getType() == Type.VARCHAR || attribute.getType() == Type.CHAR){
+        if(!defaultValue.equals("") && (attribute.getType() == Type.VARCHAR || attribute.getType() == Type.CHAR)){
             if(defaultValue.charAt(0) == '\"'){
                 defaultValue = defaultValue.substring(1);
             }
