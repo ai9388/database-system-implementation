@@ -203,11 +203,12 @@ public class PageBuffer {
         File tableFile = new File(dbPath + "/" + tableName);
         RandomAccessFile raf;
         try {
-            raf = new RandomAccessFile(tableFile, "rw");
-
             byte[] bytes = new byte[Page.getCapacity()];
             bytes = page.getPageAsBytes().array();
-            raf.writeInt(getTableName(page.getId()).getNumberOfPages());
+            int numOfPages = getTableName(page.getId()).getNumberOfPages();
+
+            raf = new RandomAccessFile(tableFile, "rw");
+            raf.writeInt(numOfPages);
             raf.seek(raf.length());
             raf.write(bytes);
 
@@ -232,7 +233,7 @@ public class PageBuffer {
         File tableFile = new File(dbPath + "/" + tableName);
         RandomAccessFile raf;
         try {
-            raf = new RandomAccessFile(tableFile, "rw");
+            raf = new RandomAccessFile(tableFile, "w");
 
             byte[] bytes = new byte[Page.getCapacity()];
             bytes = page.getPageAsBytes().array();

@@ -97,16 +97,7 @@ public class StorageManager {
         }
         for (TableSchema table : tables) {
             System.out.println(table.displayTableSchema());
-            ArrayList<Integer> pageIDs = table.getPageIds();
-            System.out.print("Records: ");
-            for (int pageid: pageIDs) {
-                System.out.println(pageid);
-                Page page = pageBuffer.getPage(table, pageid);
-                for (Record r : page.records)
-                {
-                    System.out.print(r);
-                }
-            }
+            System.out.println("Records: " + loadRecords(table, null).size() + "\n");
         }
     }
 

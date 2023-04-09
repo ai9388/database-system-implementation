@@ -217,7 +217,7 @@ public class Page {
 
     public ByteBuffer getPageAsBytes(){
         // allocate space based on the page size
-        ByteBuffer bb = ByteBuffer.allocate(capacity + 8);
+        ByteBuffer bb = ByteBuffer.allocate(capacity + (Integer.BYTES * 2));
 
         // put the size
         bb.putInt(this.id);
