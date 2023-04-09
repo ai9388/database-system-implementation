@@ -160,6 +160,9 @@ public class Record implements Comparable<Record>{
             } if (newString.length() > oldString.length()) {
                 this.size = size + (newString.length() - oldString.length());
             }
+
+            newValue= newValue.substring(1, newValue.length() - 1);
+            this.entries.set(index, newValue);
         } else if (attr.get(index).getType() == Type.DOUBLE)
         {
             this.entries.set(index, Double.parseDouble(newValue));
@@ -169,6 +172,11 @@ public class Record implements Comparable<Record>{
         } else if (attr.get(index).getType() == Type.INTEGER)
         {
             this.entries.set(index, Integer.parseInt(newValue));
+        }
+        else if (attr.get(index).getType() == Type.CHAR)
+        {
+            newValue= newValue.substring(1, newValue.length() - 1);
+            this.entries.set(index, newValue);
         }
 
         return this;
