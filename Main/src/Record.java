@@ -109,7 +109,7 @@ public class Record implements Comparable<Record>{
     }
 
     public int getSize(){
-        return size;
+        return this.size;
     }
     /**
      * sets the entries array to a new collection
