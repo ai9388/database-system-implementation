@@ -185,7 +185,7 @@ public class Catalog {
         } catch (IOException e) {
             System.out.println("messed up while reading individual page from memory");
         }
-        return null; 
+        return null;
     }
 
     /**
