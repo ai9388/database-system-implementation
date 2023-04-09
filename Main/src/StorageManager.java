@@ -97,7 +97,7 @@ public class StorageManager {
         }
         for (TableSchema table : tables) {
             System.out.println(table.displayTableSchema());
-            System.out.println("Records: " + loadRecords(table, null).size() + "\n");
+            System.out.println("Records: " + loadRecords(table).size() + "\n");
         }
     }
 
@@ -109,7 +109,7 @@ public class StorageManager {
     public void displayTableInfo(String tableName) throws TableException {
         TableSchema table = db.getTable(tableName);
         System.out.println(table.displayTableSchema());
-        System.out.println("Records: " + loadRecords(table, null).size() + "\n");
+        System.out.println("Records: " + loadRecords(table).size() + "\n");
     }
 
     /***
@@ -117,12 +117,12 @@ public class StorageManager {
      * @param table the table name
      * @return an arraylist of records
      */
-    private ArrayList<Record> loadRecords(TableSchema table, ArrayList<Attribute> subsetAttributes) throws TableException {
+    private ArrayList<Record> loadRecords(TableSchema table) throws TableException {
         ArrayList<Record> records = null;
 
         // in case the attribute names have been changed
 
-        records = pageBuffer.getRecords(table, subsetAttributes);
+        records = pageBuffer.getRecords(table);
 
         return records;
     }
@@ -135,27 +135,25 @@ public class StorageManager {
         }
         ArrayList<TableSchema> tables = new ArrayList<>();
         HashMap<TableSchema, ArrayList<Attribute>> realAttributes = new HashMap<>();
+        ArrayList<Attribute> allAttributes = new ArrayList<>();
         ArrayList<Attribute> combined = new ArrayList<>();
         ArrayList<Record> records = new ArrayList<>();
+        ArrayList<Record> filteredRecords = new ArrayList<>();
 
         // validate all tables
         for(String name: tableNames){
             TableSchema table = db.getTable(name);
             tables.add(table);
 
-            // check the * case
-            if(all){
-                realAttributes.put(table, new ArrayList<>());
-
-                for(Attribute a: table.getAttributes()){
+            for(Attribute a: table.getAttributes()) {
+                if (all) {
                     columns.add(a.getName());
                     combined.add(a);
                 }
+            }
+                allAttributes.addAll(table.getAttributes());
 
-            }
-            else{
-                realAttributes.put(table, new ArrayList<Attribute>());
-            }
+            realAttributes.put(table, new ArrayList<>());
         }
 
 
@@ -174,25 +172,11 @@ public class StorageManager {
            records = select(realAttributes, tables, combined);
        }
 
-       // where
-        if(!condition.equals("")){
-            Conditional conditional = Conditional.run(combined, condition);
-            ArrayList<Record> filteredRecords = new ArrayList<>();
-
-            for(Record r: records){
-                if((boolean)conditional.evaluate(r)){
-                    filteredRecords.add(r);
-                }
-            }
-
-            records = filteredRecords;
-            // iterate through all records and filter
-        }
-
        //order by
         Attribute orderAttribute = null;
-       for(Attribute a: combined){
-           if(a.getName().equals(orderbyAtt.strip())){
+       for(Attribute a: allAttributes){
+           if(a.getName().equals(orderbyAtt) ||
+                   a.getAlias().equals(orderbyAtt) ){
                orderAttribute = a;
                break;
            }
@@ -204,7 +188,24 @@ public class StorageManager {
            orderby(records, orderAttribute);
        }
 
-        System.out.println(formatResults(combined, records));
+        // where
+        if(!condition.equals("")){
+            Conditional conditional = Conditional.run(allAttributes, condition);
+
+            for(Record r: records){
+                if((boolean)conditional.evaluate(r)){
+                    filteredRecords.add(new Record(r.getSubset(combined), combined, false));
+                }
+            }
+
+        }else{
+            for(Record r: records){
+                filteredRecords.add(new Record(r.getSubset(combined), combined, false));
+            }
+        }
+
+
+        System.out.println(formatResults(combined, filteredRecords, tables.size() > 1));
     }
 
     public HashMap<TableSchema, ArrayList<Attribute>> getValidColumns(HashMap<TableSchema, ArrayList<Attribute>> attributes, ArrayList<TableSchema> tables, ArrayList<String> columns) throws TableException {
@@ -251,7 +252,7 @@ public class StorageManager {
     }
 
 
-    public ArrayList<Record> select(HashMap<TableSchema, ArrayList<Attribute>> attributesByTable, ArrayList<TableSchema> tables, ArrayList<Attribute> combined) throws TableException {
+    public ArrayList<Record> select(HashMap<TableSchema, ArrayList<Attribute>> attributesByTable, ArrayList<TableSchema> tables, ArrayList<Attribute> allAttributes) throws TableException {
 
         ArrayList<Record> realRecords = new ArrayList<>();
         HashMap<TableSchema, ArrayList<Record>> recordsByTable = new HashMap<>();
@@ -260,18 +261,18 @@ public class StorageManager {
         // if there is only one table
         if(attributesByTable.size() == 1){
             TableSchema onlyTable = attributesByTable.keySet().iterator().next();
-            allRecords = loadRecords(onlyTable, attributesByTable.get(onlyTable));
+            allRecords = loadRecords(onlyTable);
 
         }
         else{
             // combine all the records
-            allRecords = createResultSet(attributesByTable, tables, combined);
+            allRecords = createResultSet(tables);
         }
 
         return allRecords;
     }
 
-    public ArrayList<Record> createResultSet(HashMap<TableSchema, ArrayList<Attribute>> attributesByTable, ArrayList<TableSchema> tables, ArrayList<Attribute> combined) throws TableException {
+    public ArrayList<Record> createResultSet(ArrayList<TableSchema> tables) throws TableException {
         ArrayList<Record> setOneRecords = new ArrayList<>();
         ArrayList<Record> setTwoRecords = new ArrayList<>();
         ArrayList<Record> combinedRecords = new ArrayList<>();
@@ -280,15 +281,15 @@ public class StorageManager {
         int p2 = 1;
 
         // set one is the first table
-        setOneRecords = loadRecords(tables.get(0), attributesByTable.get(tables.get(0)));
+        setOneRecords = loadRecords(tables.get(0));
         // set two is the second table
-        setTwoRecords = loadRecords(tables.get(1), attributesByTable.get(tables.get(1)));
+        setTwoRecords = loadRecords(tables.get(1));
 
-        recordAttributes.addAll(attributesByTable.get(tables.get(0)));
+        recordAttributes.addAll(tables.get(0).getAttributes());
 
         while(true){
             // combine the attributes from table two
-            recordAttributes.addAll(attributesByTable.get(tables.get(p2)));
+            recordAttributes.addAll(tables.get(p2).getAttributes());
 
             for(Record r1: setOneRecords){
                 for(Record r2: setTwoRecords){
@@ -315,7 +316,7 @@ public class StorageManager {
             setOneRecords = combinedRecords;
 
             // set setTwoRecords to be the next table
-            setTwoRecords = loadRecords(tables.get(p2), attributesByTable.get(tables.get(1)));
+            setTwoRecords = loadRecords(tables.get(p2));
             // reset combined records
             combinedRecords = new ArrayList<>();
         }
@@ -337,7 +338,7 @@ public class StorageManager {
 
         record = db.validateRecord(table, recordInfo);
         if(record != null){
-            ArrayList<Record> records = loadRecords(table, null);
+            ArrayList<Record> records = loadRecords(table);
             db.validatePrimaryKey(record, table, records);
             ArrayList<Integer> uniqueAttributes = db.uniqueAttribute(table.getAttributes());
             db.checkUniqueness(record, uniqueAttributes, records);
@@ -554,7 +555,7 @@ public class StorageManager {
         ArrayList<Attribute> newAttributes = db.removeAttribute(attribute_name, table);
 
         // get all the records
-        ArrayList<Record> records = loadRecords(table, null);
+        ArrayList<Record> records = loadRecords(table);
         ArrayList<Record> newRecords = new ArrayList<>();
 
         // drop the old table
@@ -607,7 +608,7 @@ public class StorageManager {
         newAttributes.add(attribute);
 
         // get all the records
-        ArrayList<Record> records = loadRecords(table, null);
+        ArrayList<Record> records = loadRecords(table);
         ArrayList<Record> newRecords = new ArrayList<>();
 
         // drop the old table
@@ -638,7 +639,7 @@ public class StorageManager {
         }
     }
 
-    public String formatResults(ArrayList<Attribute> tableAttributes, ArrayList<Record> records) {
+    public String formatResults(ArrayList<Attribute> tableAttributes, ArrayList<Record> records, boolean alias) {
         if(records == null || records.size() == 0){
             return "No Records to show";
         }
@@ -649,13 +650,15 @@ public class StorageManager {
         Object[] headers = new Object[tableAttributes.size()];
         for (int i = 0; i < tableAttributes.size(); i++) {
             Attribute a = tableAttributes.get(i);
-            headers[i] = tableAttributes.get(i).getName().toUpperCase();
+            String attributeHeader = a.getName();
+            if(alias){attributeHeader = a.getAlias();}
+            headers[i] = attributeHeader.toUpperCase();
             if (a.getType() == Type.VARCHAR || a.getType() == Type.CHAR) {
-                int temp = Math.max(a.getName().length() + 2, a.getN() + 2);
+                int temp = Math.max(attributeHeader.length() + 2, a.getN() + 2);
                 format += "%-" + temp + "s|";
                 len += temp + 1;
             } else {
-                int temp = (a.getName().length() + 2);
+                int temp = (attributeHeader.length() + 2);
                 format += "%-" + temp + "s|";
                 len += temp + 1;
             }

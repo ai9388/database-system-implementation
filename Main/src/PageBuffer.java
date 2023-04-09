@@ -282,19 +282,13 @@ public class PageBuffer {
      * @param table the table object where pages are read from
      * @return an arraylist of records
      */
-    public ArrayList<Record> getRecords(TableSchema table, ArrayList<Attribute> attributeSubset) throws TableException {
+    public ArrayList<Record> getRecords(TableSchema table) throws TableException {
         ArrayList<Record> records = new ArrayList<>();
 
         // iterate all the page ID's to get the pages
         for(Integer pageID : table.getPageIds()){
             Page page = getPage(table, pageID);
-            // every page you get
-            if(attributeSubset == null || table.getAttributes().size() == attributeSubset.size()){
-                records.addAll(page.getRecords());
-            }
-            else {
-                records.addAll(page.getRecords(attributeSubset));
-            }
+            records.addAll(page.getRecords());
         }
 
         return records;

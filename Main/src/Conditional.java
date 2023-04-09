@@ -1,5 +1,4 @@
 
-import java.util.Arrays;
 import java.util.*;
 
 public abstract class Conditional{
@@ -16,7 +15,7 @@ public abstract class Conditional{
     }
      private ArrayList<Attribute> attributes;
     public static Conditional run(ArrayList<Attribute> attributes, String expression) throws ConditionalException {
-        List<String> postfix = toPostfix(expression, attributes);
+        List<String> postfix = toPostfix(expression);
         Conditional conditional = tokenize(postfix, attributes);
         if(conditional == null){
             // ERROR: unable to interpret where clause
@@ -24,7 +23,7 @@ public abstract class Conditional{
         return conditional;
     }
 
-    public static List<String> toPostfix(String expression, ArrayList<Attribute> attributes) {
+    public static List<String> toPostfix(String expression) {
         List<String> outputQueue = new ArrayList<>();
         Stack<String> operatorStack = new Stack<>();
         String[] tokens = expression.split("\\s+");

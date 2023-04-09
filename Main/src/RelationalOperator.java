@@ -1,4 +1,3 @@
-
 public class RelationalOperator extends Conditional{
 
     Conditional left;

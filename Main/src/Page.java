@@ -184,14 +184,6 @@ public class Page {
         return records;
     }
 
-    public ArrayList<Record> getRecords(ArrayList<Attribute> attributeSubset) {
-        ArrayList<Record> subsetRecords = new ArrayList<>();
-        for(Record r: this.records){
-            subsetRecords.add(new Record(r.getSubset(attributeSubset), attributeSubset, false));
-        }
-        return subsetRecords;
-    }
-
     @Override
     public boolean equals(Object obj) {
         boolean res = false;

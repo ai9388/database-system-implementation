@@ -51,6 +51,11 @@ public class TableSchema {
         this.tableID = LASTTABLEID;
         this.name = name;
         this.attributes = attributes;
+
+        for(Attribute a: attributes){
+            a.setAlias(this.name + "." + a.getName());
+        }
+
         this.pageIds = new ArrayList<>();
         setPrimaryIndex();
     }
@@ -66,6 +71,9 @@ public class TableSchema {
         this.tableID = id;
         this.name = name;
         this.attributes = attributes;
+        for(Attribute a: attributes){
+            a.setAlias(this.name + "." + a.getName());
+        }
         this.pageIds = new ArrayList<>(Arrays.asList(pageIds));
         setPrimaryIndex();
     }

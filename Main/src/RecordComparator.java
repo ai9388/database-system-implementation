@@ -24,8 +24,8 @@ public class RecordComparator implements Comparator<Record> {
             return Integer.compare(int1, int2);
         }
         else if((attribute.getType() == Type.VARCHAR) || attribute.getType() == Type.CHAR){
-            String str1 = (String) val1;
-            String str2 = (String) val2;
+            String str1 = val1.toString();
+            String str2 = val2.toString();
             return str1.compareTo(str2);
         }
         else if(attribute.getType() == Type.DOUBLE){
