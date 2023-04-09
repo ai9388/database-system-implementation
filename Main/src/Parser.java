@@ -389,7 +389,7 @@ public class Parser {
                     String where_clause = "";
                     if (input.indexOf("where") != -1) {
                         start_index = end_index;
-                        end_index = input.length() - 1;
+                        end_index = input.length();
                         where_clause = input.substring(start_index, end_index).replaceFirst("where", "").strip();
                     }
                     storageManager.update(table_name, column, value, where_clause);
