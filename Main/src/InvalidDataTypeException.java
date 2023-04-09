@@ -11,9 +11,13 @@ public class InvalidDataTypeException extends Exception{
      */
     public InvalidDataTypeException(String value, Attribute attribute){
         super();
+        int len = 0;
+        if(value != null){
+            len = value.length();
+        }
         if(attribute.getType() == Type.CHAR || attribute.getType() == Type.VARCHAR){
             this.expected = (attribute.getType().getName() + "(" + attribute.getN() + ")");
-            this.got = (Type.identifyType(value, attribute).getName() + " (" + value.length() + ")");
+            this.got = (Type.identifyType(value, attribute).getName() + " (" + len + ")");
         }
         else{
             this.expected = attribute.getType().getName();
@@ -42,9 +46,13 @@ public class InvalidDataTypeException extends Exception{
             }
             Attribute a = attributes.get(i);
             String v = values[i];
+            int len = 0;
+            if(v != null){
+                len = v.length();
+            }
             if(a.getType() == Type.CHAR || a.getType() == Type.VARCHAR){
                 this.expected += (a.getType().getName() + "(" + a.getN() + ")");
-                this.got += (Type.identifyType(v, a).getName() + "(" + v.length() + ")");
+                this.got += (Type.identifyType(v, a).getName() + "(" + len + ")");
             }
             else{
                 this.expected += a.getType().getName().strip();

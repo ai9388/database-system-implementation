@@ -203,8 +203,6 @@ public class StorageManager {
                 filteredRecords.add(new Record(r.getSubset(combined), combined, false));
             }
         }
-
-
         System.out.println(formatResults(combined, filteredRecords, tables.size() > 1));
     }
 
