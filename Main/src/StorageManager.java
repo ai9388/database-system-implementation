@@ -87,7 +87,7 @@ public class StorageManager {
         System.out.println("Page Size: " + this.pageSize);
         System.out.println("Buffer Size: " + this.bufferSize);
         System.out.println();
-        
+
         ArrayList<TableSchema> tables = db.getTables();
         if(tables.size() == 0){
             System.out.println("No tables to display");
@@ -482,7 +482,7 @@ public class StorageManager {
         return count;
     } 
 
-    public int update(String table_name, String column, String value, String where_clause) throws TableException, ConditionalException {
+    public int update(String table_name, String column, String value, String where_clause) throws TableException, ConditionalException, InvalidDataTypeException, ConstraintException, PrimaryKeyException {
 
         // keep track of rows affected
         int count = 0;

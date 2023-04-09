@@ -2,10 +2,12 @@ public class PrimaryKeyException extends Exception {
     
     private String[] errorMessages = new String[]{
         "No primary key defined", // 1
-        "Duplicate primary key for row: ", // 2
+        "Duplicate primary key for row: \"%s\"", // 2
         "More than one primary key", // 3
-        "Invalid primary key value: ", // 4
-        "Invalid primary key type: " // 5
+        "Invalid primary key value: \"%s\"", // 4
+        "Invalid primary key type: \"%s\"", // 5
+        "Primary attribute \"%s\" cannot be updated" // 6
+
     };
     private String message = "";
 
@@ -16,7 +18,7 @@ public class PrimaryKeyException extends Exception {
         }
         else
         {
-            this.message = errorMessages[errorCode - 1];
+            this.message = String.format(errorMessages[errorCode - 1], argument);
         }
     }
 

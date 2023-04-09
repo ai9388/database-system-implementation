@@ -9,7 +9,7 @@ public class RelationalOperator extends Conditional{
     String GT = ">";
     String GTE = ">=";
     String LT = "<";
-    String LTE = "<";
+    String LTE = "<=";
     String E = "=";
     String NE = "!=";
 

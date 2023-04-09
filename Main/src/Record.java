@@ -144,7 +144,14 @@ public class Record implements Comparable<Record>{
      * @param index column index where update is happening
      * @param newValue new value replacing old at column
      */
-    public Record updateAtColumn(int index, Object newValue){
+    public Record updateAtColumn(int index, String newValue) throws ConstraintException, InvalidDataTypeException, PrimaryKeyException {
+        if (!Type.validateType(newValue, attr.get(index)))
+        {
+            throw new InvalidDataTypeException(newValue, attr.get(index));
+        } else if (attr.get(index).isIsPrimaryKey())
+        {
+            throw new PrimaryKeyException(6, attr.get(index).getName());
+        }
         if (attr.get(index).getType().equals(Type.VARCHAR)) {
             String oldString = String.valueOf(this.entries.get(index));
             String newString = String.valueOf(newValue);
@@ -153,8 +160,17 @@ public class Record implements Comparable<Record>{
             } if (newString.length() > oldString.length()) {
                 this.size = size + (newString.length() - oldString.length());
             }
+        } else if (attr.get(index).getType() == Type.DOUBLE)
+        {
+            this.entries.set(index, Double.parseDouble(newValue));
+        } else if (attr.get(index).getType() == Type.BOOLEAN)
+        {
+            this.entries.set(index, Boolean.parseBoolean(newValue));
+        } else if (attr.get(index).getType() == Type.INTEGER)
+        {
+            this.entries.set(index, Integer.parseInt(newValue));
         }
-        this.entries.set(index, newValue);
+
         return this;
     }
 

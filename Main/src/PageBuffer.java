@@ -215,6 +215,7 @@ public class PageBuffer {
             //need up to figure out the update
             raf.close();
         } catch (Exception e) {
+            System.out.println("in writePage method");
             System.out.println("Unable to write to page");
         }
         return false;
@@ -233,7 +234,7 @@ public class PageBuffer {
         File tableFile = new File(dbPath + "/" + tableName);
         RandomAccessFile raf;
         try {
-            raf = new RandomAccessFile(tableFile, "w");
+            raf = new RandomAccessFile(tableFile, "rw");
 
             byte[] bytes = new byte[Page.getCapacity()];
             bytes = page.getPageAsBytes().array();
@@ -252,6 +253,7 @@ public class PageBuffer {
             //need up to figure out the update
             raf.close();
         } catch (Exception e) {
+            System.out.println("in updatePage method");
             System.out.println("Unable to write to page");
         }
         return true;
