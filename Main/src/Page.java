@@ -176,6 +176,10 @@ public class Page {
         this.size += r.getSize();
     }
 
+    /**
+     * 
+     * @return
+     */
     public int getId() {
         return id;
     }

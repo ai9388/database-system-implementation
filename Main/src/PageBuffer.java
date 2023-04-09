@@ -296,6 +296,11 @@ public class PageBuffer {
         return records;
     }
 
+    /**
+     *
+     * @param TableName
+     * @return
+     */
     public boolean dropTable(String TableName){
         File file = new File(dbPath + "/" + TableName);
         if(!file.exists()){

@@ -170,11 +170,11 @@ public class TableSchema {
      */
     public Attribute getAttribute(String name) throws TableException {
         for(Attribute a: attributes){
-            if(a.getName().equals(name)){
+            if(a.getName().equals(name) || a.getAlias().equals(name)){
                 return a;
             }
         }
-        throw new TableException(1, "name");
+        throw new TableException(1, name);
     }
 
     public ArrayList<Attribute> getAttributes() {
