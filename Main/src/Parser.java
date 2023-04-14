@@ -13,6 +13,7 @@ public class Parser {
     public Database database;
     public StorageManager storageManager;
     public String dbName;
+    public boolean indexing;
 
     public static HashSet<String> invalidWords = new HashSet<>();
 
@@ -38,10 +39,11 @@ public class Parser {
         invalidWords.add("double");
     }
 
-    public Parser(String dbName, String dbLocation, int pageSize, int bufferSize) {
+    public Parser(String dbName, String dbLocation, int pageSize, int bufferSize, boolean indexing) {
         this.dbName = dbName;
         this.dbLocation = dbLocation;
         storageManager = new StorageManager(dbName, dbLocation, bufferSize, pageSize);
+        this.indexing = indexing;
     }
 
     public void classifyInput(String str_input) {

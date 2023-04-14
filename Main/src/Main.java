@@ -15,6 +15,7 @@ public class Main {
         String dbPath = args[0];
         int buffSize = Integer.parseInt(args[1]);
         int pageSize = Integer.parseInt(args[2]);
+        boolean indexing = args.length == 4 ? args[3].equals("indexing"): false;
 
         System.out.println("Welcome to 11QL....");
 
@@ -35,6 +36,10 @@ public class Main {
             System.out.println("Buffer size: " + buffSize);
         }
 
+        if (indexing) {
+            System.out.println("Indexing is on.");
+        }
+
         // Basic nice-ities for starting up the DB
         System.out.println();
         System.out.println("Please enter commands, enter <quit> to shutdown the db");
@@ -44,7 +49,7 @@ public class Main {
         Scanner userInput = new Scanner(System.in);
         
         // parser object for this session
-        Parser parser = new Parser(directory.getName(), dbPath, pageSize, buffSize);
+        Parser parser = new Parser(directory.getName(), dbPath, pageSize, buffSize, indexing);
         // looping until <quit> is taken in
         
         boolean flag = true;
