@@ -7,7 +7,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        if(args.length != 3){
+        if(args.length < 3 | args.length > 4){
             System.out.println("Usage: Filename, Page Size, Buffer Size");
             exit(0);
         }
@@ -15,7 +15,7 @@ public class Main {
         String dbPath = args[0];
         int buffSize = Integer.parseInt(args[1]);
         int pageSize = Integer.parseInt(args[2]);
-        boolean indexing = args.length == 4 ? args[3].equals("indexing"): false;
+        boolean indexing = args.length == 4 && args[3].equals("indexing");
 
         System.out.println("Welcome to 11QL....");
 
