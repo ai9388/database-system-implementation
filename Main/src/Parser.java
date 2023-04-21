@@ -79,7 +79,7 @@ public class Parser {
     /**
      * Assume user passes in database
      */
-    public boolean parse() throws ConditionalException {
+    public boolean parse() {
         try {
             switch (command) {
                 case CREATE_TABLE -> {
@@ -281,10 +281,6 @@ public class Parser {
                     } else {
                         tables.add(table_name);
                     }
-
-
-
-                    // TODO: update this with where and orderby and the multiple tables/attributes
                     storageManager.select(tables, attributes, where_clause, orderby_clause);
                 }
                 case INSERT -> {
@@ -306,7 +302,7 @@ public class Parser {
 
                             arr.add(temp);
                         }
-                        storageManager.insertRecords(t_name, arr);
+                        storageManager.insertRecords(t_name, arr, indexing);
                     } catch (PrimaryKeyException e) {
                         System.out.println(e.getMessage());
                     } catch (ArrayIndexOutOfBoundsException e){
@@ -374,7 +370,7 @@ public class Parser {
                     if(where_info.length == 2){
                         where_clause = where_info[1].strip();
                     }
-                        storageManager.deleteRecords(table_name, where_clause);
+                        storageManager.deleteRecords(table_name, where_clause, indexing);
                 }
                 case UPDATE -> {
                     String input = user_input.replaceFirst("update", "").strip();
@@ -394,7 +390,7 @@ public class Parser {
                         end_index = input.length();
                         where_clause = input.substring(start_index, end_index).replaceFirst("where", "").strip();
                     }
-                    storageManager.update(table_name, column, value, where_clause);
+                    storageManager.update(table_name, column, value, where_clause, indexing);
                 }
                 case EMPTY -> {
                     if(!user_input.equals("")) {

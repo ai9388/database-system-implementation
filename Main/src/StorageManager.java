@@ -71,11 +71,17 @@ public class StorageManager {
      * Insert records into given table. Only for records that already exist
      * @param tableName table schema name
      * @param recordsInfo the information about all the records to be inserted
+     * @param indexing
      * @throws PrimaryKeyException
      */
-    public void insertRecords(String tableName, ArrayList<String[]> recordsInfo) throws TableException, PrimaryKeyException, InvalidDataTypeException, ConstraintException {
-        for(String[] recordInfo: recordsInfo){
-            insertRecord(tableName, recordInfo);
+    public void insertRecords(String tableName, ArrayList<String[]> recordsInfo, boolean indexing) throws TableException, PrimaryKeyException, InvalidDataTypeException, ConstraintException {
+        if (indexing) {
+            // TODO: Insert into B+ Tree Node
+        }
+        else {
+            for (String[] recordInfo : recordsInfo) {
+                insertRecord(tableName, recordInfo);
+            }
         }
     }
 
@@ -421,125 +427,130 @@ public class StorageManager {
     /**
      * deletes all of the records from a given table
      * @param table_name name of the table to delete all records from
+     * @param indexing
      */
-    public int deleteRecords(String table_name, String where) throws TableException, ConditionalException {
-
-        // keep track of rows affected
-        int count = 0;
-
-        // set the condition flag
-        boolean condition = !where.equals("");
-
-        // flag to determine if a page has been updated
-        boolean pageUpdated = false;
-
-        // getting the table schema for the table we want
-        TableSchema taSchema = this.db.getTable(table_name);
-
-        // getting all of the pageIDs associated with the table
-        ArrayList<Integer> pageIDs = taSchema.getPageIds();
-
-        // create the conditional object
-        Conditional conditional = null;
-        if(condition){
-            // run the conditional tokenizer
-            conditional = Conditional.run(taSchema.getAttributes(), where);
+    public int deleteRecords(String table_name, String where, boolean indexing) throws TableException, ConditionalException {
+        if (indexing) {
+            // TODO: Delete record in B+ Tree
+            return 0;
         }
+        else {
+            // keep track of rows affected
+            int count = 0;
 
-        // looping over all of the page ids
-        for (int i = 0; i < pageIDs.size(); i++)
-        {
-            // getting the individual page
-            Page p = this.pageBuffer.getPage(taSchema, pageIDs.get(i));
+            // set the condition flag
+            boolean condition = !where.equals("");
 
-            // make a copy of the records to refernce (READ - ONLY)
-            ArrayList<Record> records = new ArrayList<>(p.getRecords());
-            int pointer = 0; // to aid iteration
+            // flag to determine if a page has been updated
+            boolean pageUpdated = false;
 
-            // looping over all of the records and removing them
-            for(Record record: records)
-            {
-                // (if there is a condition) check if the record meets condition
-                if(condition && conditional.evaluateRecord(record)){
-                    p.removeRecord(record);
-                    count ++;
-                    pageUpdated = true;
-                }
-                else if(!condition){
-                    p.removeRecord(record);
-                    pageUpdated = true;
-                }
+            // getting the table schema for the table we want
+            TableSchema taSchema = this.db.getTable(table_name);
 
+            // getting all of the pageIDs associated with the table
+            ArrayList<Integer> pageIDs = taSchema.getPageIds();
+
+            // create the conditional object
+            Conditional conditional = null;
+            if (condition) {
+                // run the conditional tokenizer
+                conditional = Conditional.run(taSchema.getAttributes(), where);
             }
 
-            // update this page in the buffer if there has been a change
-            if(pageUpdated) {
-                this.pageBuffer.updateBuffer(p);
+            // looping over all of the page ids
+            for (int i = 0; i < pageIDs.size(); i++) {
+                // getting the individual page
+                Page p = this.pageBuffer.getPage(taSchema, pageIDs.get(i));
+
+                // make a copy of the records to refernce (READ - ONLY)
+                ArrayList<Record> records = new ArrayList<>(p.getRecords());
+                int pointer = 0; // to aid iteration
+
+                // looping over all of the records and removing them
+                for (Record record : records) {
+                    // (if there is a condition) check if the record meets condition
+                    if (condition && conditional.evaluateRecord(record)) {
+                        p.removeRecord(record);
+                        count++;
+                        pageUpdated = true;
+                    } else if (!condition) {
+                        p.removeRecord(record);
+                        pageUpdated = true;
+                    }
+
+                }
+
+                // update this page in the buffer if there has been a change
+                if (pageUpdated) {
+                    this.pageBuffer.updateBuffer(p);
+                }
             }
+            return count;
         }
-        return count;
     } 
 
-    public int update(String table_name, String column, String value, String where_clause) throws TableException, ConditionalException, InvalidDataTypeException, ConstraintException, PrimaryKeyException {
-
-        // keep track of rows affected
-        int count = 0;
-
-        // set the condition flag
-        boolean condition = !where_clause.equals("");
-
-        // flag to determine if a page has been updated
-        boolean pageUpdated = false;
-
-        // getting the table schema for the table we want
-        TableSchema taSchema = this.db.getTable(table_name);
-
-        // getting all of the pageIDs associated with the table
-        ArrayList<Integer> pageIDs = taSchema.getPageIds();
-
-        // create the conditional object
-        Conditional conditional = null;
-        if(condition){
-            // run the conditional tokenizer
-            conditional = Conditional.run(taSchema.getAttributes(), where_clause);
+    public int update(String table_name, String column, String value, String where_clause, boolean indexing) throws TableException, ConditionalException, InvalidDataTypeException, ConstraintException, PrimaryKeyException {
+        if (indexing) {
+            // TODO: Update record in B+ Tree
+            return 0;
         }
+        else {
+            // keep track of rows affected
+            int count = 0;
 
-        // looping over all of the page ids
-        for (int i = 0; i < pageIDs.size(); i++)
-        {
-            // getting the individual page
-            Page p = this.pageBuffer.getPage(taSchema, pageIDs.get(i));
+            // set the condition flag
+            boolean condition = !where_clause.equals("");
 
-            // make a copy of the records to refernce (READ - ONLY)
-            ArrayList<Record> records = new ArrayList<>(p.getRecords());
-            int pointer = 0; // to aid iteration
+            // flag to determine if a page has been updated
+            boolean pageUpdated = false;
 
-            // looping over all of the records and removing them
-            for(Record record: records)
-            {
-                // (if there is a condition) check if the record meets condition
-                if(condition && conditional.evaluateRecord(record)){
-                    p.removeRecord(record);
-                    Record newRecord = record.updateAtColumn(taSchema.getAttributeIndex(column), value);
-                    p.addRecord(newRecord);
-                    count ++;
-                    pageUpdated = true;
-                }
-                else if(!condition){
-                    p.removeRecord(record);
-                    Record newRecord = record.updateAtColumn(taSchema.getAttributeIndex(column), value);
-                    p.addRecord(newRecord);
-                    count ++;
-                    pageUpdated = true;
-                }
+            // getting the table schema for the table we want
+            TableSchema taSchema = this.db.getTable(table_name);
+
+            // getting all of the pageIDs associated with the table
+            ArrayList<Integer> pageIDs = taSchema.getPageIds();
+
+            // create the conditional object
+            Conditional conditional = null;
+            if (condition) {
+                // run the conditional tokenizer
+                conditional = Conditional.run(taSchema.getAttributes(), where_clause);
             }
 
-            // update this page in the buffer if there has been a change
-            if(pageUpdated) {
-                this.pageBuffer.updateBuffer(p);
+            // looping over all of the page ids
+            for (int i = 0; i < pageIDs.size(); i++) {
+                // getting the individual page
+                Page p = this.pageBuffer.getPage(taSchema, pageIDs.get(i));
+
+                // make a copy of the records to refernce (READ - ONLY)
+                ArrayList<Record> records = new ArrayList<>(p.getRecords());
+                int pointer = 0; // to aid iteration
+
+                // looping over all of the records and removing them
+                for (Record record : records) {
+                    // (if there is a condition) check if the record meets condition
+                    if (condition && conditional.evaluateRecord(record)) {
+                        p.removeRecord(record);
+                        Record newRecord = record.updateAtColumn(taSchema.getAttributeIndex(column), value);
+                        p.addRecord(newRecord);
+                        count++;
+                        pageUpdated = true;
+                    } else if (!condition) {
+                        p.removeRecord(record);
+                        Record newRecord = record.updateAtColumn(taSchema.getAttributeIndex(column), value);
+                        p.addRecord(newRecord);
+                        count++;
+                        pageUpdated = true;
+                    }
+                }
+
+                // update this page in the buffer if there has been a change
+                if (pageUpdated) {
+                    this.pageBuffer.updateBuffer(p);
+                }
             }
+            return count;
         }
-        return count;
     }
 
     /**
