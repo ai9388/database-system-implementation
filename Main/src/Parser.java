@@ -83,6 +83,7 @@ public class Parser {
         try {
             switch (command) {
                 case CREATE_TABLE -> {
+                    // TODO: Need to update to create B+ Tree Object + have it go to table schema
                     String input = user_input.replaceFirst("create table", "").strip();
                     int start_index = input.indexOf("(");
                     int end_index = input.length() - 1;
