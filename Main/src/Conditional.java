@@ -2,6 +2,11 @@
 import java.util.*;
 
 public abstract class Conditional{
+
+    /**
+     * map for all the operator symbols that can be used
+     * the symbol maps to the precedence of that symbol and being the
+     */
     private static final Map<String, Integer> precedence = new HashMap<>();
     static {
         precedence.put("and", 3);
@@ -23,6 +28,12 @@ public abstract class Conditional{
         return conditional;
     }
 
+    /**
+     * converts an expression to postfix form
+     * example: city = "boston" - > = city "boston"
+     * @param expression the expression to convert
+     * @return the expression in postfix form
+     */
     public static List<String> toPostfix(String expression) {
         List<String> outputQueue = new ArrayList<>();
         Stack<String> operatorStack = new Stack<>();
@@ -47,11 +58,11 @@ public abstract class Conditional{
     }
 
     /**
-     * tokenizes the
-     * @param postfixTokens
-     * @param attributes
-     * @return
-     * @throws ConditionalException
+     * tokenizes the postfix expression and classifies it as a relational or a logical operator
+     * @param postfixTokens the postfix expression
+     * @param attributes the attributes potentially used in the expression
+     * @return a conditional object for the expression
+     * @throws ConditionalException if the number of operands is incorrect
      */
     public static Conditional tokenize(List<String> postfixTokens, ArrayList<Attribute> attributes) throws ConditionalException {
 

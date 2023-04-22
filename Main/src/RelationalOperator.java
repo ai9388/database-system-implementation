@@ -1,23 +1,76 @@
 public class RelationalOperator extends Conditional{
 
+    /**
+     * the left conditional object
+     */
     Conditional left;
+
+    /**
+     * the right conditional object
+     */
     Conditional right;
 
+    /**
+     * the operator used in this relation
+     */
     String operator;
 
+    /**
+     * a very small number
+     */
     int small = -100000;
+
+    /**
+     * greater than operator
+     */
     String GT = ">";
+
+    /**
+     * greater than or equal operator
+     */
     String GTE = ">=";
+
+    /**
+     * less than operator
+     */
     String LT = "<";
+
+    /**
+     * less than or equal operator
+     */
     String LTE = "<=";
+
+    /**
+     * equal operator
+     */
     String E = "=";
+
+    /**
+     * not equal operator
+     */
     String NE = "!=";
 
+    /**
+     * creates the relational operator object
+     * @param left the conditional
+     * @param right right conditional
+     * @param operator the operator used
+     */
     public RelationalOperator(Conditional left, Conditional right, String operator){
         this.left = left;
         this.right = right;
         this.operator = operator;
     }
+
+    /**
+     * evaluates a given record to see if it meets the requirements
+     * @param record the record to evaluate
+     * @return a (boolean) object with the result
+     * @throws ConditionalException it the operands are invalid
+     * Possible expressions
+     * attribute <operator> attribute [ types must match ]
+     * attribute <operator> value [values must be the same type as the attribute]
+     */
     @Override
     public Object evaluate(Record record) throws ConditionalException {
 
