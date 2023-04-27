@@ -5,14 +5,15 @@ public class Node {
     private int pageIdx;
     private Node parent = null;
     private Node nextNode = null;
+    private Object primKey;
 
     //root 
     // internal node - other node that pages
     //leaf node point page
 
-    public Node(int pageIdx){
+    public Node(int pageIdx, Object primKey){
         this.pageIdx = pageIdx;
-
+        this.primKey = primKey;
     }
 
     public Node getNextNode() {
