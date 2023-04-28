@@ -36,7 +36,17 @@ public class LeafNode extends Node {
         return (size + 1 > N) || (size + 1 < (N / 2));
     }
 
-    public Node split() {
+    public Node[] split() {
+        Node[] children = new Node[2];
+
+        return null;
+    }
+
+    public Node merge(Node n1, Node n2) {
+        return null;
+    }
+
+    public Node borrow(Node n1, Node n2) {
         return null;
     }
 }

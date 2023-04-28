@@ -37,7 +37,17 @@ public class InternalNode extends Node {
         return false;
     }
 
-    public Node split() {
+    public Node[] split() {
+        Node[] children = new Node[2];
+
+        return null;
+    }
+
+    public Node merge(Node n1, Node n2) {
+        return null;
+    }
+
+    public Node borrow(Node n1, Node n2) {
         return null;
     }
 }
