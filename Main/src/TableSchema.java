@@ -177,6 +177,10 @@ public class TableSchema {
         throw new TableException(1, name);
     }
 
+    public Attribute getPrimaryAttribute(){
+        return attributes.get(primaryIndex);
+    }
+
     public ArrayList<Attribute> getAttributes() {
         return attributes;
     }
