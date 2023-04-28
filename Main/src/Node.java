@@ -82,6 +82,45 @@ public class Node {
 
     public void delete(String key) {
         // TODO: Delete
+
+        if (isRoot) {
+            // Root
+            // TODO: Check size
+
+            for (String k : keys) {
+                if (k.compareTo(key) == -1) {
+                    // TODO: Go to child node and call delete
+                    break;
+                }
+            }
+        }
+        else if (pointers.get(0).get(1) == -1) {
+            // Internal Node
+            // TODO: Check size
+
+            for (String k : keys) {
+                if (k.compareTo(key) == -1) {
+                    // TODO: Go to child node and call delete
+                    break;
+                }
+            }
+        }
+        else {
+            // Leaf
+            // TODO: Check size
+
+            for (String k : keys) {
+                if (k.equals(key)){
+                    int index = keys.indexOf(k);
+                    // TODO: Shift page/record pointers up
+                    keys.remove(index);
+                    pointers.remove(index);
+                    values.remove(index);
+                    size--;
+                    break;
+                }
+            }
+        }
     }
 
     public boolean getRoot(){
