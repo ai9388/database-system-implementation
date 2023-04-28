@@ -1,49 +1,113 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Node {
-    public boolean isRoot;
-    protected int size;
+public class Node implements Comparable<Node>{
+
+    public enum NodeType{INTERNAL, LEAF}
+
+    /**
+     * N: the branching factor
+     */
     protected int N;
-    private List<String> keys = new ArrayList<>();
-    private List<List<Integer>> values = new ArrayList<>();
-    private Node parent;
 
-    // I don't think we need these??
-    private int pageIdx;
-    // I think we can find this when getting record from page
-    // or the primary column in the table
-    private Object primKey;
+    /**
+     * min number of pointers this node can have
+     */
+    int min;
 
-    public Node(int pageIdx, Object primKey, int size, int N) {
-        this.pageIdx = pageIdx;
-        this.primKey = primKey;
-        this.size = size;
+    /**
+     * the max number of pointers this node can have
+     */
+    int max;
+
+    /**
+     * the number of pointers in this node
+     * */
+    int numOfPointers;
+    /**
+     * parent node above this one
+     */
+    protected Node parent;
+
+    /**
+     * leaf node before this one
+     */
+    private Node prev;
+
+    /**
+     * leaf node after
+     */
+    private Node next;
+
+    /**
+     * array of keys
+     */
+    protected ArrayList<Object> keys;
+
+    /**
+     * the type of node
+     */
+    private NodeType type;
+
+    /**
+     * This serves as both a node pointer and a record pointer
+     * Node pointer:
+     *      applies to root and internal nodes
+     *      [pageId, -1]: -1 means that it only points to a page, not a record.
+     * Record pointer:
+     *      applies to records
+     *      [pageId, record index]
+     */
+    protected ArrayList<ArrayList<Integer>> values;
+
+    /**
+     * boolean to make a node as the root
+     */
+    public boolean isRoot;
+
+    /**
+     * The primary column of the table
+     */
+    private Attribute primaryAttribute;
+
+    public Node(int N, Attribute primaryAttribute, NodeType nodeType) {
         this.N = N;
+        this.primaryAttribute = primaryAttribute;
+        this.type = nodeType;
     }
 
-    public void insert(String key, int index1, int index2) {
-        if (values.size() == 0) {
-            values.add(new ArrayList<>());
-            List<Integer> pointerIndex = values.get(0);
-            pointerIndex.add(index1, index2);
-            size += 1;
-        }
-        else {
-            if (values.get(0).get(0) == -1) {
-                // its a parent node
-                // Check size
-            }
-            else if (values.get(0).get(1) == -1) {
-                // it's a internal node
-                // Check size
-            }
-            else {
-                // it's a leaf node
-                // Check size
+    // TODO: fix this constructor later
+//    public Node(int pageIdx, Object primKey, int size, int N) {
+//        this.pageIdx = pageIdx;
+//        this.primKey = primKey;
+//        this.size = size;
+//        this.N = N;
+//    }
 
-            }
-        }
+    public void insert(String key, int index1, int index2) {
+//        if (values.size() == 0) {
+//            values.add(new ArrayList<>());
+//            List<Integer> pointerIndex = values.get(0);
+//            pointerIndex.add(index1, index2);
+//            size += 1;
+//        }
+//        else {
+//            if (values.get(0).get(0) == -1) {
+//                // its a parent node
+//                // Check size
+//            }
+//            else if (values.get(0).get(1) == -1) {
+//                // it's a internal node
+//                // Check size
+//            }
+//            else {
+//                // it's a leaf node
+//                // Check size
+//
+//            }
+//        }
+
+        //TODO: @Newcarlis
     }
 
     public boolean getRoot(){
@@ -54,8 +118,12 @@ public class Node {
         this.isRoot = isRoot;
     }
 
-    public int getPageIdx() {
-        return pageIdx;
+    public Node getNextNode() {
+        return next;
+    }
+
+    public Node getPrev() {
+        return prev;
     }
 
     public Node getParent() {
@@ -72,5 +140,20 @@ public class Node {
 
     public Node borrow(Node n1, Node n2) {
         return null;
+    }
+
+    /**
+     * checks if the node is overflown
+     * true if number of nodes exceeds max
+     * @return boolean
+     */
+    public boolean isOverflow() {
+        return this.numOfPointers > max;
+    }
+
+
+    @Override
+    public int compareTo(Node o) {
+        return 0;
     }
 }

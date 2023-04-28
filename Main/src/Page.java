@@ -5,11 +5,6 @@ import java.util.Comparator;
 
 public class Page {
 
-    /**
-     * page capacity
-     * TODO: set capacity from storage manager
-     * call: Page.setCapacity()
-     */
     private static int capacity;
     /**
      * actual size of the page based on contents
