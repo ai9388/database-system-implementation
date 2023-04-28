@@ -42,7 +42,7 @@ public class Node implements Comparable<Node>{
     /**
      * array of keys
      */
-    protected ArrayList<Object> keys;
+    private ArrayList<Object> keys;
 
     /**
      * the type of node
@@ -58,7 +58,7 @@ public class Node implements Comparable<Node>{
      *      applies to records
      *      [pageId, record index]
      */
-    protected ArrayList<ArrayList<Integer>> pointers;
+    private ArrayList<ArrayList<Integer>> pointers;
 
     /**
      * boolean to make a node as the root
@@ -70,8 +70,25 @@ public class Node implements Comparable<Node>{
      */
     private Attribute primaryAttribute;
 
-    public Node(int N, Attribute primaryAttribute, NodeType nodeType) {
+    /**
+     * Constructor used to create a new node with one record pointer on it
+     * @param N the tree's branching factor. used to calculate min and max
+     * @param primaryAttribute the attribute used for indexing
+     * @param parent the parent node (could be null if root)
+     * @param nodeType the type of Node (LEAF)
+     * @param record the record that will be inserted
+     */
+    public Node(int N, Attribute primaryAttribute, Node parent, NodeType nodeType, Record record) {
+        this.primaryAttribute = primaryAttribute;
+        this.parent = parent;
+        this.isRoot = this.parent == null;
+        this.type = nodeType;
         this.N = N;
+        // make call to set min and max value
+        setLimits();
+
+        // call insert to insert the record into this node
+        insert(record);
     }
 
     // TODO: fix this constructor later
@@ -82,7 +99,12 @@ public class Node implements Comparable<Node>{
 //        this.N = N;
 //    }
 
-    public void insert(String key, int index1, int index2) {
+    public boolean insert(Record record) {
+        if (this.isFull()) {
+            return false;
+        } else {
+        }
+
 //        if (values.size() == 0) {
 //            values.add(new ArrayList<>());
 //            List<Integer> pointerIndex = values.get(0);
@@ -106,6 +128,36 @@ public class Node implements Comparable<Node>{
 //        }
 
         //TODO: @Newcarlis
+
+        return false;
+    }
+
+    /**
+     * sets the min and max values based on N and the node type
+     */
+    public void setLimits(){
+
+        if(type == NodeType.LEAF){
+            this.min = Math.ceilDiv(N-1,2);
+            this.max = N - 1;
+        }
+        else if(type == NodeType.INTERNAL){
+            this.min = Math.ceilDiv(N, 2);
+            this.max = N;
+        }
+        if(isRoot){
+            this.min = 2;
+        }
+    }
+
+    /**
+     * method to change the nodeType if needed
+     * also makes sure to change the min and max values
+     * @param type
+     */
+    public void setType(NodeType type) {
+        this.type = type;
+        setLimits();
     }
 
     public void delete(String key) {
@@ -191,10 +243,53 @@ public class Node implements Comparable<Node>{
      * true if number of nodes exceeds max
      * @return boolean
      */
-    public boolean isOverflow() {
-        return this.numOfPointers > max;
+    public boolean isFull() {
+        return this.numOfPointers == max;
     }
 
+    public ArrayList<Object> getKeys() {
+        return keys;
+    }
+
+
+    public Object getKey(int i){
+        return keys.get(i);
+    }
+
+    public void insertKey(int index, Object key){
+        this.keys.add(index, key);
+    }
+
+    public void insertPointer(int index, ArrayList<Integer> pointer){
+        this.keys.add(index, pointer);
+    }
+
+    public ArrayList<ArrayList<Integer>> getPointers() {
+        return pointers;
+    }
+
+    public ArrayList<Object> splitKeys(int midPoint){
+        ArrayList<Object> newKeys = new ArrayList<>();
+
+        for(int i = midPoint + 1; i < this.N; i++){
+            Object key = this.keys.remove(i);
+            newKeys.add(key);
+        }
+
+        return newKeys;
+    }
+
+
+    public ArrayList<ArrayList<Integer>> splitPointers(int midPoint){
+        ArrayList<ArrayList<Integer>> newPointer = new ArrayList<>();
+
+        for(int i = midPoint + 1; i < this.N; i++){
+            ArrayList<Integer> pointer = this.pointers.remove(i);
+            newPointer.add(pointer);
+        }
+
+        return newPointer;
+    }
 
     @Override
     public int compareTo(Node o) {
