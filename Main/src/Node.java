@@ -6,7 +6,11 @@ public class Node {
     protected int size;
     protected int N;
     private List<String> keys = new ArrayList<>();
-    private List<List<Integer>> values = new ArrayList<>();
+    private List<List<Integer>> pointers = new ArrayList<>();
+
+    // TODO: If we end up getting serialization we can delete values list
+    private List<String> values = new ArrayList<>();
+
     private Node parent;
 
     // I don't think we need these??
@@ -22,26 +26,56 @@ public class Node {
         this.N = N;
     }
 
-    public void insert(String key, int index1, int index2) {
-        if (values.size() == 0) {
-            values.add(new ArrayList<>());
-            List<Integer> pointerIndex = values.get(0);
+    public void insert(String key, String value, int index1, int index2) {
+        if (pointers.size() == 0) {
+            List<Integer> pointerIndex = new ArrayList<>();
             pointerIndex.add(index1, index2);
-            size += 1;
+            pointers.add(pointerIndex);
+            size++;
         }
         else {
-            if (values.get(0).get(0) == -1) {
-                // its a parent node
-                // Check size
+            if (pointers.get(0).get(0) == -1) {
+                // It's a parent node
+                // TODO: Check size
+
+                // Add pointer locations to pointers if size correct
+                List<Integer> pointerIndex = new ArrayList<>();
+                pointerIndex.add(index1, index2);
+                pointers.add(pointerIndex);
+                // Add key to keys if size correct
+                keys.add(key);
+                // Add value to values if size correct
+                values.add(value);
+                size++;
+
             }
-            else if (values.get(0).get(1) == -1) {
-                // it's a internal node
-                // Check size
+            else if (pointers.get(0).get(1) == -1) {
+                // It's a internal node
+                // TODO: Check size
+
+                // Add pointer locations to pointers if size correct
+                List<Integer> pointerIndex = new ArrayList<>();
+                pointerIndex.add(index1, index2);
+                pointers.add(pointerIndex);
+                // Add key to keys if size correct
+                keys.add(key);
+                // Add value to values if size correct
+                values.add(value);
+                size++;
             }
             else {
                 // it's a leaf node
-                // Check size
+                // TODO: Check size
 
+                // Add pointer locations to pointers if size correct
+                List<Integer> pointerIndex = new ArrayList<>();
+                pointerIndex.add(index1, index2);
+                pointers.add(pointerIndex);
+                // Add key to keys if size correct
+                keys.add(key);
+                // Add value to values if size correct
+                values.add(value);
+                size++;
             }
         }
     }
