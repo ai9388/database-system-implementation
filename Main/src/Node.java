@@ -80,6 +80,10 @@ public class Node {
         }
     }
 
+    public void delete(String key) {
+        // TODO: Delete
+    }
+
     public boolean getRoot(){
         return this.isRoot;
     }
