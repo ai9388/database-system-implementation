@@ -58,7 +58,7 @@ public class Node implements Comparable<Node>{
      *      applies to records
      *      [pageId, record index]
      */
-    protected ArrayList<ArrayList<Integer>> values;
+    protected ArrayList<ArrayList<Integer>> pointers;
 
     /**
      * boolean to make a node as the root
@@ -72,8 +72,6 @@ public class Node implements Comparable<Node>{
 
     public Node(int N, Attribute primaryAttribute, NodeType nodeType) {
         this.N = N;
-        this.primaryAttribute = primaryAttribute;
-        this.type = nodeType;
     }
 
     // TODO: fix this constructor later
@@ -110,6 +108,10 @@ public class Node implements Comparable<Node>{
         //TODO: @Newcarlis
     }
 
+    public void delete(String key) {
+        // TODO: Delete
+    }
+
     public boolean getRoot(){
         return this.isRoot;
     }
@@ -131,14 +133,17 @@ public class Node implements Comparable<Node>{
     }
 
     public Node[] split(Node node) {
+        // TODO: Split
         return null;
     }
 
     public Node merge(Node n1, Node n2) {
+        // TODO: Merge
         return null;
     }
 
     public Node borrow(Node n1, Node n2) {
+        // TODO: Borrow
         return null;
     }
 
