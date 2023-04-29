@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Node implements Comparable<Node>{
@@ -167,8 +168,8 @@ public class Node implements Comparable<Node>{
             // we have an existing page
             Page p = pages.get(b);
             p.addRecord(record);
-            this.insertPointer(pageNumber, p.getIndexOf(record));
-        }   
+            this.insertPointer(index, new ArrayList<Integer>(Arrays.asList(new Integer[]{pageNumber, p.getIndexOf(record)})));
+        }
 
         return true;
     }
@@ -296,7 +297,29 @@ public class Node implements Comparable<Node>{
     }
 
     public Node merge(Node n1, Node n2) {
-        // TODO: Merge
+        // preconditions: merging is able to happen
+        // if the parents are the same, then we can just combine the two nodes
+        if (n1.parent.equals(n2.parent))
+        {
+            for (int i = 0; i < n1.keys.size(); i++) 
+            {
+                n1.keys.add(n2.keys.get(i));    
+            }
+
+            for (int i = 0; i < n1.pointers.size(); i++) 
+            {
+                n1.pointers.add(n2.pointers.get(i));
+            }
+
+            n1.numOfPointers += n2.pointers.size();
+
+            n1.next = n2.next;
+
+            n2.parent = null;
+            n2.prev = null;
+            n2.next = null;
+        }
+
         return null;
     }
 

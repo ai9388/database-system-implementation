@@ -54,6 +54,12 @@ public class BplusTree {
         return pages;
     }
 
+    public int getPageNumber(Node leafNode, int index)
+    {
+        //TODO: get it working
+        return 0;
+    }
+
     public void insert(Record record){
         // Case 1: the tree is empty
         // create a new leaf node that is also the root
@@ -70,7 +76,7 @@ public class BplusTree {
         Object newKey = record.getPrimaryObject();
         Node leafNode = findLeafNode(newKey);
         int index = getInsertIndex(leafNode, newKey);
-        int pageNumber = 0;
+        int pageNumber = getPageNumber(leafNode, index);
         boolean insertionRes = leafNode.insert(record, index, pageNumber);
         if(!insertionRes){ // could not be inserted because it is full
             // get the index where this record should go based on the primary key
@@ -88,6 +94,7 @@ public class BplusTree {
             ArrayList<Object> newKeys = leafNode.splitKeys(midPoint); // include midpoint
             ArrayList<ArrayList<Integer>> newPointers = leafNode.splitPointers(midPoint);
 
+            // TODO set the pointers for the new node
             // let k be the least key value on the new nodes keys
             // this is the new parent key
             Object k = newKeys.get(0);
@@ -111,7 +118,7 @@ public class BplusTree {
             }
 
             // make a new node with the second half of the values
-            Node newNode = new Node(N, tableSchema.getPrimaryAttribute(), leafNode.parent, Node.NodeType.LEAF, record);
+            Node newNode = new Node(N, tableSchema, leafNode.parent, Node.NodeType.LEAF, record);
             // set the keys of the new node
             newNode.setKeys(newKeys);
 
@@ -225,7 +232,7 @@ public class BplusTree {
                 Record record = page.getRecords().get(recordIndex);
                 ArrayList<Integer> leftPointer = left.getPointers().get(-1);
                 left.delete(String.valueOf(left.getKey(-1)));
-                leafNode.insert(record);
+                leafNode.insert(record, recordIndex, page.getId());
             }
             else if (leafNode.canBorrowRight()) {
                 Node right = leafNode.getNextNode();
@@ -236,7 +243,7 @@ public class BplusTree {
                 Record record = page.getRecords().get(recordIndex);
                 ArrayList<Integer> rightPointer = right.getPointers().get(0);
                 right.delete(String.valueOf(right.getKey(0)));
-                leafNode.insert(record);
+                leafNode.insert(record, recordIndex, page.getId());
             }
 
             // if you cant borrow merge
