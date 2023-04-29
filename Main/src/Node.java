@@ -313,8 +313,20 @@ public class Node implements Comparable<Node>{
         return next.numOfPointers - 1 >= next.min;
     }
 
+    public boolean canMergeLeft() {
+        return (prev.numOfPointers + this.numOfPointers - 1) <= this.max;
+    }
+
+    public boolean canMergeRight() {
+        return (next.numOfPointers + this.numOfPointers - 1) <= this.max;
+    }
+
     public ArrayList<Object> getKeys() {
         return keys;
+    }
+
+    public ArrayList<Object> getValues() {
+        return values;
     }
 
     public void setKeys(ArrayList<Object> keys) {
