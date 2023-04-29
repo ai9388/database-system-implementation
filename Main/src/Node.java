@@ -45,6 +45,11 @@ public class Node implements Comparable<Node>{
     private ArrayList<Object> keys;
 
     /**
+     * array of children nodes
+     */
+    private ArrayList<Node> children;
+
+    /**
      * the type of node
      */
     private NodeType type;
@@ -131,6 +136,12 @@ public class Node implements Comparable<Node>{
 
         return false;
     }
+
+
+    public void insertChildNode(Node node){
+
+    }
+
 
     /**
      * sets the min and max values based on N and the node type

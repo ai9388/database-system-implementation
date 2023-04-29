@@ -86,7 +86,17 @@ public class BplusTree {
             // split the node
             int midPoint = Math.ceilDiv(N, 2);
 
+            ArrayList<Object> newKeys = leafNode.splitKeys(midPoint);
+            ArrayList<ArrayList<Integer>> newPointers = leafNode.splitPointers(midPoint);
 
+            // make a new node with the remaining values - P
+            Node newNode = new Node(N, tableSchema.getPrimaryAttribute(), leafNode.parent, Node.NodeType.LEAF, record);
+            // let k be the least key value on the new node
+            Object k = new newNode.getKey(0);
+
+
+            // make a pointer in the parent node that points to this
+            leafNode.parent.insertChildNode(newNode);
         }
 
     }
