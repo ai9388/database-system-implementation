@@ -1,5 +1,7 @@
 import java.util.*;
 
+import javax.lang.model.util.ElementScanner14;
+
 public class Node implements Comparable<Node>{
 
     public enum NodeType{INTERNAL, LEAF}
@@ -106,7 +108,7 @@ public class Node implements Comparable<Node>{
         setLimits();
 
         // call insert to insert the record into this node
-        insert(record, 0, 0);
+        insert(record, 0);
     }
 
 
@@ -136,14 +138,14 @@ public class Node implements Comparable<Node>{
 //        this.N = N;
 //    }
 
-    public boolean insert(Record record, int index, int pageNumber) {
+    public boolean insert(Record record, int index) {
         if (this.isFull()) {
             return false;
         }
 
         // insert this record key
         this.insertKey(index, record.getPrimaryObject());
-
+        this.saveRecordAndCreateRecordPointer(index, record);
         return true;
     }
 
@@ -153,7 +155,7 @@ public class Node implements Comparable<Node>{
      * @param index
      * @return
      */
-    public boolean saveRecordAndCreateRecordPointer(Object key, int index, Record r){
+    public boolean saveRecordAndCreateRecordPointer(int index, Record r){
         // try and determine the page number
         // case 1: key index is 0 and there are no pages
         if(index == 0 && pages.size() == 0){
@@ -194,12 +196,71 @@ public class Node implements Comparable<Node>{
                 return true;
             }
         }
+
+        // case 3: key index is last index and there are some pages
+        else if (index == this.numOfPointers && pages.size() > 1)
+        {
+            int lastPageUsedInThisLeafNode = this.pointers.get(this.pointers.size() - 1).get(0);
+            boolean res = attemptToInsertToPage(r, lastPageUsedInThisLeafNode);
+            boolean res2 = false;
+
+            if (!res) 
+            { // if it could not be inserted in the last page
+              // try to insert in to the next page used by the leaf node before this one(if any)
+                if (this.next != null) 
+                {
+                    int firstPageUsedByLeftSibling = next.getPointerByIdx(0).get(0);
+                    res2 = attemptToInsertToPage(r, firstPageUsedByLeftSibling);
+                }
+                if (res2) 
+                { // also didn't fit on the page after
+                    return true;
+                } else 
+                { // if the next is null, or it exists but record doesn't fit
+                  // force insert the record into the page and then cause a split
+                    Page initialPage = pages.get(pageId);
+                    initialPage.insertRecordAt(r, initialPage.getIndexOf(r));
+                    handlePageSplitting(initialPage);
+                }
+            } else 
+            {
+                return true;
+            }
+        }
+        
+        // everything in between
+        else
+        {
+            // attempting to insert at the given index
+            int lastPageUsedInThisLeafNode = this.pointers.get(index).get(0);
+            boolean res = attemptToInsertToPage(r, lastPageUsedInThisLeafNode);
+
+            // if insertion did not work, we try again and subtract from the index
+            if (!res)
+            {
+                lastPageUsedInThisLeafNode = this.pointers.get(index - 1).get(0);
+                res = attemptToInsertToPage(r, lastPageUsedInThisLeafNode);
+
+                // if it still doesnt insert, we must split
+                if (!res)
+                {
+                    Page initialPage = pages.get(pageId);
+                    initialPage.insertRecordAt(r, initialPage.getIndexOf(r));
+                    handlePageSplitting(initialPage);
+                }
+            } else
+            {
+                return true;
+            }
+        }
+        // something failed along the way :(
         return false;
     }
 
     public void handlePageSplitting(Page initialPage){
         // split the initial page
         Page newPageFromSplit = initialPage.split(Node.getPageId());
+        pages.put(newPageFromSplit.getId(), newPageFromSplit);
 
         // now that the page has been split, we have to update the pointers involving the two pages
         generateRecordPointersForPage(initialPage);

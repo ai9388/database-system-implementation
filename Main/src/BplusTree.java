@@ -43,6 +43,7 @@ public class BplusTree {
         this.tableSchema = tableSchema;
         this.N = calculateN();
         pages = 0;
+        Node.setPageId(0);
     }
 
     /**
@@ -77,7 +78,7 @@ public class BplusTree {
         Node leafNode = findLeafNode(newKey);
         int index = getInsertIndex(leafNode, newKey);
         int pageNumber = getPageNumber(leafNode, index);
-        boolean insertionRes = leafNode.insert(record, index, pageNumber);
+        boolean insertionRes = leafNode.insert(record, index);
         if(!insertionRes){ // could not be inserted because it is full
             // get the index where this record should go based on the primary key
 
@@ -232,7 +233,7 @@ public class BplusTree {
                 Record record = page.getRecords().get(recordIndex);
                 ArrayList<Integer> leftPointer = left.getPointers().get(-1);
                 left.delete(String.valueOf(left.getKey(-1)));
-                leafNode.insert(record, recordIndex, page.getId());
+                leafNode.insert(record, recordIndex);
             }
             else if (leafNode.canBorrowRight()) {
                 Node right = leafNode.getNextNode();
@@ -243,7 +244,7 @@ public class BplusTree {
                 Record record = page.getRecords().get(recordIndex);
                 ArrayList<Integer> rightPointer = right.getPointers().get(0);
                 right.delete(String.valueOf(right.getKey(0)));
-                leafNode.insert(record, recordIndex, page.getId());
+                leafNode.insert(record, recordIndex);
             }
 
             // if you cant borrow merge
