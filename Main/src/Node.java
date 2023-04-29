@@ -96,6 +96,24 @@ public class Node implements Comparable<Node>{
         insert(record);
     }
 
+
+    /**
+     * used to create internal node (no record)
+     * @param N
+     * @param primaryAttribute
+     * @param parent
+     * @param nodeType
+     */
+    public Node(int N, Attribute primaryAttribute, Node parent, NodeType nodeType){
+        this.primaryAttribute = primaryAttribute;
+        this.parent = parent;
+        this.isRoot = this.parent == null;
+        this.type = nodeType;
+        this.N = N;
+        // make call to set min and max value
+        setLimits();
+    }
+
     // TODO: fix this constructor later
 //    public Node(int pageIdx, Object primKey, int size, int N) {
 //        this.pageIdx = pageIdx;
@@ -226,8 +244,16 @@ public class Node implements Comparable<Node>{
         return next;
     }
 
+    public void setNext(Node next) {
+        this.next = next;
+    }
+
     public Node getPrev() {
         return prev;
+    }
+
+    public void setPrev(Node prev) {
+        this.prev = prev;
     }
 
     public Node getParent() {
@@ -250,7 +276,7 @@ public class Node implements Comparable<Node>{
     }
 
     /**
-     * checks if the node is overflown
+     * checks if the node is full
      * true if number of nodes exceeds max
      * @return boolean
      */
@@ -258,10 +284,30 @@ public class Node implements Comparable<Node>{
         return this.numOfPointers == max;
     }
 
+    /**
+     * checks if the node is overflown
+     * true if number of nodes exceeds max
+     * @return boolean
+     */
+    public boolean isOverfull() {
+        return this.numOfPointers > max;
+    }
+
     public ArrayList<Object> getKeys() {
         return keys;
     }
 
+    public void setKeys(ArrayList<Object> keys) {
+        this.keys = keys;
+    }
+
+    public void setPointers(ArrayList<ArrayList<Integer>> pointers) {
+        this.pointers = pointers;
+    }
+
+    public void setChildren(ArrayList<Node> children) {
+        this.children = children;
+    }
 
     public Object getKey(int i){
         return keys.get(i);
@@ -269,6 +315,7 @@ public class Node implements Comparable<Node>{
 
     public void insertKey(int index, Object key){
         this.keys.add(index, key);
+        numOfPointers++;
     }
 
     public void insertPointer(int index, ArrayList<Integer> pointer){
