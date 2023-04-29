@@ -247,8 +247,18 @@ public class BplusTree {
             }
 
             // if you cant borrow merge
-            else {
+            else if (leafNode.canMergeLeft()){
                 Node left = leafNode.getPrev();
+                ArrayList<Object> leftKeys = left.getKeys();
+                ArrayList<Object> leftValues = left.getValues();
+                ArrayList<ArrayList<Integer>> leftPointers = left.getPointers();
+
+                leafNode.setPrev(left.getPrev());
+                // Can't think right now :P
+            }
+            else if (leafNode.canMergeRight()) {
+                Node right = leafNode.getNextNode();
+
             }
         }
     }
