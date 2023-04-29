@@ -143,35 +143,66 @@ public class BplusTree {
         return pairs - 1;
     }
 
-    // public Node findLeafNode(Object key){
-        
-    // }
-
-    public Node findNode(Object key){
+    public Node findLeafNode(Object key){
+         // TODO @ Hai-Yen
         Node C = root;
-
+        Object currentKey = null;
+        int i = 0;
         while(C.getType() != Node.NodeType.LEAF){
+            currentKey = root.getKey(i);
 
-            for(int i = 0; i < C.getKeys().size(); i++){
-                Object currentKey = root.getKey(i);
-                // if new key is less than current, insert at location
-                if(compareKeys(key, currentKey) > 0 ){
-                    ArrayList<Integer> pointer = C.getPointerByIdx(C.getKeys().size());
-                    C = C.getNodebyPointer(pointer);
-                }
-                else if(compareKeys(key, currentKey) == 0){
-                    ArrayList<Integer> pointer = C.getPointerByIdx(i+1);
-                    C = C.getNodebyPointer(pointer);
-                    return C;
-                }
-                else{
-                    ArrayList<Integer> pointer = C.getPointerByIdx(i);
-                    C = C.getNodebyPointer(pointer);
-                }
+            if(i >= C.getKeys().size()){ //reach to the end of the keys
+                ArrayList<Integer> pointer = C.getPointerByIdx(C.getKeys().size());
+                C = C.getNodebyPointer(pointer);
+                break;
             }
+            else if(compareKeys(key, currentKey) == 0){
+                ArrayList<Integer> pointer = C.getPointerByIdx(i+1);
+                C = C.getNodebyPointer(pointer);
+            }
+            else{
+                ArrayList<Integer> pointer = C.getPointerByIdx(i);
+                C = C.getNodebyPointer(pointer);
+            }
+            i++;
+        }
+        if(compareKeys(key, currentKey) == 0){
+            ArrayList<Integer> pointer = C.getPointerByIdx(i);
+            C = C.getNodebyPointer(pointer);
         }
 
-        return null; // TODO @ Hai-Yen
+        return C;
+    }
+
+    public ArrayList<Integer> findNodePointer(Object key){
+        // TODO @ Hai-Yen
+        Node C = root;
+        Object currentKey = null;
+        int i = 0;
+        while(C.getType() != Node.NodeType.LEAF){
+            currentKey = root.getKey(i);
+
+            if(i >= C.getKeys().size()){ //reach to the end of the keys
+                ArrayList<Integer> pointer = C.getPointerByIdx(C.getKeys().size());
+                C = C.getNodebyPointer(pointer);
+                break;
+            }
+            else if(compareKeys(key, currentKey) == 0){
+                ArrayList<Integer> pointer = C.getPointerByIdx(i+1);
+                C = C.getNodebyPointer(pointer);
+            }
+            else{
+                ArrayList<Integer> pointer = C.getPointerByIdx(i);
+                C = C.getNodebyPointer(pointer);
+            }
+            i++;
+        }
+        if(compareKeys(key, currentKey) == 0){
+            return C.getPointerByIdx(i);
+        }
+
+
+        return null; 
     }
 
     public ArrayList<Integer> getPageAndIndex(){
