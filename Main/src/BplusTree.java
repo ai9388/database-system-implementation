@@ -143,8 +143,35 @@ public class BplusTree {
         return pairs - 1;
     }
 
-    public Node findLeafNode(Object key){
-        return null; // TODO
+    // public Node findLeafNode(Object key){
+        
+    // }
+
+    public Node findNode(Object key){
+        Node C = root;
+
+        while(C.getType() != Node.NodeType.LEAF){
+
+            for(int i = 0; i < C.getKeys().size(); i++){
+                Object currentKey = root.getKey(i);
+                // if new key is less than current, insert at location
+                if(compareKeys(key, currentKey) > 0 ){
+                    ArrayList<Integer> pointer = C.getPointerByIdx(C.getKeys().size());
+                    C = C.getNodebyPointer(pointer);
+                }
+                else if(compareKeys(key, currentKey) == 0){
+                    ArrayList<Integer> pointer = C.getPointerByIdx(i+1);
+                    C = C.getNodebyPointer(pointer);
+                    return C;
+                }
+                else{
+                    ArrayList<Integer> pointer = C.getPointerByIdx(i);
+                    C = C.getNodebyPointer(pointer);
+                }
+            }
+        }
+
+        return null; // TODO @ Hai-Yen
     }
 
     public ArrayList<Integer> getPageAndIndex(){

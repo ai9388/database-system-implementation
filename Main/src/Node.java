@@ -279,6 +279,10 @@ public class Node implements Comparable<Node>{
         return pointers;
     }
 
+    public ArrayList<Integer> getPointerByIdx(int index){
+        return pointers.get(index);
+    }
+
     public ArrayList<Object> splitKeys(int midPoint){
         ArrayList<Object> newKeys = new ArrayList<>();
 
@@ -302,8 +306,17 @@ public class Node implements Comparable<Node>{
         return newPointer;
     }
 
+    public Node getNodebyPointer(ArrayList<Integer> pointer){
+        int idx = pointer.get(0);
+        return children.get(idx);
+    }
+
     @Override
     public int compareTo(Node o) {
         return 0;
+    }
+
+    public NodeType getType() {
+        return type;
     }
 }
