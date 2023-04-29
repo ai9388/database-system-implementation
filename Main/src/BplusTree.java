@@ -60,7 +60,7 @@ public class BplusTree {
         // insert the record into that node
         // add node to tree and increment pointer count
         if(isEmpty()){
-            Node node = new Node(this.N, tableSchema. getPrimaryAttribute(), null, Node.NodeType.LEAF, record);
+            Node node = new Node(this.N, tableSchema, null, Node.NodeType.LEAF, record);
             this.root = node;
         }
 
@@ -69,10 +69,11 @@ public class BplusTree {
         // try to insert the record in there
         Object newKey = record.getPrimaryObject();
         Node leafNode = findLeafNode(newKey);
-        boolean insertionRes = leafNode.insert(record);
+        int index = getInsertIndex(leafNode, newKey);
+        int pageNumber = 0;
+        boolean insertionRes = leafNode.insert(record, index, pageNumber);
         if(!insertionRes){ // could not be inserted because it is full
             // get the index where this record should go based on the primary key
-            int index = getInsertIndex(leafNode, newKey);
 
             // get the new Record pointer
             ArrayList<Integer> recordPointer = getPageAndIndex();

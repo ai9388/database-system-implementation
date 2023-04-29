@@ -55,6 +55,16 @@ public class Node implements Comparable<Node>{
     private NodeType type;
 
     /**
+     * pages
+     */
+    private ArrayList<Page> pages;
+
+    /**
+     * name of table
+     */
+    private String tableName;
+
+    /**
      * This serves as both a node pointer and a record pointer
      * Node pointer:
      *      applies to root and internal nodes
@@ -83,8 +93,9 @@ public class Node implements Comparable<Node>{
      * @param nodeType the type of Node (LEAF)
      * @param record the record that will be inserted
      */
-    public Node(int N, Attribute primaryAttribute, Node parent, NodeType nodeType, Record record) {
-        this.primaryAttribute = primaryAttribute;
+    public Node(int N, TableSchema tableSchema, Node parent, NodeType nodeType, Record record) {
+        this.primaryAttribute = tableSchema.getPrimaryAttribute();
+        this.tableName = tableSchema.getName();
         this.parent = parent;
         this.isRoot = this.parent == null;
         this.type = nodeType;
@@ -93,7 +104,7 @@ public class Node implements Comparable<Node>{
         setLimits();
 
         // call insert to insert the record into this node
-        insert(record);
+        insert(record, 0, 0);
     }
 
 
@@ -122,37 +133,44 @@ public class Node implements Comparable<Node>{
 //        this.N = N;
 //    }
 
-    public boolean insert(Record record) {
+    public boolean insert(Record record, int index, int pageNumber) {
         if (this.isFull()) {
             return false;
-        } else {
         }
 
-//        if (values.size() == 0) {
-//            values.add(new ArrayList<>());
-//            List<Integer> pointerIndex = values.get(0);
-//            pointerIndex.add(index1, index2);
-//            size += 1;
-//        }
-//        else {
-//            if (values.get(0).get(0) == -1) {
-//                // its a parent node
-//                // Check size
-//            }
-//            else if (values.get(0).get(1) == -1) {
-//                // it's a internal node
-//                // Check size
-//            }
-//            else {
-//                // it's a leaf node
-//                // Check size
-//
-//            }
-//        }
+        this.insertKey(index, record.getPrimaryObject());
 
-        //TODO: @Newcarlis
+        // create the page initially
+        // get the page number
+        // iterate over the page records to find the record index
 
-        return false;
+        int b = -1;
+        for (int i = 0; i < pages.size(); i++) {
+            if (pages.get(i).getId() == pageNumber)
+            {
+                b = i;
+                break;
+            }
+        }
+
+        //check if we do not have page
+        if (b == -1)
+        {
+            // we do NOT have the page
+            // make the page
+            Page p = new Page(pageNumber, this.tableName);
+            this.pages.add(p);
+            p.addRecord(record);
+        }
+        else
+        {
+            // we have an existing page
+            Page p = pages.get(b);
+            p.addRecord(record);
+            this.insertPointer(pageNumber, p.getIndexOf(record));
+        }   
+
+        return true;
     }
 
 
