@@ -225,13 +225,12 @@ public class Node implements Comparable<Node>{
                     break;
                 }
             }
-        }
         else {
             // Leaf
             // TODO: Check size
 
             for (Object k : keys) {
-                if (k.equals(key)){
+                if (k.equals(k)){
                     int index = keys.indexOf(k);
                     // TODO: Shift page/record pointers up
                     keys.remove(index);
