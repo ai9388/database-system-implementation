@@ -323,6 +323,14 @@ public class Node implements Comparable<Node>{
         return this.numOfPointers > max;
     }
 
+    public boolean canBorrowLeft() {
+        return prev.numOfPointers - 1 >= prev.min;
+    }
+
+    public boolean canBorrowRight() {
+        return next.numOfPointers - 1 >= next.min;
+    }
+
     public ArrayList<Object> getKeys() {
         return keys;
     }
