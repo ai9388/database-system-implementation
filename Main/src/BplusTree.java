@@ -194,6 +194,55 @@ public class BplusTree {
         return location;
     }
 
+    public void delete(String key) throws TableException {
+        // Case 1: There are no records in the tree.
+        // Throw error
+        if (isEmpty()) {
+            throw new TableException(13,"");
+        }
+        // Case 2: Find where key is in tree
+        // Delete it.
+        Node leafNode = findLeafNode(key);
+        boolean deletionRex = leafNode.delete(key);
+        if(!deletionRex){ // could not be deleted because it is underful
+            // get the index where this record should go based on the primary key
+            int index = getDeleteIndex(leafNode, key);
+
+            // get the new Record pointer
+            ArrayList<Integer> recordPointer = getPageAndIndex();
+
+            // insert the new key and the new record pointer
+            leafNode.deleteKey(key);
+            leafNode.deletePointer(index);
+
+            // check if you can borrow
+
+            // if you cant borrow merge
+
+        }
+    }
+
+    private int getDeleteIndex(Node leafNode, String key) {
+        // TODO: I have no idea if this works but its
+        //  finneeeee we're just stubbing this out for now
+
+        // get the index where this would go - assume keys are in order
+        int location = -1;
+        for(int i = 0; i < leafNode.numOfPointers; i++){
+            Object currentKey = leafNode.getKey(i);
+            // if new key is less than current, insert at location
+            if(compareKeys(key, currentKey) < 0){
+                location = i;
+                break;
+            }
+        }
+
+        // if no location found, append to the end
+        location = leafNode.numOfPointers;
+
+        return location;
+    }
+
     public boolean isEmpty(){
         return root == null;
     }
@@ -277,7 +326,7 @@ public class BplusTree {
         }
 
 
-        return null; 
+        return null;
     }
 
     public ArrayList<Integer> getPageAndIndex(){
@@ -325,5 +374,18 @@ public class BplusTree {
         tree.insert(r1);
         tree.printTreeInfo();
 
+    }
+
+    public Record getRecord(String key) throws TableException {
+        Node node = findLeafNode(key);
+        Object object = node.getValue(key);
+        if (object == null) {
+            throw new TableException(14, "");
+        }
+        Page p = (Page) object;
+        ArrayList<Record> records = p.getRecords();
+        int index = node.getIndexValue(key);
+        Record record = records.get(node.getPointers().get(index).get(1));
+        return record;
     }
 }

@@ -45,9 +45,9 @@ public class Node implements Comparable<Node>{
     private ArrayList<Object> keys;
 
     /**
-     * array of children nodes
+     * array of values
      */
-    private ArrayList<Node> children;
+    private ArrayList<Object> values;
 
     /**
      * the type of node
@@ -207,47 +207,59 @@ public class Node implements Comparable<Node>{
         setLimits();
     }
 
-    public void delete(String key) {
+    public boolean delete(String key) {
         // TODO: Delete
 
         if (isRoot) {
             // Root
             // TODO: Check size
 
-            for (String k : keys) {
-                if (k.compareTo(key) == -1) {
+            for (Object o : keys) {
+                //if (o.compareTo(key) == -1) {
                     // TODO: Go to child node and call delete
-                    break;
-                }
+                //    break;
+                //}
             }
         }
         else if (pointers.get(0).get(1) == -1) {
             // Internal Node
             // TODO: Check size
 
-            for (String k : keys) {
-                if (k.compareTo(key) == -1) {
-                    // TODO: Go to child node and call delete
+            switch(primaryAttribute.getType()){
+                case INTEGER:
+                    keys.remove(Integer.parseInt(key));
+                    break;
+                case DOUBLE:
+                    keys.remove(Double.parseDouble(key));
+                    break;
+                case BOOLEAN:
+                    keys.remove(Boolean.parseBoolean(key));
+                    break;
+                case VARCHAR:
+                    keys.remove(key);
+                    break;
+                case CHAR:
+                    keys.remove(key);
                     break;
                 }
             }
-        }
         else {
             // Leaf
             // TODO: Check size
 
-            for (String k : keys) {
-                if (k.equals(key)){
+            for (Object k : keys) {
+                if (k.equals(k)){
                     int index = keys.indexOf(k);
                     // TODO: Shift page/record pointers up
                     keys.remove(index);
                     pointers.remove(index);
                     values.remove(index);
-                    size--;
+                    numOfPointers--;
                     break;
                 }
             }
         }
+        return false;
     }
 
     public boolean getRoot(){
@@ -323,21 +335,24 @@ public class Node implements Comparable<Node>{
         this.pointers = pointers;
     }
 
-    public void setChildren(ArrayList<Node> children) {
-        this.children = children;
-    }
-
     public Object getKey(int i){
         return keys.get(i);
     }
 
     public void insertKey(int index, Object key){
         this.keys.add(index, key);
-        numOfPointers++;
     }
 
     public void insertPointer(int index, ArrayList<Integer> pointer){
-        this.keys.add(index, pointer);
+        this.pointers.add(index, pointer);
+    }
+
+    public void deleteKey(Object key){
+        this.keys.remove(key);
+    }
+
+    public void deletePointer(int index){
+        this.pointers.remove(index);
     }
 
     public ArrayList<ArrayList<Integer>> getPointers() {
@@ -373,7 +388,25 @@ public class Node implements Comparable<Node>{
 
     public Node getNodebyPointer(ArrayList<Integer> pointer){
         int idx = pointer.get(0);
-        return children.get(idx);
+        return (Node) values.get(idx);
+    }
+
+    public Object getValue(String key) {
+        for (int i = 0; i < keys.size(); i++) {
+            if (String.valueOf(keys.get(i)).equals(key)) {
+                return values.get(i);
+            }
+        }
+        return null;
+    }
+
+    public int getIndexValue(String key) {
+        for (int i = 0; i < keys.size(); i++) {
+            if (String.valueOf(keys.get(i)).equals(key)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override

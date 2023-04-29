@@ -11,7 +11,9 @@ public class TableException extends Exception{
         "Ambiguous column \"%s\", belongs to multiple tables", // 9
         "Table \"%s\" does not exist", // 10
         "No records to \"%s\"", // 11
-        "Unable to load table data. Memory corrupted" // 12
+        "Unable to load table data. Memory corrupted", // 12
+        "No records to delete.", // 13
+        "No record to update." // 14
     };
 
     private int errorCode;
