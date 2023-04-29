@@ -259,7 +259,7 @@ public enum Type {
         return result;
     }
 
-    public static int compareObejects(Object val1, Object val2, Type type) {
+    public static int compareObjects(Object val1, Object val2, Type type) {
         if(type == Type.BOOLEAN){
             Boolean b1 = (Boolean) val1;
             Boolean b2 = (Boolean) val2;

@@ -189,7 +189,7 @@ public class BplusTree {
         for(int i = 0; i < node.numOfPointers; i++){
             Object currentKey = node.getKey(i);
             // if new key is less than current, insert at location
-            if(compareKeys(newKey, currentKey) < 0){
+            if(Type.compareObjects(newKey, currentKey, tableSchema.getPrimaryAttribute().getType()) < 0){
                 location = i;
                 break;
             }
@@ -272,7 +272,7 @@ public class BplusTree {
         for(int i = 0; i < leafNode.numOfPointers; i++){
             Object currentKey = leafNode.getKey(i);
             // if new key is less than current, insert at location
-            if(compareKeys(key, currentKey) < 0){
+            if(Type.compareObjects(key, currentKey, tableSchema.getPrimaryAttribute().getType()) < 0){
                 location = i;
                 break;
             }
@@ -321,7 +321,7 @@ public class BplusTree {
                 C = C.getNodebyPointer(pointer);
                 break;
             }
-            else if(compareKeys(key, currentKey) == 0){
+            else if(Type.compareObjects(key, currentKey, tableSchema.getPrimaryAttribute().getType()) == 0){
                 ArrayList<Integer> pointer = C.getPointerByIdx(i+1);
                 C = C.getNodebyPointer(pointer);
             }
@@ -331,7 +331,7 @@ public class BplusTree {
             }
             i++;
         }
-        if(compareKeys(key, currentKey) == 0){
+        if(Type.compareObjects(key, currentKey, tableSchema.getPrimaryAttribute().getType()) == 0){
             ArrayList<Integer> pointer = C.getPointerByIdx(i);
             C = C.getNodebyPointer(pointer);
         }
@@ -352,7 +352,7 @@ public class BplusTree {
                 C = C.getNodebyPointer(pointer);
                 break;
             }
-            else if(compareKeys(key, currentKey) == 0){
+            else if(Type.compareObjects(key, currentKey, tableSchema.getPrimaryAttribute().getType()) == 0){
                 ArrayList<Integer> pointer = C.getPointerByIdx(i+1);
                 C = C.getNodebyPointer(pointer);
             }
@@ -362,7 +362,7 @@ public class BplusTree {
             }
             i++;
         }
-        if(compareKeys(key, currentKey) == 0){
+        if(Type.compareObjects(key, currentKey, tableSchema.getPrimaryAttribute().getType()) == 0){
             return C.getPointerByIdx(i);
         }
 

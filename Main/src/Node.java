@@ -194,36 +194,7 @@ public class Node implements Comparable<Node>{
                 return true;
             }
         }
-
-        // create the page initially
-        // get the page number
-        // iterate over the page records to find the record index
-
-        int b = -1;
-        for (int i = 0; i < pages.size(); i++) {
-            if (pages.get(i).getId() == pageNumber)
-            {
-                b = i;
-                break;
-            }
-        }
-
-        //check if we do not have page
-        if (b == -1)
-        {
-            // we do NOT have the page
-            // make the page
-            Page p = new Page(pageNumber, this.tableName);
-            this.pages.add(p);
-            p.addRecord(record);
-        }
-        else
-        {
-            // we have an existing page
-            Page p = pages.get(b);
-            p.addRecord(record);
-            this.insertPointer(index, new ArrayList<Integer>(Arrays.asList(new Integer[]{pageNumber, p.getIndexOf(record)})));
-        }
+        return false;
     }
 
     public void handlePageSplitting(Page initialPage){
@@ -241,7 +212,7 @@ public class Node implements Comparable<Node>{
 
             for(int rId = 0; rId < page.getRecords().size(); rId++){
                 Record r = page.getRecords().get(rId);
-                if(Type.compareObejects(key, r.getPrimaryObject(), this.primaryAttribute.getType()) == 0){
+                if(Type.compareObjects(key, r.getPrimaryObject(), this.primaryAttribute.getType()) == 0){
                     // update the old pointer if it existed
                     if(pointers.size() - 1 >= keyId){
                         this.pointers.set(keyId, new ArrayList<>(Arrays.asList(page.getId(), rId)));
