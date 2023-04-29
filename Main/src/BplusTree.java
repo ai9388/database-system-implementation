@@ -216,9 +216,33 @@ public class BplusTree {
             leafNode.deletePointer(index);
 
             // check if you can borrow
+            if (leafNode.canBorrowLeft()) {
+                Node left = leafNode.getPrev();
+                Object leftKey = left.getKey(-1);
+                Object leftValue = left.getValue(String.valueOf(leftKey));
+                Page page = (Page) leftValue;
+                int recordIndex = left.getIndexValue(String.valueOf(leftKey));
+                Record record = page.getRecords().get(recordIndex);
+                ArrayList<Integer> leftPointer = left.getPointers().get(-1);
+                left.delete(String.valueOf(left.getKey(-1)));
+                leafNode.insert(record);
+            }
+            else if (leafNode.canBorrowRight()) {
+                Node right = leafNode.getNextNode();
+                Object rightKey = right.getKey(0);
+                Object rightValue = right.getValue(String.valueOf(rightKey));
+                Page page = (Page) rightValue;
+                int recordIndex = right.getIndexValue(String.valueOf(rightKey));
+                Record record = page.getRecords().get(recordIndex);
+                ArrayList<Integer> rightPointer = right.getPointers().get(0);
+                right.delete(String.valueOf(right.getKey(0)));
+                leafNode.insert(record);
+            }
 
             // if you cant borrow merge
-
+            else {
+                Node left = leafNode.getPrev();
+            }
         }
     }
 
