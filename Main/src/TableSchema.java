@@ -34,6 +34,11 @@ public class TableSchema {
     private ArrayList<Integer> pageIds;
 
     /**
+     * The BplusTree to use if indexing is on
+     */
+    private BplusTree bplusTree = null;
+
+    /**
      * The primary index for this table
      */
     private int primaryIndex;
@@ -311,6 +316,22 @@ public class TableSchema {
         bb = Type.concat(bb, Type.convertIntToByteArray(numOfAttributes));
 
         return bb;
+    }
+
+    /**
+     * If theres a b+ tree return it
+     * @return b+ tree
+     */
+    public BplusTree getBplusTree() {
+        return bplusTree;
+    }
+
+    /**
+     * add a b+ tree
+     * @param bplusTree b+ tree to add
+     */
+    public void setBplusTree(BplusTree bplusTree) {
+        this.bplusTree = bplusTree;
     }
 
     @Override

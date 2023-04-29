@@ -75,13 +75,8 @@ public class StorageManager {
      * @throws PrimaryKeyException
      */
     public void insertRecords(String tableName, ArrayList<String[]> recordsInfo, boolean indexing) throws TableException, PrimaryKeyException, InvalidDataTypeException, ConstraintException {
-        if (indexing) {
-            // TODO: Insert into B+ Tree Node
-        }
-        else {
-            for (String[] recordInfo : recordsInfo) {
-                insertRecord(tableName, recordInfo);
-            }
+        for (String[] recordInfo : recordsInfo) {
+            insertRecord(tableName, recordInfo, indexing);
         }
     }
 
@@ -336,7 +331,7 @@ public class StorageManager {
      * @throws InvalidDataTypeException if the types provided in the record info are invalid
      * @throws PrimaryKeyException if the primary key isn't valid or if repeated
      */
-    public void insertRecord(String tableName, String[] recordInfo) throws TableException, InvalidDataTypeException, PrimaryKeyException, ConstraintException {
+    public void insertRecord(String tableName, String[] recordInfo, boolean indexing) throws TableException, InvalidDataTypeException, PrimaryKeyException, ConstraintException {
         TableSchema table = db.getTable(tableName);
         Record record = null;
 
@@ -346,7 +341,18 @@ public class StorageManager {
             db.validatePrimaryKey(record, table, records);
             ArrayList<Integer> uniqueAttributes = db.uniqueAttribute(table.getAttributes());
             db.checkUniqueness(record, uniqueAttributes, records);
-            pageBuffer.insertRecord(table, record);
+            if (indexing) {
+                BplusTree bplusTree = table.getBplusTree();
+                if (bplusTree == null) {
+                    bplusTree = new BplusTree(pageSize, table);
+                }
+                else {
+                    bplusTree.insert(record);
+                }
+            }
+            else {
+                pageBuffer.insertRecord(table, record);
+            }
         }
     }
 
@@ -430,33 +436,43 @@ public class StorageManager {
      * @param indexing
      */
     public int deleteRecords(String table_name, String where, boolean indexing) throws TableException, ConditionalException {
-        if (indexing) {
-            // TODO: Delete record in B+ Tree
-            return 0;
+        // keep track of rows affected
+        int count = 0;
+
+        // set the condition flag
+        boolean condition = !where.equals("");
+
+        // flag to determine if a page has been updated
+        boolean pageUpdated = false;
+
+        // getting the table schema for the table we want
+        TableSchema taSchema = this.db.getTable(table_name);
+
+        // getting all of the pageIDs associated with the table
+        ArrayList<Integer> pageIDs = taSchema.getPageIds();
+
+        // create the conditional object
+        Conditional conditional = null;
+        if (condition) {
+            // run the conditional tokenizer
+            conditional = Conditional.run(taSchema.getAttributes(), where);
+        }
+
+        if (indexing && condition) {
+            if (taSchema.getBplusTree() == null) {
+                throw new TableException(13, "");
+            }
+            else {
+                BplusTree bplusTree = taSchema.getBplusTree();
+                int index = where.indexOf("=");
+                String key = where.substring(index + 1);
+                bplusTree.delete(key);
+            }
         }
         else {
-            // keep track of rows affected
-            int count = 0;
-
-            // set the condition flag
-            boolean condition = !where.equals("");
-
-            // flag to determine if a page has been updated
-            boolean pageUpdated = false;
-
-            // getting the table schema for the table we want
-            TableSchema taSchema = this.db.getTable(table_name);
-
-            // getting all of the pageIDs associated with the table
-            ArrayList<Integer> pageIDs = taSchema.getPageIds();
-
-            // create the conditional object
-            Conditional conditional = null;
-            if (condition) {
-                // run the conditional tokenizer
-                conditional = Conditional.run(taSchema.getAttributes(), where);
+            if (indexing) {
+                taSchema.setBplusTree(null);
             }
-
             // looping over all of the page ids
             for (int i = 0; i < pageIDs.size(); i++) {
                 // getting the individual page
@@ -485,38 +501,49 @@ public class StorageManager {
                     this.pageBuffer.updateBuffer(p);
                 }
             }
-            return count;
         }
-    } 
+        return count;
+    }
 
     public int update(String table_name, String column, String value, String where_clause, boolean indexing) throws TableException, ConditionalException, InvalidDataTypeException, ConstraintException, PrimaryKeyException {
-        if (indexing) {
-            // TODO: Update record in B+ Tree
-            return 0;
+
+        // keep track of rows affected
+        int count = 0;
+
+        // set the condition flag
+        boolean condition = !where_clause.equals("");
+
+        // flag to determine if a page has been updated
+        boolean pageUpdated = false;
+
+        // getting the table schema for the table we want
+        TableSchema taSchema = this.db.getTable(table_name);
+
+        // getting all of the pageIDs associated with the table
+        ArrayList<Integer> pageIDs = taSchema.getPageIds();
+
+        // create the conditional object
+        Conditional conditional = null;
+        if (condition) {
+            // run the conditional tokenizer
+            conditional = Conditional.run(taSchema.getAttributes(), where_clause);
+        }
+
+        if (indexing && condition) {
+            if (taSchema.getBplusTree() == null) {
+                throw new TableException(13, "");
+            }
+            else {
+                BplusTree bplusTree = taSchema.getBplusTree();
+                int index = where_clause.indexOf("=");
+                String key = where_clause.substring(index + 1);
+                Record record = bplusTree.getRecord(key);
+                record.updateAtColumn(taSchema.getPrimaryIndex(), value);
+                deleteRecords(table_name, where_clause, indexing);
+                insertRecord(table_name, record.record(), indexing);
+            }
         }
         else {
-            // keep track of rows affected
-            int count = 0;
-
-            // set the condition flag
-            boolean condition = !where_clause.equals("");
-
-            // flag to determine if a page has been updated
-            boolean pageUpdated = false;
-
-            // getting the table schema for the table we want
-            TableSchema taSchema = this.db.getTable(table_name);
-
-            // getting all of the pageIDs associated with the table
-            ArrayList<Integer> pageIDs = taSchema.getPageIds();
-
-            // create the conditional object
-            Conditional conditional = null;
-            if (condition) {
-                // run the conditional tokenizer
-                conditional = Conditional.run(taSchema.getAttributes(), where_clause);
-            }
-
             // looping over all of the page ids
             for (int i = 0; i < pageIDs.size(); i++) {
                 // getting the individual page
@@ -549,8 +576,8 @@ public class StorageManager {
                     this.pageBuffer.updateBuffer(p);
                 }
             }
-            return count;
         }
+        return count;
     }
 
     /**
