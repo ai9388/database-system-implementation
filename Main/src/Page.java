@@ -171,6 +171,22 @@ public class Page {
         this.size += r.getSize();
     }
 
+    public int getIndexOf(Record record)
+    {
+        int index = -1;
+
+        for (int i = 0; i < this.records.size(); i++) 
+        {
+            if (this.records.get(i).equals(record))
+            {
+                index = i;
+                break;
+            }    
+        }
+
+        return index;
+    }
+
     /**
      * 
      * @return

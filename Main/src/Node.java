@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Node implements Comparable<Node>{
@@ -45,14 +46,24 @@ public class Node implements Comparable<Node>{
     private ArrayList<Object> keys;
 
     /**
-     * array of children nodes
+     * array of values
      */
-    private ArrayList<Node> children;
+    private ArrayList<Object> values;
 
     /**
      * the type of node
      */
     private NodeType type;
+
+    /**
+     * pages
+     */
+    private ArrayList<Page> pages;
+
+    /**
+     * name of table
+     */
+    private String tableName;
 
     /**
      * This serves as both a node pointer and a record pointer
@@ -83,8 +94,9 @@ public class Node implements Comparable<Node>{
      * @param nodeType the type of Node (LEAF)
      * @param record the record that will be inserted
      */
-    public Node(int N, Attribute primaryAttribute, Node parent, NodeType nodeType, Record record) {
-        this.primaryAttribute = primaryAttribute;
+    public Node(int N, TableSchema tableSchema, Node parent, NodeType nodeType, Record record) {
+        this.primaryAttribute = tableSchema.getPrimaryAttribute();
+        this.tableName = tableSchema.getName();
         this.parent = parent;
         this.isRoot = this.parent == null;
         this.type = nodeType;
@@ -93,7 +105,7 @@ public class Node implements Comparable<Node>{
         setLimits();
 
         // call insert to insert the record into this node
-        insert(record);
+        insert(record, 0, 0);
     }
 
 
@@ -122,37 +134,44 @@ public class Node implements Comparable<Node>{
 //        this.N = N;
 //    }
 
-    public boolean insert(Record record) {
+    public boolean insert(Record record, int index, int pageNumber) {
         if (this.isFull()) {
             return false;
-        } else {
         }
 
-//        if (values.size() == 0) {
-//            values.add(new ArrayList<>());
-//            List<Integer> pointerIndex = values.get(0);
-//            pointerIndex.add(index1, index2);
-//            size += 1;
-//        }
-//        else {
-//            if (values.get(0).get(0) == -1) {
-//                // its a parent node
-//                // Check size
-//            }
-//            else if (values.get(0).get(1) == -1) {
-//                // it's a internal node
-//                // Check size
-//            }
-//            else {
-//                // it's a leaf node
-//                // Check size
-//
-//            }
-//        }
+        this.insertKey(index, record.getPrimaryObject());
 
-        //TODO: @Newcarlis
+        // create the page initially
+        // get the page number
+        // iterate over the page records to find the record index
 
-        return false;
+        int b = -1;
+        for (int i = 0; i < pages.size(); i++) {
+            if (pages.get(i).getId() == pageNumber)
+            {
+                b = i;
+                break;
+            }
+        }
+
+        //check if we do not have page
+        if (b == -1)
+        {
+            // we do NOT have the page
+            // make the page
+            Page p = new Page(pageNumber, this.tableName);
+            this.pages.add(p);
+            p.addRecord(record);
+        }
+        else
+        {
+            // we have an existing page
+            Page p = pages.get(b);
+            p.addRecord(record);
+            this.insertPointer(index, new ArrayList<Integer>(Arrays.asList(new Integer[]{pageNumber, p.getIndexOf(record)})));
+        }
+
+        return true;
     }
 
 
@@ -189,47 +208,59 @@ public class Node implements Comparable<Node>{
         setLimits();
     }
 
-    public void delete(String key) {
+    public boolean delete(String key) {
         // TODO: Delete
 
         if (isRoot) {
             // Root
             // TODO: Check size
 
-            for (String k : keys) {
-                if (k.compareTo(key) == -1) {
+            for (Object o : keys) {
+                //if (o.compareTo(key) == -1) {
                     // TODO: Go to child node and call delete
-                    break;
-                }
+                //    break;
+                //}
             }
         }
         else if (pointers.get(0).get(1) == -1) {
             // Internal Node
             // TODO: Check size
 
-            for (String k : keys) {
-                if (k.compareTo(key) == -1) {
-                    // TODO: Go to child node and call delete
+            switch(primaryAttribute.getType()){
+                case INTEGER:
+                    keys.remove(Integer.parseInt(key));
+                    break;
+                case DOUBLE:
+                    keys.remove(Double.parseDouble(key));
+                    break;
+                case BOOLEAN:
+                    keys.remove(Boolean.parseBoolean(key));
+                    break;
+                case VARCHAR:
+                    keys.remove(key);
+                    break;
+                case CHAR:
+                    keys.remove(key);
                     break;
                 }
             }
-        }
         else {
             // Leaf
             // TODO: Check size
 
-            for (String k : keys) {
-                if (k.equals(key)){
+            for (Object k : keys) {
+                if (k.equals(k)){
                     int index = keys.indexOf(k);
                     // TODO: Shift page/record pointers up
                     keys.remove(index);
                     pointers.remove(index);
                     values.remove(index);
-                    size--;
+                    numOfPointers--;
                     break;
                 }
             }
         }
+        return false;
     }
 
     public boolean getRoot(){
@@ -266,7 +297,29 @@ public class Node implements Comparable<Node>{
     }
 
     public Node merge(Node n1, Node n2) {
-        // TODO: Merge
+        // preconditions: merging is able to happen
+        // if the parents are the same, then we can just combine the two nodes
+        if (n1.parent.equals(n2.parent))
+        {
+            for (int i = 0; i < n1.keys.size(); i++) 
+            {
+                n1.keys.add(n2.keys.get(i));    
+            }
+
+            for (int i = 0; i < n1.pointers.size(); i++) 
+            {
+                n1.pointers.add(n2.pointers.get(i));
+            }
+
+            n1.numOfPointers += n2.pointers.size();
+
+            n1.next = n2.next;
+
+            n2.parent = null;
+            n2.prev = null;
+            n2.next = null;
+        }
+
         return null;
     }
 
@@ -293,8 +346,28 @@ public class Node implements Comparable<Node>{
         return this.numOfPointers > max;
     }
 
+    public boolean canBorrowLeft() {
+        return prev.numOfPointers - 1 >= prev.min;
+    }
+
+    public boolean canBorrowRight() {
+        return next.numOfPointers - 1 >= next.min;
+    }
+
+    public boolean canMergeLeft() {
+        return (prev.numOfPointers + this.numOfPointers - 1) <= this.max;
+    }
+
+    public boolean canMergeRight() {
+        return (next.numOfPointers + this.numOfPointers - 1) <= this.max;
+    }
+
     public ArrayList<Object> getKeys() {
         return keys;
+    }
+
+    public ArrayList<Object> getValues() {
+        return values;
     }
 
     public void setKeys(ArrayList<Object> keys) {
@@ -305,21 +378,24 @@ public class Node implements Comparable<Node>{
         this.pointers = pointers;
     }
 
-    public void setChildren(ArrayList<Node> children) {
-        this.children = children;
-    }
-
     public Object getKey(int i){
         return keys.get(i);
     }
 
     public void insertKey(int index, Object key){
         this.keys.add(index, key);
-        numOfPointers++;
     }
 
     public void insertPointer(int index, ArrayList<Integer> pointer){
-        this.keys.add(index, pointer);
+        this.pointers.add(index, pointer);
+    }
+
+    public void deleteKey(Object key){
+        this.keys.remove(key);
+    }
+
+    public void deletePointer(int index){
+        this.pointers.remove(index);
     }
 
     public ArrayList<ArrayList<Integer>> getPointers() {
@@ -355,7 +431,25 @@ public class Node implements Comparable<Node>{
 
     public Node getNodebyPointer(ArrayList<Integer> pointer){
         int idx = pointer.get(0);
-        return children.get(idx);
+        return (Node) values.get(idx);
+    }
+
+    public Object getValue(String key) {
+        for (int i = 0; i < keys.size(); i++) {
+            if (String.valueOf(keys.get(i)).equals(key)) {
+                return values.get(i);
+            }
+        }
+        return null;
+    }
+
+    public int getIndexValue(String key) {
+        for (int i = 0; i < keys.size(); i++) {
+            if (String.valueOf(keys.get(i)).equals(key)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override

@@ -119,6 +119,14 @@ public class Record implements Comparable<Record>{
         this.entries = newEntries;
     }
 
+    public String[] record() {
+        String[] recordEntry = new String[entries.size()];
+        for (int i = 0; i < entries.size(); i++) {
+            Object o = getValueAtColumn(i);
+            recordEntry[i] = String.valueOf(o);
+        }
+        return recordEntry;
+    }
 
     public ArrayList<Object> getSubset(ArrayList<Attribute> subset){
         ArrayList<Object> subsetRecords = new ArrayList<>();
