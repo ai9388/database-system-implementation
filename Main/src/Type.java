@@ -259,4 +259,29 @@ public enum Type {
         return result;
     }
 
+    public static int compareObejects(Object val1, Object val2, Type type) {
+        if(type == Type.BOOLEAN){
+            Boolean b1 = (Boolean) val1;
+            Boolean b2 = (Boolean) val2;
+            return Boolean.compare(b1, b2);
+        }
+        else if(type == Type.INTEGER){
+            Integer int1 = (Integer) val1;
+            Integer int2 = (Integer) val2;
+            return Integer.compare(int1, int2);
+        }
+        else if((type == Type.VARCHAR) || type == Type.CHAR){
+            String str1 = val1.toString();
+            String str2 = val2.toString();
+            return str1.compareTo(str2);
+        }
+        else if(type == Type.DOUBLE){
+            Double do1 = (Double) val1;
+            Double do2 = (Double) val2;
+            return Double.compare(do1, do2);
+        }
+
+        return 0;
+    }
+
 }

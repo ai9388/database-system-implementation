@@ -108,6 +108,10 @@ public class Page {
         return this.size > Page.capacity;
     }
 
+    public int getSize() {
+        return size;
+    }
+
     public byte[] getHeader(){
         return Type.concat(Type.convertIntToByteArray(this.id), Type.convertIntToByteArray(this.size));
     }
