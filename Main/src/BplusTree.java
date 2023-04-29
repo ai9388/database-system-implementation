@@ -55,8 +55,6 @@ public class BplusTree {
     }
 
     public void insert(Record record){
-        // TODO: @Newcarlis
-
         // Case 1: the tree is empty
         // create a new leaf node that is also the root
         // insert the record into that node
@@ -87,9 +85,113 @@ public class BplusTree {
             // split the node
             int midPoint = Math.ceilDiv(N, 2);
 
+            ArrayList<Object> newKeys = leafNode.splitKeys(midPoint); // include midpoint
+            ArrayList<ArrayList<Integer>> newPointers = leafNode.splitPointers(midPoint);
 
+            // let k be the least key value on the new nodes keys
+            // this is the new parent key
+            Object k = newKeys.get(0);
+
+            // validate parent node
+            if(leafNode.parent == null){// there is no parent bc this node was the root
+                // if the parent does not exist create it
+                Node parent = new Node(N, tableSchema.getPrimaryAttribute(), null, Node.NodeType.INTERNAL);
+                parent.insertKey(0, k);
+                leafNode.parent = parent;
+                parent.insertChildNode(leafNode);
+
+                // remove the root status
+                leafNode.setRoot(false);
+            }
+            else{
+                // get the index where the new key would go in the parent
+                int newKeyIndex = getInsertIndex(leafNode.parent, k);
+                // insert the new key into the parent
+                leafNode.parent.insertKey(newKeyIndex, k);
+            }
+
+            // make a new node with the second half of the values
+            Node newNode = new Node(N, tableSchema.getPrimaryAttribute(), leafNode.parent, Node.NodeType.LEAF, record);
+            // set the keys of the new node
+            newNode.setKeys(newKeys);
+
+            // for setting the nodes: a leaf does not have nodes (children)
+
+            // make the parent point to this node
+            leafNode.parent.insertChildNode(newNode);
+
+            // update the next pointer of the new Node, to what the og node's next
+            newNode.setNext(leafNode.getNextNode());
+            // if the next node exists, set it's previous to this new node
+            if(newNode.getNextNode() != null){
+                newNode.getNextNode().setPrev(newNode);
+            }
+
+            // now the next pointer of the og node is the new node
+            leafNode.setNext(newNode);
+            // set the left pointer of the new node to the og
+            newNode.setPrev(leafNode);
+
+            // check if after splitting the parent (internal node) overflows
+            Node internal = leafNode.parent;
+            while(internal != null){
+                if(internal.isOverfull()){
+                    splitInternalNode(internal);
+                }
+                else{
+                    break;
+                }
+                internal = internal.parent;
+            }
         }
 
+    }
+
+    /**
+     * splits an internal node
+     * pre: assume that the node that caused the split is already inserted
+     *
+     * @param internal
+     */
+    public void splitInternalNode(Node internal){
+        Node parent = internal.parent;
+
+        int midPoint = Math.ceilDiv(this.N, 2);
+
+        // split and include the midpoint but then remove it
+        ArrayList<Object> newKeys = internal.splitKeys(midPoint);
+        ArrayList<ArrayList<Integer>> newPointers = internal.splitPointers(midPoint);
+
+        // rmeove the midKey and mid pointer
+        Object newParentKey = newKeys.remove(0);
+        ArrayList<Integer> pointer = newPointers.remove(0);
+
+        // create the sibling node
+        Node sibling = new Node(N, tableSchema.getPrimaryAttribute(), internal.parent, Node.NodeType.INTERNAL);
+
+        //
+
+
+
+
+    }
+
+    public int getInsertIndex(Node node, Object newKey){
+        // get the index where this would go - assume keys are in order
+        int location = -1;
+        for(int i = 0; i < node.numOfPointers; i++){
+            Object currentKey = node.getKey(i);
+            // if new key is less than current, insert at location
+            if(compareKeys(newKey, currentKey) < 0){
+                location = i;
+                break;
+            }
+        }
+
+        // if no location found, append to the end
+        location = node.numOfPointers;
+
+        return location;
     }
 
     public void delete(String key) throws TableException {
@@ -141,24 +243,6 @@ public class BplusTree {
         return location;
     }
 
-    public int getInsertIndex(Node leafNode, Object newKey){
-        // get the index where this would go - assume keys are in order
-        int location = -1;
-        for(int i = 0; i < leafNode.numOfPointers; i++){
-            Object currentKey = leafNode.getKey(i);
-            // if new key is less than current, insert at location
-            if(compareKeys(newKey, currentKey) < 0){
-                location = i;
-                break;
-            }
-        }
-
-        // if no location found, append to the end
-        location = leafNode.numOfPointers;
-
-        return location;
-    }
-
     public boolean isEmpty(){
         return root == null;
     }
@@ -184,7 +268,65 @@ public class BplusTree {
     }
 
     public Node findLeafNode(Object key){
-        return null; // TODO
+         // TODO @ Hai-Yen
+        Node C = root;
+        Object currentKey = null;
+        int i = 0;
+        while(C.getType() != Node.NodeType.LEAF){
+            currentKey = root.getKey(i);
+
+            if(i >= C.getKeys().size()){ //reach to the end of the keys
+                ArrayList<Integer> pointer = C.getPointerByIdx(C.getKeys().size());
+                C = C.getNodebyPointer(pointer);
+                break;
+            }
+            else if(compareKeys(key, currentKey) == 0){
+                ArrayList<Integer> pointer = C.getPointerByIdx(i+1);
+                C = C.getNodebyPointer(pointer);
+            }
+            else{
+                ArrayList<Integer> pointer = C.getPointerByIdx(i);
+                C = C.getNodebyPointer(pointer);
+            }
+            i++;
+        }
+        if(compareKeys(key, currentKey) == 0){
+            ArrayList<Integer> pointer = C.getPointerByIdx(i);
+            C = C.getNodebyPointer(pointer);
+        }
+
+        return C;
+    }
+
+    public ArrayList<Integer> findNodePointer(Object key){
+        // TODO @ Hai-Yen
+        Node C = root;
+        Object currentKey = null;
+        int i = 0;
+        while(C.getType() != Node.NodeType.LEAF){
+            currentKey = root.getKey(i);
+
+            if(i >= C.getKeys().size()){ //reach to the end of the keys
+                ArrayList<Integer> pointer = C.getPointerByIdx(C.getKeys().size());
+                C = C.getNodebyPointer(pointer);
+                break;
+            }
+            else if(compareKeys(key, currentKey) == 0){
+                ArrayList<Integer> pointer = C.getPointerByIdx(i+1);
+                C = C.getNodebyPointer(pointer);
+            }
+            else{
+                ArrayList<Integer> pointer = C.getPointerByIdx(i);
+                C = C.getNodebyPointer(pointer);
+            }
+            i++;
+        }
+        if(compareKeys(key, currentKey) == 0){
+            return C.getPointerByIdx(i);
+        }
+
+
+        return null;
     }
 
     public ArrayList<Integer> getPageAndIndex(){

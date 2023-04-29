@@ -96,6 +96,24 @@ public class Node implements Comparable<Node>{
         insert(record);
     }
 
+
+    /**
+     * used to create internal node (no record)
+     * @param N
+     * @param primaryAttribute
+     * @param parent
+     * @param nodeType
+     */
+    public Node(int N, Attribute primaryAttribute, Node parent, NodeType nodeType){
+        this.primaryAttribute = primaryAttribute;
+        this.parent = parent;
+        this.isRoot = this.parent == null;
+        this.type = nodeType;
+        this.N = N;
+        // make call to set min and max value
+        setLimits();
+    }
+
     // TODO: fix this constructor later
 //    public Node(int pageIdx, Object primKey, int size, int N) {
 //        this.pageIdx = pageIdx;
@@ -136,6 +154,12 @@ public class Node implements Comparable<Node>{
 
         return false;
     }
+
+
+    public void insertChildNode(Node node){
+
+    }
+
 
     /**
      * sets the min and max values based on N and the node type
@@ -199,6 +223,7 @@ public class Node implements Comparable<Node>{
                 case CHAR:
                     keys.remove(key);
                     break;
+                }
             }
         }
         else {
@@ -232,8 +257,16 @@ public class Node implements Comparable<Node>{
         return next;
     }
 
+    public void setNext(Node next) {
+        this.next = next;
+    }
+
     public Node getPrev() {
         return prev;
+    }
+
+    public void setPrev(Node prev) {
+        this.prev = prev;
     }
 
     public Node getParent() {
@@ -256,7 +289,7 @@ public class Node implements Comparable<Node>{
     }
 
     /**
-     * checks if the node is overflown
+     * checks if the node is full
      * true if number of nodes exceeds max
      * @return boolean
      */
@@ -264,10 +297,26 @@ public class Node implements Comparable<Node>{
         return this.numOfPointers == max;
     }
 
+    /**
+     * checks if the node is overflown
+     * true if number of nodes exceeds max
+     * @return boolean
+     */
+    public boolean isOverfull() {
+        return this.numOfPointers > max;
+    }
+
     public ArrayList<Object> getKeys() {
         return keys;
     }
 
+    public void setKeys(ArrayList<Object> keys) {
+        this.keys = keys;
+    }
+
+    public void setPointers(ArrayList<ArrayList<Integer>> pointers) {
+        this.pointers = pointers;
+    }
 
     public Object getKey(int i){
         return keys.get(i);
@@ -293,6 +342,10 @@ public class Node implements Comparable<Node>{
         return pointers;
     }
 
+    public ArrayList<Integer> getPointerByIdx(int index){
+        return pointers.get(index);
+    }
+
     public ArrayList<Object> splitKeys(int midPoint){
         ArrayList<Object> newKeys = new ArrayList<>();
 
@@ -316,6 +369,11 @@ public class Node implements Comparable<Node>{
         return newPointer;
     }
 
+    public Node getNodebyPointer(ArrayList<Integer> pointer){
+        int idx = pointer.get(0);
+        return (Node) values.get(idx);
+    }
+
     public Object getValue(String key) {
         for (int i = 0; i < keys.size(); i++) {
             if (String.valueOf(keys.get(i)).equals(key)) {
@@ -329,5 +387,9 @@ public class Node implements Comparable<Node>{
     @Override
     public int compareTo(Node o) {
         return 0;
+    }
+
+    public NodeType getType() {
+        return type;
     }
 }
