@@ -382,6 +382,14 @@ public class Node implements Comparable<Node>{
         return null;
     }
 
+    public int getIndexValue(String key) {
+        for (int i = 0; i < keys.size(); i++) {
+            if (String.valueOf(keys.get(i)).equals(key)) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     @Override
     public int compareTo(Node o) {

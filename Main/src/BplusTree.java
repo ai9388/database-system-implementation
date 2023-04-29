@@ -382,7 +382,10 @@ public class BplusTree {
         if (object == null) {
             throw new TableException(14, "");
         }
-        Record record = (Record) object;
+        Page p = (Page) object;
+        ArrayList<Record> records = p.getRecords();
+        int index = node.getIndexValue(key);
+        Record record = records.get(node.getPointers().get(index).get(1));
         return record;
     }
 }
