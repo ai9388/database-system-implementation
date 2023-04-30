@@ -123,7 +123,7 @@ public class BplusTree {
             }
 
             // make a new node with the second half of the values
-            Node newNode = new Node(N, tableSchema, leafNode.parent, Node.NodeType.LEAF, record);
+            Node newNode = new Node(N, tableSchema, leafNode.parent, Node.NodeType.LEAF);
             // set the keys of the new node
             newNode.setKeys(newKeys);
             newNode.setPointers(newPointers);
