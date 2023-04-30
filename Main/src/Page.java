@@ -183,12 +183,13 @@ public class Page {
         {
             if (this.records.get(i).equals(record))
             {
-                index = i;
-                break;
+                return i;
             }    
         }
 
-        return index;
+        // if index not found return the last one
+
+        return records.size();
     }
 
     /**

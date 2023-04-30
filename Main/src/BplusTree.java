@@ -1,3 +1,5 @@
+import org.w3c.dom.ls.LSOutput;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -42,6 +44,7 @@ public class BplusTree {
         this.pageSize = pageSize;
         this.tableSchema = tableSchema;
         this.N = calculateN();
+        Page.setCapacity(pageSize);
         pages = 0;
         Node.setPageId(0);
     }
@@ -69,6 +72,7 @@ public class BplusTree {
         if(isEmpty()){
             Node node = new Node(this.N, tableSchema, null, Node.NodeType.LEAF, record);
             this.root = node;
+            return;
         }
 
         // Case 2: the tree is not empty
@@ -76,18 +80,15 @@ public class BplusTree {
         // try to insert the record in there
         Object newKey = record.getPrimaryObject();
         Node leafNode = findLeafNode(newKey);
-        int index = getInsertIndex(leafNode, newKey);
-        int pageNumber = getPageNumber(leafNode, index);
-        boolean insertionRes = leafNode.insert(record, index);
-        if(!insertionRes){ // could not be inserted because it is full
-            // get the index where this record should go based on the primary key
 
-            // get the new Record pointer
-            ArrayList<Integer> recordPointer = getPageAndIndex();
+        // get the index where this record should go based on the primary key
+        int index = getInsertIndex(leafNode, newKey);
+        boolean insertionRes = leafNode.insert(record, index);
+
+        if(!insertionRes){ // could not be inserted because it is full
 
             // insert the new key and the new record pointer
-            leafNode.insertKey(index, newKey);
-            leafNode.insertPointer(index, recordPointer);
+            leafNode.forceInsert(record, index);
 
             // split the node
             int midPoint = Math.ceilDiv(N, 2);
@@ -103,9 +104,12 @@ public class BplusTree {
             // validate parent node
             if(leafNode.parent == null){// there is no parent bc this node was the root
                 // if the parent does not exist create it
-                Node parent = new Node(N, tableSchema.getPrimaryAttribute(), null, Node.NodeType.INTERNAL);
+                Node parent = new Node(N, tableSchema, null, Node.NodeType.INTERNAL);
                 parent.insertKey(0, k);
                 leafNode.parent = parent;
+                this.root = parent;
+
+                // current node goes at index 0
                 parent.insertChildNode(leafNode);
 
                 // remove the root status
@@ -122,6 +126,7 @@ public class BplusTree {
             Node newNode = new Node(N, tableSchema, leafNode.parent, Node.NodeType.LEAF, record);
             // set the keys of the new node
             newNode.setKeys(newKeys);
+            newNode.setPointers(newPointers);
 
             // for setting the nodes: a leaf does not have nodes (children)
 
@@ -175,7 +180,7 @@ public class BplusTree {
         ArrayList<Integer> pointer = newPointers.remove(0);
 
         // create the sibling node
-        Node sibling = new Node(N, tableSchema.getPrimaryAttribute(), internal.parent, Node.NodeType.INTERNAL);
+        Node sibling = new Node(N, tableSchema, internal.parent, Node.NodeType.INTERNAL);
 
         //
 
@@ -217,7 +222,7 @@ public class BplusTree {
             int index = getDeleteIndex(leafNode, key);
 
             // get the new Record pointer
-            ArrayList<Integer> recordPointer = getPageAndIndex();
+            ArrayList<Integer> recordPointer = new ArrayList<>(Arrays.asList(0,0));
 
             // insert the new key and the new record pointer
             leafNode.deleteKey(key);
@@ -251,7 +256,7 @@ public class BplusTree {
             else if (leafNode.canMergeLeft()){
                 Node left = leafNode.getPrev();
                 ArrayList<Object> leftKeys = left.getKeys();
-                ArrayList<Object> leftValues = left.getValues();
+                ArrayList<Node> leftValues = left.getValues();
                 ArrayList<ArrayList<Integer>> leftPointers = left.getPointers();
 
                 leafNode.setPrev(left.getPrev());
@@ -312,7 +317,7 @@ public class BplusTree {
     public Node findLeafNode(Object key){
          // TODO @ Hai-Yen
         Node C = root;
-        Object currentKey = null;
+        Object currentKey = root.getKey(0);
         int i = 0;
         while(C.getType() != Node.NodeType.LEAF){
             currentKey = root.getKey(i);
@@ -371,13 +376,13 @@ public class BplusTree {
         return null;
     }
 
-    public ArrayList<Integer> getPageAndIndex(){
-        return null;
-    }
-
     public void printTreeInfo(){
-        String s = "N: " + N;
-        System.out.println(s);
+        System.out.println("N: " + this.N);
+        System.out.println("root: " + this.root.toString());
+
+        for(int id: Node.getPages().keySet()){
+            System.out.println(Node.getPages().get(id));
+        }
     }
 
     public static void main(String[] args) {
@@ -386,8 +391,16 @@ public class BplusTree {
         ArrayList<Attribute> attributes = new ArrayList<>(Arrays.asList(new Attribute[]{a1, a2}));
         TableSchema table = new TableSchema("foo", attributes);
         Record r1 = new Record(new ArrayList<>(Arrays.asList(new String[]{"1", "false"})), attributes);
+        Record r2 = new Record(new ArrayList<>(Arrays.asList(new String[]{"2", "true"})), attributes);
+        Record r3 = new Record(new ArrayList<>(Arrays.asList(new String[]{"3", "false"})), attributes);
+        Record r4 = new Record(new ArrayList<>(Arrays.asList(new String[]{"4", "true"})), attributes);
+        Record r5 = new Record(new ArrayList<>(Arrays.asList(new String[]{"5", "false"})), attributes);
         BplusTree tree = new BplusTree(50, table);
         tree.insert(r1);
+        tree.insert(r2);
+        tree.insert(r3);
+        tree.insert(r4);
+        tree.insert(r5);
         tree.printTreeInfo();
 
     }
