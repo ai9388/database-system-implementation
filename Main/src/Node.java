@@ -1,3 +1,5 @@
+import com.sun.jdi.ArrayReference;
+
 import java.util.*;
 
 public class Node implements Comparable<Node>{
@@ -20,11 +22,6 @@ public class Node implements Comparable<Node>{
      * the max number of pointers this node can have
      */
     int max;
-
-    /**
-     * the number of pointers in this node
-     * */
-    int numOfPointers;
     /**
      * parent node above this one
      */
@@ -59,6 +56,7 @@ public class Node implements Comparable<Node>{
      * pages
      */
     private static HashMap<Integer, Page> pages = new HashMap<>();
+    private static HashMap<Object, ArrayList<Integer>> affectedBySplit = new HashMap<>();
 
     /**
      * name of table
@@ -89,7 +87,7 @@ public class Node implements Comparable<Node>{
     /**
      * Constructor used to create a new node with one record pointer on it
      * @param N the tree's branching factor. used to calculate min and max
-     * @param primaryAttribute the attribute used for indexing
+     * @param tableSchema the table used
      * @param parent the parent node (could be null if root)
      * @param nodeType the type of Node (LEAF)
      * @param record the record that will be inserted
@@ -115,7 +113,6 @@ public class Node implements Comparable<Node>{
     /**
      * used to create internal node (no record)
      * @param N
-     * @param primaryAttribute
      * @param parent
      * @param nodeType
      */
@@ -147,73 +144,65 @@ public class Node implements Comparable<Node>{
         }
 
         // insert this record key
-        this.saveRecordAndCreateRecordPointer(index, record);
         this.insertKey(index, record.getPrimaryObject());
+        this.saveRecordAndCreateRecordPointer(index, record);
         return true;
     }
 
     public void forceInsert(Record record, int index){
         // insert this record pointer
-        this.saveRecordAndCreateRecordPointer(index, record);
         this.insertKey(index, record.getPrimaryObject());
+        this.saveRecordAndCreateRecordPointer(index, record);
     }
 
     /**
      * index where they key goes
-     * @param key
      * @param index
      * @return
      */
-    public boolean saveRecordAndCreateRecordPointer(int index, Record r){
+    public void saveRecordAndCreateRecordPointer(int index, Record r){
         // try and determine the page number
         // case 1: key index is 0 and there are no pages
-        if(index == 0 && pages.size() == 0){
+        if(index == 0 && pages.size() == 0)
+        {
             // create the first page
             Page page = new Page(0, this.tableName);
             pages.put(0, page);
             page.insertRecordAt(r, 0);
             // both the page number and record index are 0
             this.pointers.add(new ArrayList<>(Arrays.asList(0, 0)));
-            return true;
         }
 
         // case 2: key index is 0 and there are some pages
-        else if(index == 0 && pages.size() > 1){
+        else if(index == 0 && pages.size() >= 1)
+        {
             // Try to insert it in the page used by the same pointer
-            int firstPageUsedInThisLeafNode = this.pointers.get(0).get(0);
-            boolean res = attemptToInsertToPage(r, firstPageUsedInThisLeafNode);
+            int firstPageUsedInThisLeafNode = this.getPointers().get(0).get(0);
+            boolean res = attemptToInsertToPage(r, firstPageUsedInThisLeafNode, index);
             boolean res2 = false;
 
             if(!res){ // if it could not be inserted in the first page
                 // try to insert in to the last page used by the leaf node before this one(if any)
                 if(this.prev != null){
-                    int lastPageUsedByLeftSibling = prev.getPointerByIdx(prev.numOfPointers - 1).get(0);
-                    res2 = attemptToInsertToPage(r, lastPageUsedByLeftSibling);
+                    int lastPageUsedByLeftSibling = prev.getPointerByIdx(prev.getNumOfPointers() - 1).get(0);
+                    res2 = attemptToInsertToPage(r, lastPageUsedByLeftSibling, index);
                 }
-                if(res2){ // record was added
-                    this.insertPointer(index, new ArrayList<>(Arrays.asList(pageId, index)));
-                    return true;
-                }
-                else { // if the previous is null, or it exists but record doesn't fit
+                if(!res2){ // if the previous is null, or it exists but record doesn't fit
                     // force insert the record into the page and then cause a split
                     Page initialPage = pages.get(pageId);
-                    initialPage.insertRecordAt(r, initialPage.getIndexOf(r));
+                    initialPage.addLast(r);
                     this.insertPointer(index, new ArrayList<>(Arrays.asList(pageId, initialPage.getIndexOf(r))));
                     handlePageSplitting(initialPage);
                 }
 
             }
-            else{
-                this.insertPointer(index, new ArrayList<>(Arrays.asList(pageId, index)));
-                return true;
-            }
         }
 
         // case 3: key index is last index and there are some pages
-        else if (index == this.numOfPointers && pages.size() >= 1)
+        else if (index == this.keys.size() - 1 && pages.size() >= 1)
         {
-            int lastPageUsedInThisLeafNode = this.pointers.get(this.pointers.size() - 1).get(0);
-            boolean res = attemptToInsertToPage(r, lastPageUsedInThisLeafNode);
+            int lastPageUsedInThisLeafNode = this.getPointers().get(this.pointers.size() - 1).get(0);
+            boolean res = attemptToInsertToPage(r, lastPageUsedInThisLeafNode, index);
             boolean res2 = false;
 
             if (!res)
@@ -222,24 +211,16 @@ public class Node implements Comparable<Node>{
                 if (this.next != null)
                 {
                     int firstPageUsedByLeftSibling = next.getPointerByIdx(0).get(0);
-                    res2 = attemptToInsertToPage(r, firstPageUsedByLeftSibling);
+                    res2 = attemptToInsertToPage(r, firstPageUsedByLeftSibling, index);
                 }
-                if (res2)
-                { // record was added
-                    this.insertPointer(index, new ArrayList<>(Arrays.asList(pageId, index)));
-                    return true;
-                } else
+                if (!res2)
                 { // if the next is null, or it exists but record doesn't fit
                   // force insert the record into the page and then cause a split
                     Page initialPage = pages.get(pageId);
-                    initialPage.insertRecordAt(r, initialPage.getIndexOf(r));
+                    initialPage.addLast(r);
                     this.insertPointer(index, new ArrayList<>(Arrays.asList(pageId, initialPage.getIndexOf(r))));
                     handlePageSplitting(initialPage);
                 }
-            } else
-            {
-                this.insertPointer(index, new ArrayList<>(Arrays.asList(pageId, index)));
-                return true;
             }
         }
 
@@ -247,30 +228,25 @@ public class Node implements Comparable<Node>{
         else
         {
             // attempting to insert at the given index
-            int lastPageUsedInThisLeafNode = this.pointers.get(index).get(0);
-            boolean res = attemptToInsertToPage(r, lastPageUsedInThisLeafNode);
+            int lastPageUsedInThisLeafNode = this.getPointers().get(index).get(0);
+            boolean res = attemptToInsertToPage(r, lastPageUsedInThisLeafNode, index);
 
             // if insertion did not work, we try again and subtract from the index
             if (!res)
             {
-                lastPageUsedInThisLeafNode = this.pointers.get(index - 1).get(0);
-                res = attemptToInsertToPage(r, lastPageUsedInThisLeafNode);
+                lastPageUsedInThisLeafNode = this.getPointers().get(index - 1).get(0);
+                res = attemptToInsertToPage(r, lastPageUsedInThisLeafNode, index);
 
-                // if it still doesnt insert, we must split
+                // if it still doesn't insert, we must split
                 if (!res)
                 {
                     Page initialPage = pages.get(pageId);
-                    initialPage.insertRecordAt(r, initialPage.getIndexOf(r));
+                    initialPage.addLast(r);
                     this.insertPointer(index, new ArrayList<>(Arrays.asList(pageId, initialPage.getIndexOf(r))));
                     handlePageSplitting(initialPage);
                 }
-            } else
-            {
-                return true;
             }
         }
-        // something failed along the way :(
-        return false;
     }
 
     public void handlePageSplitting(Page initialPage){
@@ -278,38 +254,46 @@ public class Node implements Comparable<Node>{
         Page newPageFromSplit = initialPage.split(Node.getPageId());
         pages.put(newPageFromSplit.getId(), newPageFromSplit);
 
-        // now that the page has been split, we have to update the pointers involving the two pages
-        generateRecordPointersForPage(initialPage);
-        generateRecordPointersForPage(newPageFromSplit);
+        // keep a log of the records affected by the pages spitting
+        for (int i = 0; i < newPageFromSplit.records.size(); i++) {
+            Object key = newPageFromSplit.getRecords().get(i).getPrimaryObject();
+            affectedBySplit.put(key, new ArrayList<>(Arrays.asList(newPageFromSplit.getId(), i)));
+        }
+
+        // now that the page has been split, we have to update the pointers affected by split
+        updatePointersAffectedByPageSplit();
     }
 
-    public void generateRecordPointersForPage(Page page){
-        for(int keyId = 0; keyId < this.numOfPointers; keyId++){
+    public void updatePointersAffectedByPageSplit(){
+        if(affectedBySplit.size() == 0){
+            return;
+        }
+        for(int keyId = 0; keyId < this.getNumOfKeys(); keyId++) {
             Object key = this.getKey(keyId);
-
-            for(int rId = 0; rId < page.getRecords().size(); rId++){
-                Record r = page.getRecords().get(rId);
-                if(Type.compareObjects(key, r.getPrimaryObject(), this.primaryAttribute.getType()) == 0){
-                    // update the old pointer if it existed
-                    if(pointers.size() - 1 >= keyId){
-                        this.pointers.set(keyId, new ArrayList<>(Arrays.asList(page.getId(), rId)));
-                    }
-                    else{ // if it didn't exist create it
-                        this.pointers.add(keyId, new ArrayList<>(Arrays.asList(page.getId(), rId)));
-                    }
+            // check if this key has been affected
+            if(affectedBySplit.containsKey(key)){
+                if(pointers.size() - 1 >= keyId){
+                    this.pointers.set(keyId, new ArrayList<>(affectedBySplit.get(key)));
                 }
+                else{ // if it didn't exist create it
+                    this.pointers.add(keyId, affectedBySplit.get(key));
+                }
+
+                affectedBySplit.remove(key);
             }
         }
     }
 
-    public boolean attemptToInsertToPage(Record r, int pageId){
+    public boolean attemptToInsertToPage(Record r, int pageId, int index){
         Page page = pages.get(pageId);
         // see if this record can fit in this page -before all existing records
         if((page.getSize() + r.getSize()) <= Page.getCapacity()){
-            // if the record fits we identify the index where it fits
-            int recordIndex = page.getIndexOf(r);
-            // add the record to the page
-            page.insertRecordAt(r, recordIndex);
+            // if the record fits we insert it
+            int recordIndex = page.getRecords().size();
+            page.addLast(r);
+
+            insertPointer(index, new ArrayList<>(Arrays.asList(pageId, recordIndex)));
+
             return true;
         }
         return false;
@@ -317,11 +301,11 @@ public class Node implements Comparable<Node>{
 
     public void insertChildNode(Node node){
 
-        // get the key reference if node
+        // get the key reference of node
         Object key = node.getKey(0);
         boolean containsKey = false;
 
-        // callculate the index where this node woould go
+        // calculate the index where this node would go
         int keyIndex = -1;
 
         for(int i = 0; i < values.size(); i++){
@@ -333,11 +317,6 @@ public class Node implements Comparable<Node>{
         }
         if(keyIndex == -1){
             keyIndex = values.size();
-        }
-
-        // insert this key at index
-        if(!this.keys.contains(key)) {
-            this.insertKey(keyIndex, key);
         }
 
         // insert the new node
@@ -366,6 +345,7 @@ public class Node implements Comparable<Node>{
         }
         if(isRoot){
             this.min = 2;
+            this.max = N - 1;
         }
     }
 
@@ -426,7 +406,7 @@ public class Node implements Comparable<Node>{
                     keys.remove(index);
                     pointers.remove(index);
                     values.remove(index);
-                    numOfPointers--;
+//                    numOfPointers--;
                     break;
                 }
             }
@@ -444,6 +424,10 @@ public class Node implements Comparable<Node>{
 
     public Node getNextNode() {
         return next;
+    }
+
+    public void addNode(Node node){
+        this.values.add(node);
     }
 
     public void setNext(Node next) {
@@ -482,7 +466,7 @@ public class Node implements Comparable<Node>{
                 n1.pointers.add(n2.pointers.get(i));
             }
 
-            n1.numOfPointers += n2.pointers.size();
+//            n1.numOfPointers += n2.pointers.size();
 
             n1.next = n2.next;
 
@@ -505,7 +489,7 @@ public class Node implements Comparable<Node>{
      * @return boolean
      */
     public boolean isFull() {
-        return this.numOfPointers == max;
+        return this.getNumOfKeys() == max;
     }
 
     /**
@@ -514,23 +498,23 @@ public class Node implements Comparable<Node>{
      * @return boolean
      */
     public boolean isOverfull() {
-        return this.numOfPointers > max;
+        return this.getNumOfKeys() > max;
     }
 
     public boolean canBorrowLeft() {
-        return prev.numOfPointers - 1 >= prev.min;
+        return prev.getNumOfKeys() - 1 >= prev.min;
     }
 
     public boolean canBorrowRight() {
-        return next.numOfPointers - 1 >= next.min;
+        return next.getNumOfKeys() - 1 >= next.min;
     }
 
     public boolean canMergeLeft() {
-        return (prev.numOfPointers + this.numOfPointers - 1) <= this.max;
+        return (prev.getNumOfKeys() + this.getNumOfKeys() - 1) <= this.max;
     }
 
     public boolean canMergeRight() {
-        return (next.numOfPointers + this.numOfPointers - 1) <= this.max;
+        return (next.getNumOfKeys() + this.getNumOfKeys() - 1) <= this.max;
     }
 
     public ArrayList<Object> getKeys() {
@@ -559,7 +543,6 @@ public class Node implements Comparable<Node>{
 
     public void insertKey(int index, Object key){
         this.keys.add(index, key);
-        this.numOfPointers++;
     }
 
     public void insertPointer(int index, ArrayList<Integer> pointer){
@@ -575,11 +558,20 @@ public class Node implements Comparable<Node>{
     }
 
     public ArrayList<ArrayList<Integer>> getPointers() {
+        updatePointersAffectedByPageSplit();
         return pointers;
     }
 
+    public int getNumOfPointers(){
+        return this.pointers.size();
+    }
+
+    public int getNumOfKeys(){
+        return this.keys.size();
+    }
+
     public ArrayList<Integer> getPointerByIdx(int index){
-        return pointers.get(index);
+        return getPointers().get(index);
     }
 
     public ArrayList<Object> splitKeys(int midPoint){
@@ -607,7 +599,7 @@ public class Node implements Comparable<Node>{
 
     public Node getNodebyPointer(ArrayList<Integer> pointer){
         int idx = pointer.get(0);
-        return (Node) values.get(idx);
+        return values.get(idx);
     }
 
     public Object getValue(String key) {
@@ -652,9 +644,9 @@ public class Node implements Comparable<Node>{
         String s = "";
 
         if(this.type == NodeType.LEAF){
-            s += "Leaf {";
-
-            for(ArrayList<Integer> pointer: pointers){
+            s += "[" + getKey(0) + "-" + getKey(keys.size() - 1)  + "]" + " Leaf {";
+            int i = 0;
+            for(ArrayList<Integer> pointer: getPointers()){
                 s += "[" + pointer.get(0) + ", " + pointer.get(1) + "]";
             }
             s += "}\n";
@@ -664,8 +656,15 @@ public class Node implements Comparable<Node>{
             String nodess = "";
             for(int i = 0; i < keys.size(); i++){
                 Object key = getKey(i);
-                s += (key.toString() + ", ");
-                nodess += (key.toString() + ": "  + values.get(pointers.get(i).get(0)).toString());
+                s += (key.toString());
+
+                if(i != keys.size() - 1){
+                    s += ",";
+                }
+            }
+
+            for(Node node: this.values){
+                nodess += "\t" + node.toString();
             }
             s += "}\n" + nodess;
         }

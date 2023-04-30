@@ -181,7 +181,8 @@ public class Page {
 
         for (int i = 0; i < this.records.size(); i++) 
         {
-            if (this.records.get(i).equals(record))
+            Record r = this.records.get(i);
+            if (record.compareTo(r) == 0)
             {
                 return i;
             }    
@@ -221,8 +222,9 @@ public class Page {
         String str0 = "--------------------------------------------------------------------\n";
         String str = String.format("Page: %d\tCapacity: %d\tSize: %d\tRecords: %d\n", id, capacity, size, records.size());
         String str2 = "";
+        int i = 0;
         for(Record r: records){
-            str2 += r + "\n";
+            str2 += i++ + ": " + r + "\n";
         }
         return str0 + str + str2 + str0;
     }

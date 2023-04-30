@@ -2,6 +2,7 @@ import org.w3c.dom.ls.LSOutput;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.atomic.DoubleAdder;
 
 public class BplusTree {
 
@@ -79,7 +80,7 @@ public class BplusTree {
         // find the leaf node where this record would go
         // try to insert the record in there
         Object newKey = record.getPrimaryObject();
-        Node leafNode = findLeafNode(newKey);
+        Node leafNode = findLeafNode(root, newKey);
 
         // get the index where this record should go based on the primary key
         int index = getInsertIndex(leafNode, newKey);
@@ -174,6 +175,7 @@ public class BplusTree {
         // split and include the midpoint but then remove it
         ArrayList<Object> newKeys = internal.splitKeys(midPoint);
         ArrayList<ArrayList<Integer>> newPointers = internal.splitPointers(midPoint);
+        ArrayList<Node> nodes = internal.getValues();
 
         // rmeove the midKey and mid pointer
         Object newParentKey = newKeys.remove(0);
@@ -182,29 +184,70 @@ public class BplusTree {
         // create the sibling node
         Node sibling = new Node(N, tableSchema, internal.parent, Node.NodeType.INTERNAL);
 
-        //
+        sibling.setKeys(newKeys);
+        sibling.setPointers(newPointers);
 
+        // reposition the next node's previous pointer
+        for(ArrayList<Integer> p: newPointers){
+            Node node = nodes.get(p.get(0));
+            node.parent = sibling;
+            sibling.addNode(node);
+        }
 
+        // reposition the right pointer
+        sibling.setNext(internal.getNextNode());
 
+        // reposition the next node's previous pointer
+        if(sibling.getNextNode() != null){
+            sibling.getNextNode().setPrev(sibling);
+        }
+
+        // make old node point to this new one
+        internal.setNext(sibling);
+
+        // set old one as previous node of siblinc
+        sibling.setPrev(internal);
+
+        // is this the roo?
+        if(parent == null || internal.isRoot){
+            // if the parent does not exist create it
+            Node newRoot = new Node(N, tableSchema, null, Node.NodeType.INTERNAL);
+            newRoot.insertKey(0, newParentKey);
+            internal.parent = parent;
+            sibling.parent = parent;
+
+            // set new node as root
+            this.root = newRoot;
+
+            // current node goes at index 0
+            newRoot.insertChildNode(internal);
+            newRoot.insertChildNode(sibling);
+
+            // remove the root status
+            internal.setRoot(false);
+        }
+        else{
+            // get the index where the new key would go in the parent
+            int newKeyIndex = getInsertIndex(parent, newParentKey);
+            parent.insertKey(newKeyIndex, newKeyIndex);
+            parent.insertChildNode(sibling);
+            sibling.parent = parent;
+        }
 
     }
 
     public int getInsertIndex(Node node, Object newKey){
         // get the index where this would go - assume keys are in order
-        int location = -1;
-        for(int i = 0; i < node.numOfPointers; i++){
+        for(int i = 0; i < node.getKeys().size(); i++){
             Object currentKey = node.getKey(i);
             // if new key is less than current, insert at location
             if(Type.compareObjects(newKey, currentKey, tableSchema.getPrimaryAttribute().getType()) < 0){
-                location = i;
-                break;
+                return i;
             }
         }
 
         // if no location found, append to the end
-        location = node.numOfPointers;
-
-        return location;
+        return node.getKeys().size();
     }
 
     public void delete(String key) throws TableException {
@@ -275,7 +318,7 @@ public class BplusTree {
 
         // get the index where this would go - assume keys are in order
         int location = -1;
-        for(int i = 0; i < leafNode.numOfPointers; i++){
+        for(int i = 0; i < leafNode.getKeys().size(); i++){
             Object currentKey = leafNode.getKey(i);
             // if new key is less than current, insert at location
             if(Type.compareObjects(key, currentKey, tableSchema.getPrimaryAttribute().getType()) < 0){
@@ -285,7 +328,7 @@ public class BplusTree {
         }
 
         // if no location found, append to the end
-        location = leafNode.numOfPointers;
+        location = leafNode.getKeys().size();
 
         return location;
     }
@@ -312,6 +355,37 @@ public class BplusTree {
         int pairSize = (size + 4);
         int pairs = Math.floorDiv(pageSize, pairSize);
         return pairs - 1;
+    }
+
+    private Node findLeafNode(Node node, Object key) {
+
+        if(node.getType() == Node.NodeType.LEAF){
+            return node;
+        }
+
+        int i;
+        for (i = 0; i < node.getKeys().size(); i++) {
+            if (Type.compareObjects(key, node.getKey(i), tableSchema.getPrimaryAttribute().getType()) < 0) {
+                break;
+            }
+        }
+        ArrayList<Integer> pointer;
+        // if we're at the end, return the last pointer
+        if(i == node.getKeys().size()){
+            pointer = node.getPointerByIdx(node.getPointers().size() - 1);
+        }
+        else{
+            // get the pointer at index i
+            pointer = node.getPointerByIdx(i);
+        }
+
+
+        Node childNode = node.getNodebyPointer(pointer);
+        if (childNode.getType() == Node.NodeType.LEAF) {
+            return childNode;
+        } else {
+            return findLeafNode(node, key);
+        }
     }
 
     public Node findLeafNode(Object key){
@@ -376,13 +450,16 @@ public class BplusTree {
         return null;
     }
 
-    public void printTreeInfo(){
-        System.out.println("N: " + this.N);
-        System.out.println("root: " + this.root.toString());
+    @Override
+    public String toString() {
+        String s = "";
+        s += ("N: " + this.N);
+        s += ("\nroot: " + this.root.toString());
 
         for(int id: Node.getPages().keySet()){
-            System.out.println(Node.getPages().get(id));
+            s += Node.getPages().get(id);
         }
+        return s;
     }
 
     public static void main(String[] args) {
@@ -390,23 +467,23 @@ public class BplusTree {
         Attribute a2 = new Attribute("valid", Type.BOOLEAN, false, true, false, 0);
         ArrayList<Attribute> attributes = new ArrayList<>(Arrays.asList(new Attribute[]{a1, a2}));
         TableSchema table = new TableSchema("foo", attributes);
-        Record r1 = new Record(new ArrayList<>(Arrays.asList(new String[]{"1", "false"})), attributes);
-        Record r2 = new Record(new ArrayList<>(Arrays.asList(new String[]{"2", "true"})), attributes);
-        Record r3 = new Record(new ArrayList<>(Arrays.asList(new String[]{"3", "false"})), attributes);
-        Record r4 = new Record(new ArrayList<>(Arrays.asList(new String[]{"4", "true"})), attributes);
-        Record r5 = new Record(new ArrayList<>(Arrays.asList(new String[]{"5", "false"})), attributes);
-        BplusTree tree = new BplusTree(50, table);
-        tree.insert(r1);
-        tree.insert(r2);
-        tree.insert(r3);
-        tree.insert(r4);
-        tree.insert(r5);
-        tree.printTreeInfo();
+        BplusTree tree = new BplusTree(70, table);
+        int[] nums = new int[]{21,42,11,44,1,13,27,52,81,9,7,10,17,25,45};
+        for (int i = 0; i < nums.length; i++) {
+            Record r1 = new Record(new ArrayList<>(Arrays.asList(""+nums[i], "false")), attributes);
+            if(nums[i] == 45){
+                System.out.println();
+
+            }
+            tree.insert(r1);
+        }
+
+        System.out.println(tree.toString());
 
     }
 
     public Record getRecord(String key) throws TableException {
-        Node node = findLeafNode(key);
+        Node node = findLeafNode(root, key);
         Object object = node.getValue(key);
         if (object == null) {
             throw new TableException(14, "");
