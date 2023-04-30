@@ -478,9 +478,27 @@ public class Node implements Comparable<Node>{
         return null;
     }
 
-    public Node borrow(Node n1, Node n2) {
-        // TODO: Borrow
-        return null;
+    public boolean borrow(Node left, Node right) {
+        // TODO: Borrow 
+        
+        if(left.getType() == NodeType.LEAF && right.getType() == NodeType.LEAF){
+            if(left.getKeys().size() > left.min){
+                Object nodeBorrow = left.getKey(left.keys.size() -1);
+                left.deleteKey(left.keys.size() -1);
+                this.insertKey(0, nodeBorrow);
+
+                return true;
+            }
+            else if(right.getKeys().size() > right.min){
+                Object nodeBorrow = right.getKey(0);
+                right.deleteKey(0);
+                this.insertKey(keys.size(), nodeBorrow);
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
